@@ -1,6 +1,6 @@
-import classNames from "classnames";
-import { FC, MouseEvent, useRef, useState } from "react";
-interface IAlertProps {
+import classNames from 'classnames';
+import { FC, MouseEvent, useRef, useState } from 'react';
+export interface AlertProps {
   title: string; // Alert 标题
   description?: string; // 内容描述
   type?: AlertType; // Alert类型
@@ -9,25 +9,26 @@ interface IAlertProps {
 }
 
 // * alert弹窗类型
-export type AlertType = "success" | "default" | "danger" | "warning";
+export type AlertType = 'success' | 'default' | 'danger' | 'warning';
 
-const Alert: FC<IAlertProps> = (props) => {
+const Alert: FC<AlertProps> = (props) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [hide, setHide] = useState(false); //是否隐藏alert
   const alertRef = useRef<HTMLDivElement>(null);
-  const { title, description, type, onClose, closable, ...resetProps } = props;
-  const classes = classNames("simple-alert", {
+  const { title, description, type, onClose, closable } = props;
+  const classes = classNames('simple-alert', {
     [`simple-alert-${type}`]: type,
   });
-  const titleClass = classNames("simple-alert-title", {
-    "bold-title": description,
+  const titleClass = classNames('simple-alert-title', {
+    'bold-title': description,
   });
   const handleClose = (e: MouseEvent<HTMLSpanElement>) => {
     onClose && onClose(e);
-    alertRef.current!.style.display = "none";
+    alertRef.current!.style.display = 'none';
     setHide(true);
   };
   return (
-     <div className={classes} ref={alertRef}>
+    <div className={classes} ref={alertRef}>
       <span className={titleClass}>{title}</span>
       {description && <p className="simple-alert-desc">{description}</p>}
       {closable && (
@@ -39,7 +40,7 @@ const Alert: FC<IAlertProps> = (props) => {
   );
 };
 Alert.defaultProps = {
-  type: "default",
+  type: 'default',
   closable: true,
 };
 export default Alert;
