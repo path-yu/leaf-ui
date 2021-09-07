@@ -24,6 +24,7 @@ export interface MenuProps {
   style?: CSSProperties;
   // 点击菜单项触发的回调函数
   onSelect?: SelectedCallback;
+  defaultOpenSubMenus?: string[];
 }
 
 export const Menu: FC<MenuProps> = (props) => {
@@ -34,7 +35,8 @@ export const Menu: FC<MenuProps> = (props) => {
       children,
       defaultIndex,
       onSelect,
-  } = props;
+      defaultOpenSubMenus,
+    } = props;
   const [currentActive, setActive] = useState(defaultIndex);
   const classes = classNames('simple-menu', className, {
     'menu-vertical': mode === 'vertical',
@@ -48,6 +50,7 @@ export const Menu: FC<MenuProps> = (props) => {
     index: currentActive ? currentActive : '0',
     onselect: handleClick,
     mode,
+    defaultOpenSubMenus,
   };
   const renderChildren = () => {
     return Children.map(children, (child, index) => {
@@ -75,5 +78,6 @@ export const Menu: FC<MenuProps> = (props) => {
 Menu.defaultProps = {
   mode: 'horizontal',
   defaultIndex: '0',
+  defaultOpenSubMenus:[]
 }
 export default Menu
