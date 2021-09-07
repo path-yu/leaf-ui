@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import { CSSProperties, FC, useContext } from 'react';
 import { MenuContext } from './Menu';
 
-interface MenuItemProps {
+export interface MenuItemProps {
   index?: string;
   // 选项是否被禁用
   disabled?: boolean;
@@ -31,3 +31,4 @@ export const MenuItem: FC<MenuItemProps> = (props) => {
     </li>
   )
 }
+MenuItem.displayName = 'MenuItem'
