@@ -49,12 +49,12 @@ export const Menu: FC<MenuProps> = (props) => {
     mode,
   };
   return (
-    <ul className={classes} style={style} >
+    <ul className={classes} style={style} data-testId="test-menu">
       <MenuContext.Provider value={passedContext}>
-          {children}
+        {children}
       </MenuContext.Provider>
     </ul>
-  )
+  );
 }
 Menu.defaultProps = {
   mode: 'horizontal',
