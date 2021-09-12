@@ -1,8 +1,9 @@
-import Alert from "./components/Alert/Alert";
-import Button from "./components/Button/Button";
+import Alert from './components/Alert/Alert';
+import Button from './components/Button/Button';
 import Menu from './components/Menu/Menu';
 import { MenuItem } from './components/Menu/MenuItem';
-import SubMenu from './components/Menu/SubMenu';
+import TabPane from './components/Tabs/TabPane';
+import Tabs from './components/Tabs/Tabs';
 function App() {
   return (
     <div className="App">
@@ -30,22 +31,27 @@ function App() {
       {/* <Alert title="this is Alert" description="hello alert" /> */}
       <Alert type="danger" title="this is Alert" description="hello alert" />
       <Alert type="warning" title="this is Alert" description="hello alert" />
-      <Menu
-        defaultIndex="1"
-        mode="vertical"
-        defaultOpenSubMenus={['3']}
-        onSelect={(index) => {
-          alert(index);
-        }}
-      >
+      <Menu defaultIndex="1" mode="vertical" defaultOpenSubMenus={['3']}>
         <MenuItem disabled>one</MenuItem>
         <MenuItem>two</MenuItem>
         <MenuItem>three</MenuItem>
-        <SubMenu title="SubMenu">
-          <MenuItem>active</MenuItem>
-          <MenuItem>test</MenuItem>
-        </SubMenu>
       </Menu>
+      <Tabs
+        onChange={(index) => {
+          console.log(index);
+        }}
+        defaultIndex={3}
+        type="line"
+        centered={true}
+        activeBarMode="center"
+      >
+        <TabPane label="tab1">content1</TabPane>
+        <TabPane label="tab1">content2</TabPane>
+        <TabPane label="tab1">content3</TabPane>
+        <TabPane tab={(index) => <span>tab55</span>} label="tab1">
+          content4
+        </TabPane>
+      </Tabs>
     </div>
   );
 }

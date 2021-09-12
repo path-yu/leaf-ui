@@ -44,11 +44,8 @@ const Tabs: FC<TabsProps> = (props) => {
     centered,
   } = props;
   const [activeIndex, setActiveIndex] = useState(defaultIndex);
-  const [activeBarStyle, setActiveBarStyle] = useState<IActiveBarStyle>({
-    left: '0px',
-    width: '32px',
-  });
-  const tabsListRef = useRef<HTMLDivElement>(null);
+  const [activeBarStyle, setActiveBarStyle] = useState<IActiveBarStyle>();
+  const tabsListRef = useRef<HTMLUListElement>(null);
   const tabsItemWidth = useRef<number>(0);
   const cacheChildrenIndex = useRef<Array<number>>([]);
   const navClass = classNames('simple-tabs-nav', {
@@ -80,13 +77,12 @@ const Tabs: FC<TabsProps> = (props) => {
     parentElement: HTMLLIElement,
     target: HTMLSpanElement
   ) => {
-    const index = defaultIndex as number;
     // 计算单个tabItem长度
     let barStyle: IActiveBarStyle = {};
     const parentElementOffSetWith = parentElement.offsetWidth;
     if (activeBarMode === 'fill') {
       barStyle.width = parentElementOffSetWith + 'px';
-      barStyle.left = parentElementOffSetWith * index + 'px';
+      barStyle.left = parentElement.offsetLeft + 'px';
     } else {
       barStyle.left = target.offsetLeft + 'px';
       barStyle.width = target.offsetWidth + 'px';
@@ -97,13 +93,22 @@ const Tabs: FC<TabsProps> = (props) => {
   // 切换tab底部导航栏样式
   const changeBarStyle = (currentTarget: HTMLElement, index: number) => {
     let left: number;
+    let width = tabsItemWidth.current;
     if (activeBarMode === 'center') {
-      left = (currentTarget.children[0] as HTMLElement).offsetLeft;
+      let ele = currentTarget.children[0] as HTMLElement;
+      left = ele.offsetLeft;
+      if (ele.offsetWidth !== tabsItemWidth.current) {
+        width = ele.offsetWidth;
+      }
     } else {
-      left = tabsItemWidth.current * index;
+      left = (currentTarget as HTMLElement).offsetLeft;
+      if (currentTarget.offsetWidth !== tabsItemWidth.current) {
+        width = currentTarget.offsetWidth;
+      }
     }
+
     const style: IActiveBarStyle = {
-      ...activeBarStyle,
+      width: width + 'px',
       left: left + 'px',
     };
     setActiveBarStyle(style);
@@ -116,6 +121,8 @@ const Tabs: FC<TabsProps> = (props) => {
     if (!disabled) {
       setActiveIndex(index);
       if (type === 'line' && animated) {
+        console.log(e.currentTarget);
+
         changeBarStyle(e.currentTarget as HTMLElement, index);
       }
       onChange && onChange(index);
@@ -183,12 +190,12 @@ const Tabs: FC<TabsProps> = (props) => {
       style={tabStyle}
       className={`simple-tabs ${className ? classNames : ''}`}
     >
-      <ul className={navClass} style={centerStyle}>
-        <div ref={tabsListRef} className="tabsList">
+      <div className={navClass} style={centerStyle}>
+        <ul ref={tabsListRef} className="tabsList">
           {renderNavLinks()}
           {isRenderBar() && renderAnimateBar()}
-        </div>
-      </ul>
+        </ul>
+      </div>
       <div className="simple-tabs-content">
         <div className="d-flex" style={centerStyle}>
           {' '}

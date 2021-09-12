@@ -1,13 +1,15 @@
 .simple-tabs-nav {
-   display: flex;
-  padding-left: 0;
+  display: flex;
   margin-bottom: 0;
   list-style: none;
   border-bottom: $nav-tabs-border-width solid $nav-tabs-border-color;
+
   >.tabsList {
-  position: relative;
-      display: flex;
-      flex-wrap: wrap;
+    position: relative;
+    display: flex;
+    padding-left: 0;
+
+    flex-wrap: wrap;
   }
 }
 
@@ -41,7 +43,8 @@
       border-bottom: $nav-tabs-border-width * 2 solid $nav-tabs-link-active-color;
     }
   }
-  .simple-tabs-ink-bar{
+
+  .simple-tabs-ink-bar {
     position: absolute;
     background: $nav-tabs-link-active-color;
     pointer-events: none;

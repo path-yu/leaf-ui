@@ -7,6 +7,9 @@
 //mixin
 @import "./mixin";
 
+// common
+@import "./common";
+
 //button
 @import "../components/Button/style";
 
@@ -14,4 +17,7 @@
 @import "../components/Alert/style";
 
 //menu
-@import "../components/Menu/style"
+@import "../components/Menu/style";
+
+//tabs
+@import "../components/Tabs/style"

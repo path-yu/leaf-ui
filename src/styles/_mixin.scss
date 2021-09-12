@@ -4,31 +4,47 @@
     border-radius: $border-radius;
 }
 
-@mixin button-style(
-    $background,
+@mixin button-style($background,
     $border, $color,
     $hover-background:lighten($background, 7.5%),
     $hover-color:$color,
     $hover-border:lighten($border, 10)) {
+    color: $color;
+    background: $background;
+    border-color: $border;
+
+    &:hover {
+        color: $hover-color;
+        background: $hover-background;
+        border-color: $hover-border;
+    }
+
+    &:focus,
+    &.focus {
+        color: $hover-color;
+        background: $hover-background;
+        border-color: $hover-border;
+    }
+
+    &:disabled,
+    &.disabled {
         color: $color;
         background: $background;
         border-color: $border;
-        &:hover{
-            color: $hover-color;
-            background: $hover-background;
-            border-color: $hover-border;
-        }
-         &:focus,
-         &.focus
-         {
-             color: $hover-color;
-             background: $hover-background;
-             border-color: $hover-border;
-         }
-           &:disabled,
-           &.disabled {
-               color:$color;
-               background: $background;
-               border-color: $border;
-           }
     }
+}
+
+@mixin border-right-radius($raduis) {
+    border-top-right-radius: $raduis;
+    border-bottom-right-radius: $raduis;
+}
+
+@mixin border-left-radius($raduis) {
+    border-top-left-radius: $raduis;
+    border-bottom-left-radius: $raduis;
+}
+
+@mixin border-top-radius($raduis) {
+    border-top-left-radius: $raduis;
+    border-top-right-radius: $raduis;
+}
