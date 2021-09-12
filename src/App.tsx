@@ -33,7 +33,7 @@ function App() {
       {/* <Alert title="this is Alert" description="hello alert" /> */}
       <Alert type="danger" title="this is Alert" description="hello alert" />
       <Alert type="warning" title="this is Alert" description="hello alert" />
-      <Menu mode="horizontal" defaultIndex="1" defaultOpenSubMenus={['3']}>
+      <Menu mode="vertical" defaultIndex="1" defaultOpenSubMenus={['3']}>
         <MenuItem disabled>one</MenuItem>
         <MenuItem>two</MenuItem>
         <MenuItem>three</MenuItem>

@@ -1,5 +1,7 @@
 import classNames from 'classnames';
 import { FC, MouseEvent, useRef, useState } from 'react';
+import Icon from '../Icon';
+import Transition from '../Transition';
 export interface AlertProps {
   title: string; // Alert 标题
   description?: string; // 内容描述
@@ -24,19 +26,20 @@ const Alert: FC<AlertProps> = (props) => {
   });
   const handleClose = (e: MouseEvent<HTMLSpanElement>) => {
     onClose && onClose(e);
-    alertRef.current!.style.display = 'none';
     setHide(true);
   };
   return (
-    <div className={classes} ref={alertRef}>
-      <span className={titleClass}>{title}</span>
-      {description && <p className="simple-alert-desc">{description}</p>}
-      {closable && (
-        <span className="simple-alert-close" onClick={handleClose}>
-          关闭
-        </span>
-      )}
-    </div>
+    <Transition in={!hide} timeout={300} animation="zoom-in-top">
+      <div className={classes} ref={alertRef}>
+        <span className={titleClass}>{title}</span>
+        {description && <p className="simple-alert-desc">{description}</p>}
+        {closable && (
+          <span className="simple-alert-close" onClick={handleClose}>
+            <Icon icon="times" />
+          </span>
+        )}
+      </div>
+    </Transition>
   );
 };
 Alert.defaultProps = {

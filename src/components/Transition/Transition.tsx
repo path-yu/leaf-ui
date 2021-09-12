@@ -12,8 +12,6 @@ type TransitionProps = CSSTransitionProps & {
   wrapper?: boolean;
 };
 
-
-
 const Transition: FC<TransitionProps> = (props) => {
   const {
     children,
@@ -31,5 +29,8 @@ const Transition: FC<TransitionProps> = (props) => {
     </CSSTransition>
   );
 };
-
+Transition.defaultProps = {
+  unmountOnExit: true,
+  appear: true,
+};
 export default Transition

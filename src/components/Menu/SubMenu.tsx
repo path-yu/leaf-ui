@@ -7,6 +7,7 @@ import {
   useState
 } from 'react';
 import Icon from '../Icon';
+import Transition from '../Transition';
 import { MenuContext } from './Menu';
 import { MenuItemProps } from './MenuItem';
 
@@ -73,7 +74,15 @@ export const SubMenu: FC<SubMenuProps> = ({ index, title, children, className })
         );
       }
     });
-    return <ul className={subMenuClass}>{childrenComponent}</ul>;
+    return (
+      <Transition
+        in={menuOpen}
+        timeout={300}
+        animation="zoom-in-top"
+      >
+        <ul className={subMenuClass}>{childrenComponent}</ul>
+      </Transition>
+    );
   };
   return (
     <li key={index} className={classes} {...hoverEvents}>

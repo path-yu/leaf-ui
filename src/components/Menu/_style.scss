@@ -63,7 +63,6 @@
     list-style: none;
     white-space: nowrap;
     padding-left: 0;
-    display: none;
     .menu-item {
       padding: $menu-item-padding-y $menu-item-padding-x;
       cursor: pointer;
@@ -76,9 +75,9 @@
       }
     }
   }
-   .menu-opened {
-     display: block;
-   }
+  //  .menu-opened {
+  //    display: block;
+  //  }
 }
 
 .menu-horizontal {
