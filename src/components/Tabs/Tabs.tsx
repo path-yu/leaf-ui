@@ -6,6 +6,7 @@ import {
   FC,
   FunctionComponentElement,
   MouseEvent,
+  ReactNode,
   useEffect,
   useRef,
   useState
@@ -20,7 +21,7 @@ interface TabsProps {
   className?: string;
   // Tabs的样式类型, 两种可选 默认为line
   type?: 'line' | 'card';
-  // 是否开启动画
+  // 是否开启底部导航栏切换动画
   animated?: boolean;
   //底部导航栏模式 只在animated 为true 时生效
   activeBarMode?: 'center' | 'fill';
@@ -49,7 +50,7 @@ const Tabs: FC<TabsProps> = (props) => {
   });
   const tabsListRef = useRef<HTMLDivElement>(null);
   const tabsItemWidth = useRef<number>(0);
-  const cacheChildren = useRef<Array<number>>([]);
+  const cacheChildrenIndex = useRef<Array<number>>([]);
   const navClass = classNames('simple-tabs-nav', {
     'nav-line': type === 'line',
     'nav-card': type === 'card',
@@ -67,12 +68,12 @@ const Tabs: FC<TabsProps> = (props) => {
         defaultIndex as number
       ] as HTMLLIElement;
       tabsItemWidth.current = parentElement.offsetWidth;
-      const spaEle = parentElement.children[0] as HTMLSpanElement;
-      inItActiveBarStyle(parentElement, spaEle);
+      const target = parentElement.children[0] as HTMLHtmlElement;
+      inItActiveBarStyle(parentElement, target);
     } else {
     }
     setTabStyle({ opacity: 1 });
-  }, [animated, tabStyle.opacity, defaultIndex]);
+  }, []);
 
   // 初始化计算底部导航栏样式
   const inItActiveBarStyle = (
@@ -120,17 +121,26 @@ const Tabs: FC<TabsProps> = (props) => {
       onChange && onChange(index);
     }
   };
+  // 当前是否为激活项
   const isActive = (index: number) => index === activeIndex;
+  // 是否渲染Bar组件
   const isRenderBar = () => type === 'line' && animated;
+  // 渲染头部导航栏标签
   const renderNavLinks = () => {
-   return Children.map(children, (child, index) => {
+    return Children.map(children, (child, index) => {
       const childElement = child as FunctionComponentElement<TabPaneProps>;
-      const { label, disabled } = childElement.props;
+      const { label, disabled, tab } = childElement.props;
       const classes = classNames('simple-tabs-nav-item', {
         'is-active': activeIndex === index,
         disabled: disabled,
         'is-active-bottom-bar': activeIndex === index && !animated,
       });
+      let childEle: ReactNode;
+      if (tab) {
+        childEle = typeof tab === 'function' ? tab(index) : tab;
+      } else {
+        childEle = label;
+      }
       return (
         <li
           className={classes}
@@ -139,24 +149,21 @@ const Tabs: FC<TabsProps> = (props) => {
             handleClick(e, index, disabled);
           }}
         >
-          <span> {label}</span>
+          <div> {childEle}</div>
         </li>
       );
     });
-    // return <div>
-    //   {navLinkChildren}
-    //   {isRenderBar() && renderAnimateBar()}
-    // </div>;
   };
 
   const renderContent = () => {
     return Children.map(children, (child, index) => {
       const displayStyle = isActive(index) ? 'block' : 'none';
+      // 如果当前项是否激活则添加到cacheChildren里面
       if (isActive(index)) {
-        cacheChildren.current.push(index);
+        cacheChildrenIndex.current.push(index);
       }
-      // 判断是否初始化渲染child
-      const isRenderChild = cacheChildren.current.includes(index);
+      // 判断是否需要渲染child, 减少不必要的渲染开销
+      const isRenderChild = cacheChildrenIndex.current.includes(index);
       return (
         <div style={{ display: displayStyle }}>{isRenderChild && child}</div>
       );
