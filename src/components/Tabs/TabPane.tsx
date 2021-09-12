@@ -1,11 +1,11 @@
 import { FC } from 'react';
 
 export interface TabPaneProps {
-  index: string;
   label: string;
+  disabled?:boolean
 }
-const TabPane: FC<TabPaneProps> = ({ index, children, label }) => {
-  return <li>{label}</li>;
+const TabPane: FC<TabPaneProps> = ({  children, label }) => {
+  return <div className="simple-tab-panel">{children}</div>;
 };
 
 TabPane.displayName = 'TabPane'

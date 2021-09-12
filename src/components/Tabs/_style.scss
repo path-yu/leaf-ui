@@ -1,0 +1,69 @@
+.simple-tabs-nav {
+   display: flex;
+  padding-left: 0;
+  margin-bottom: 0;
+  list-style: none;
+  border-bottom: $nav-tabs-border-width solid $nav-tabs-border-color;
+  >.tabsList {
+  position: relative;
+      display: flex;
+      flex-wrap: wrap;
+  }
+}
+
+.simple-tabs-nav-item {
+  display: block;
+  padding: $nav-link-padding-y $nav-link-padding-x;
+  cursor: pointer;
+
+  &:hover,
+  &:focus {
+    color: $nav-tabs-link-hover-color;
+  }
+
+  // Disabled state lightens text
+  &.disabled {
+    color: $nav-link-disabled-color;
+    pointer-events: auto;
+    background-color: transparent;
+    border-color: transparent;
+    cursor: not-allowed;
+  }
+
+  &.is-active {
+    color: $nav-tabs-link-active-color;
+  }
+}
+
+.nav-line {
+  .simple-tabs-nav-item {
+    &.is-active-bottom-bar {
+      border-bottom: $nav-tabs-border-width * 2 solid $nav-tabs-link-active-color;
+    }
+  }
+  .simple-tabs-ink-bar{
+    position: absolute;
+    background: $nav-tabs-link-active-color;
+    pointer-events: none;
+    height: 2px;
+    bottom: 0;
+    transition: 0.2s ease-in-out;
+  }
+}
+
+.nav-card {
+  .simple-tabs-nav-item {
+    border: $nav-tabs-border-width solid transparent;
+    margin-bottom: -$nav-tabs-border-width;
+
+    &.is-active {
+      @include border-top-radius($nav-tabs-border-radius);
+      background-color: $nav-tabs-link-active-bg;
+      border-color: $nav-tabs-link-active-border-color;
+    }
+  }
+}
+
+.simple-tabs-content {
+  margin-top: $nav-tabs-content-margin;
+}
