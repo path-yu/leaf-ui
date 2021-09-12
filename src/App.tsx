@@ -1,5 +1,6 @@
 import Alert from './components/Alert/Alert';
 import Button from './components/Button/Button';
+import Icon from './components/Icon/Icon';
 import Menu from './components/Menu/Menu';
 import { MenuItem } from './components/Menu/MenuItem';
 import TabPane from './components/Tabs/TabPane';
@@ -42,16 +43,20 @@ function App() {
         }}
         defaultIndex={3}
         type="line"
-        centered={true}
-        activeBarMode="center"
+        activeBarMode="fill"
+        animated
       >
         <TabPane label="tab1">content1</TabPane>
         <TabPane label="tab1">content2</TabPane>
         <TabPane label="tab1">content3</TabPane>
+        <TabPane disabled tab={(index) => <span>tab55</span>} label="tab1">
+          content4
+        </TabPane>
         <TabPane tab={(index) => <span>tab55</span>} label="tab1">
           content4
         </TabPane>
       </Tabs>
+      <Icon icon="film" theme="primary" size="10x" />
     </div>
   );
 }
