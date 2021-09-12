@@ -2,7 +2,7 @@ import { FC, ReactNode } from 'react';
 
 export type tabType = ReactNode |( (index:number) => ReactNode)
 export interface TabPaneProps {
-  label: string;
+  label?: string;
   disabled?: boolean;
   tab?: tabType;
 }

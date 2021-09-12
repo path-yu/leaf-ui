@@ -12,7 +12,7 @@ import {
   useState
 } from 'react';
 import { TabPaneProps } from './TabPane';
-interface TabsProps {
+export interface TabsProps {
   // 初始化选中面板的 key，如果没有设置 activeKey
   defaultIndex?: number;
   // 切换面板的回调
@@ -23,7 +23,7 @@ interface TabsProps {
   type?: 'line' | 'card';
   // 是否开启底部导航栏切换动画
   animated?: boolean;
-  //底部导航栏模式 只在animated 为true 时生效
+  //底部导航栏模式 只在animated 为true  type为line 时生效
   activeBarMode?: 'center' | 'fill';
   // 标签居中显示
   centered?: boolean;
@@ -121,8 +121,6 @@ const Tabs: FC<TabsProps> = (props) => {
     if (!disabled) {
       setActiveIndex(index);
       if (type === 'line' && animated) {
-        console.log(e.currentTarget);
-
         changeBarStyle(e.currentTarget as HTMLElement, index);
       }
       onChange && onChange(index);
