@@ -3,6 +3,7 @@ import Button from './components/Button/Button';
 import Icon from './components/Icon/Icon';
 import Menu from './components/Menu/Menu';
 import { MenuItem } from './components/Menu/MenuItem';
+import SubMenu from './components/Menu/SubMenu';
 import TabPane from './components/Tabs/TabPane';
 import Tabs from './components/Tabs/Tabs';
 function App() {
@@ -32,10 +33,14 @@ function App() {
       {/* <Alert title="this is Alert" description="hello alert" /> */}
       <Alert type="danger" title="this is Alert" description="hello alert" />
       <Alert type="warning" title="this is Alert" description="hello alert" />
-      <Menu defaultIndex="1" mode="vertical" defaultOpenSubMenus={['3']}>
+      <Menu mode="vertical" defaultIndex="1" defaultOpenSubMenus={['3']}>
         <MenuItem disabled>one</MenuItem>
         <MenuItem>two</MenuItem>
         <MenuItem>three</MenuItem>
+        <SubMenu title="submenu">
+          <MenuItem>two</MenuItem>
+          <MenuItem>three</MenuItem>
+        </SubMenu>
       </Menu>
       <Tabs
         onChange={(index) => {

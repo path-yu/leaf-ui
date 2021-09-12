@@ -33,7 +33,7 @@
   >.submenu-item {
     position: relative;
 
-    .subment-title {
+    .submenu-title {
       display: flex;
       align-items: center;
     }
@@ -49,7 +49,16 @@
       }
     }
   }
-
+   .is-vertical {
+     .arrow-icon {
+       transform: rotate(0deg) !important;
+     }
+   }
+     .is-vertical.is-opened {
+       .arrow-icon {
+         transform: rotate(180deg) !important;
+       }
+     }
   .simple-submenu {
     list-style: none;
     white-space: nowrap;
