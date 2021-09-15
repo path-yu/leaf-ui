@@ -23,7 +23,10 @@ describe('test Alert Component', () => {
     expect(container.querySelector('.simple-alert')).toHaveClass(
       'simple-alert-default',
     );
-    fireEvent.click(getByText('关闭'));
+    const closeEle = container.querySelector(
+      '.simple-alert-close',
+    ) as HTMLElement;
+    fireEvent.click(closeEle);
     expect(testProps.onClose).toHaveBeenCalled();
   });
   it('shound render the correct Alert based on different type and description', () => {

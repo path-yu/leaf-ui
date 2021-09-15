@@ -19,19 +19,7 @@ const testVerticalProps: MenuProps = {
   mode: 'vertical',
   defaultOpenSubMenus: ['4'],
 };
-const createStyleFile = () => {
-  const cssFile: string = `
-   .simple-submenu {
-      display: none;
-    }
-    .menu-opened {
-      display:block;
-    } 
-  `;
-  const style = document.createElement('style');
-  style.innerHTML = cssFile;
-  return style;
-};
+
 const generateMenu = (props: MenuProps) => {
   return (
     <Menu {...props}>
@@ -57,7 +45,6 @@ let wrapper: RenderResult,
 describe('test Menu and MenuItem component in default(horizontal) mode', () => {
   beforeEach(() => {
     wrapper = render(generateMenu(testProps));
-    wrapper.container.append(createStyleFile());
     menuElement = wrapper.getByTestId('test-menu');
     activeElement = wrapper.getByText('active');
     disabledElement = wrapper.getByText('disabled');
@@ -79,12 +66,12 @@ describe('test Menu and MenuItem component in default(horizontal) mode', () => {
     expect(testProps.onSelect).not.toHaveBeenCalledWith('2');
   });
   it('should show dropdown items when hover on SubMenu', async () => {
-    expect(wrapper.queryByText('drop1')).not.toBeVisible();
+    expect(wrapper.queryByText('drop1')).not.toBeInTheDocument();
     const dropdownElement = wrapper.getByText('dropdown');
     fireEvent.mouseEnter(dropdownElement);
     await waitFor(
       () => {
-        expect(wrapper.queryByText('drop1')).toBeVisible();
+        expect(wrapper.queryByText('drop1')).toBeInTheDocument();
       },
       { timeout: 300 },
     );
@@ -93,7 +80,7 @@ describe('test Menu and MenuItem component in default(horizontal) mode', () => {
     fireEvent.mouseLeave(dropdownElement);
     await waitFor(
       () => {
-        expect(wrapper.queryByText('drop1')).not.toBeVisible();
+        expect(wrapper.queryByText('drop1')).toBeInTheDocument();
       },
       { timeout: 300 },
     );
@@ -102,17 +89,16 @@ describe('test Menu and MenuItem component in default(horizontal) mode', () => {
 describe('test menu and MenuItem component in vertical mode', () => {
   beforeEach(() => {
     wrapper2 = render(generateMenu(testVerticalProps));
-    wrapper2.container.append(createStyleFile());
   });
   it('should render vertical mode when mode is set to vertical', () => {
     const menuElement = wrapper2.getByTestId('test-menu');
     expect(menuElement).toHaveClass('menu-vertical');
   });
   it('should show dropdown items when click on subMenu for vertical mode', () => {
-    const dropDownItem = wrapper2.getByText('drop1');
-    expect(dropDownItem).not.toBeVisible();
+    const dropDownItem = wrapper2.queryByText('drop1');
+    expect(dropDownItem).not.toBeInTheDocument();
     fireEvent.click(wrapper2.getByText('dropdown'));
-    expect(dropDownItem).toBeVisible();
+    expect(dropDownItem).not.toBeInTheDocument();
   });
   it('should show subMenu dropdown when defaultOpenSubMenus contains SubMenu index', () => {
     expect(wrapper2.queryByText('opened1')).toBeVisible();
