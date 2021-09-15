@@ -1,6 +1,6 @@
 import { fireEvent, render } from '@testing-library/react';
-import Button, { ButtonProps } from './Button';
-
+import React from 'react';
+import Button, { ButtonProps } from './button';
 const defaultProps: ButtonProps = {
   onClick: jest.fn(),
 };
@@ -35,18 +35,18 @@ describe('test Button Component', () => {
     const wrapper = render(
       <Button btnType="link" href="http://dummyurl">
         Nice
-      </Button>
+      </Button>,
     );
     const element = wrapper.getByText('Nice');
     expect(element.tagName).toEqual('A');
     expect(element).toHaveClass('btn btn-link');
   });
-   it('should render disabled button when disabled set to true', () => {
-     const wrapper = render(<Button {...disabledProps}>Nice</Button>);
-     const element = wrapper.getByText('Nice') as HTMLButtonElement;
-     expect(element).toBeInTheDocument();
-     expect(element.disabled).toBeTruthy();
-     fireEvent.click(element);
-     expect(disabledProps.onClick).not.toHaveBeenCalled();
-   });
+  it('should render disabled button when disabled set to true', () => {
+    const wrapper = render(<Button {...disabledProps}>Nice</Button>);
+    const element = wrapper.getByText('Nice') as HTMLButtonElement;
+    expect(element).toBeInTheDocument();
+    expect(element.disabled).toBeTruthy();
+    fireEvent.click(element);
+    expect(disabledProps.onClick).not.toHaveBeenCalled();
+  });
 });

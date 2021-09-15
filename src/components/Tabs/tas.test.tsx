@@ -1,7 +1,8 @@
 import '@testing-library/jest-dom/extend-expect';
 import { fireEvent, render, RenderResult } from '@testing-library/react';
-import TabPane from './TabPane';
-import Tabs, { TabsProps } from './Tabs';
+import React from 'react';
+import TabPane from './tab-pane';
+import Tabs, { TabsProps } from './tabs';
 
 const testProps: TabsProps = {
   defaultIndex: 1,
@@ -17,10 +18,8 @@ describe('test Tabs Component', () => {
         <TabPane label="disabled" disabled>
           content3
         </TabPane>
-        <TabPane  tab={<span>custom Tab</span>}>
-          content4
-        </TabPane>
-      </Tabs>
+        <TabPane tab={<span>custom Tab</span>}>content4</TabPane>
+      </Tabs>,
     );
   });
   afterEach(() => {
@@ -30,7 +29,7 @@ describe('test Tabs Component', () => {
     const { queryByText, container } = wrapper;
     const nav = container.querySelector('.simple-tabs-nav') as HTMLElement;
     expect(getComputedStyle(nav.parentElement as HTMLElement).opacity).toEqual(
-      '1'
+      '1',
     );
     expect(nav).toHaveClass('nav-line');
     expect(getComputedStyle(nav).justifyContent).toEqual('flex-start');
@@ -43,7 +42,7 @@ describe('test Tabs Component', () => {
     const { queryByText, getByText } = wrapper;
     const clickedElement = getByText('tab1');
     fireEvent.click(clickedElement);
-    expect(testProps.onChange).toHaveBeenCalledWith(0)
+    expect(testProps.onChange).toHaveBeenCalledWith(0);
     expect(clickedElement).toBeInTheDocument();
     expect(clickedElement.parentElement).toHaveClass('is-active');
     expect(queryByText('content3')).not.toBeInTheDocument();
@@ -64,8 +63,8 @@ describe('test Tabs Component', () => {
     const customTabElement = getByText('custom Tab');
     expect(customTabElement).toBeInTheDocument();
     expect(queryByText('content4')).not.toBeInTheDocument();
-    fireEvent.click(customTabElement)
-    expect(queryByText('content4')?.parentElement).toBeInTheDocument()
-     expect(queryByText('content4')?.parentElement).toBeVisible();
-  })
+    fireEvent.click(customTabElement);
+    expect(queryByText('content4')?.parentElement).toBeInTheDocument();
+    expect(queryByText('content4')?.parentElement).toBeVisible();
+  });
 });

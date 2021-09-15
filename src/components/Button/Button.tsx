@@ -1,28 +1,23 @@
 import classNames from 'classnames';
-import {
+import React, {
   AnchorHTMLAttributes,
   ButtonHTMLAttributes,
   FC,
-  ReactNode
+  ReactNode,
 } from 'react';
 
 export type ButtonType = 'primary' | 'default' | 'danger' | 'link';
 export type ButtonSize = 'lg' | 'sm';
 export type ButtonShare = 'circle' | 'round';
- interface BaseButtonProps {
-   className?: string;
-   /**是否禁用 Button */
-   disabled?: boolean;
-   /**设置 Button 的大小 */
-   size?: ButtonSize;
-   /**设置 Button 的类型 */
-   btnType?: ButtonType;
-   children: ReactNode;
-   /**当按钮为link类型时的href链接地址 */
-   href?: string;
-   /**button的形状 */
-   share?: ButtonShare;
- }
+export interface BaseButtonProps {
+  className?: string;
+  disabled?: boolean;
+  size?: ButtonSize;
+  btnType?: ButtonType;
+  children: ReactNode;
+  href?: string;
+  share?: ButtonShare;
+}
 // * 将原生元素button和a标签的props属性和Button自定义的props属性类型进行联合
 type NativeButtonProps = BaseButtonProps & ButtonHTMLAttributes<HTMLElement>;
 type AnchorButtonProps = BaseButtonProps & AnchorHTMLAttributes<HTMLElement>;
@@ -36,14 +31,22 @@ export type ButtonProps = Partial<NativeButtonProps & AnchorButtonProps>;
  * ```
  */
 const Button: FC<ButtonProps> = (props) => {
-  const { className, btnType, disabled, size, children, href,share, ...resetProps } =
-    props;
+  const {
+    className,
+    btnType,
+    disabled,
+    size,
+    children,
+    href,
+    share,
+    ...resetProps
+  } = props;
   // *btn btn-lg btn-primary
   const classes = classNames('btn', className, {
     [`btn-${btnType}`]: btnType,
     [`btn-${size}`]: size,
     disabled: btnType === 'link' && disabled,
-    [`btn-${share}`]:share
+    [`btn-${share}`]: share,
   });
 
   if (btnType === 'link' && href) {
@@ -64,7 +67,7 @@ const Button: FC<ButtonProps> = (props) => {
 Button.defaultProps = {
   disabled: false,
   btnType: 'default',
-  share:'round'
+  share: 'round',
 };
 
 export default Button;

@@ -2,11 +2,12 @@ import {
   fireEvent,
   render,
   RenderResult,
-  waitFor
+  waitFor,
 } from '@testing-library/react';
-import Menu, { MenuProps } from './Menu';
-import { MenuItem } from './MenuItem';
-import SubMenu from './SubMenu';
+import React from 'react';
+import Menu, { MenuProps } from './menu';
+import { MenuItem } from './menu-item';
+import SubMenu from './sub-menu';
 
 const testProps: MenuProps = {
   defaultIndex: '0',
@@ -85,7 +86,7 @@ describe('test Menu and MenuItem component in default(horizontal) mode', () => {
       () => {
         expect(wrapper.queryByText('drop1')).toBeVisible();
       },
-      { timeout: 300 }
+      { timeout: 300 },
     );
     fireEvent.click(wrapper.getByText('drop1'));
     expect(testProps.onSelect).toHaveBeenCalledWith('3-0');
@@ -94,7 +95,7 @@ describe('test Menu and MenuItem component in default(horizontal) mode', () => {
       () => {
         expect(wrapper.queryByText('drop1')).not.toBeVisible();
       },
-      { timeout: 300 }
+      { timeout: 300 },
     );
   });
 });
@@ -113,7 +114,7 @@ describe('test menu and MenuItem component in vertical mode', () => {
     fireEvent.click(wrapper2.getByText('dropdown'));
     expect(dropDownItem).toBeVisible();
   });
-   it('should show subMenu dropdown when defaultOpenSubMenus contains SubMenu index', () => {
-     expect(wrapper2.queryByText('opened1')).toBeVisible();
-   });
+  it('should show subMenu dropdown when defaultOpenSubMenus contains SubMenu index', () => {
+    expect(wrapper2.queryByText('opened1')).toBeVisible();
+  });
 });

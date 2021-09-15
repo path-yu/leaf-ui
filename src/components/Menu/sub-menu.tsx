@@ -1,25 +1,31 @@
 import classNames from 'classnames';
-import {
-  Children, cloneElement, FC,
+import React, {
+  Children,
+  cloneElement,
+  FC,
   FunctionComponentElement,
   MouseEvent,
   useContext,
-  useState
+  useState,
 } from 'react';
 import Icon from '../Icon';
 import Transition from '../Transition';
-import { MenuContext } from './Menu';
-import { MenuItemProps } from './MenuItem';
+import { MenuContext } from './menu';
+import { MenuItemProps } from './menu-item';
 
-
-export interface SubMenuProps{
-  index?: string,
+export interface SubMenuProps {
+  index?: string;
   // x下拉菜单的名字
-  title: string,
-  className?:string
+  title: string;
+  className?: string;
 }
 
-export const SubMenu: FC<SubMenuProps> = ({ index, title, children, className }) => {
+export const SubMenu: FC<SubMenuProps> = ({
+  index,
+  title,
+  children,
+  className,
+}) => {
   const context = useContext(MenuContext);
   const openedSubMenus = context.defaultOpenSubMenus as Array<string>;
   const isOpen =
@@ -70,16 +76,12 @@ export const SubMenu: FC<SubMenuProps> = ({ index, title, children, className })
         });
       } else {
         console.error(
-          'Warning: SubMenu has a child which is not a MenuItem component'
+          'Warning: SubMenu has a child which is not a MenuItem component',
         );
       }
     });
     return (
-      <Transition
-        in={menuOpen}
-        timeout={300}
-        animation="zoom-in-top"
-      >
+      <Transition in={menuOpen} timeout={300} animation="zoom-in-top">
         <ul className={subMenuClass}>{childrenComponent}</ul>
       </Transition>
     );
@@ -95,4 +97,4 @@ export const SubMenu: FC<SubMenuProps> = ({ index, title, children, className })
   );
 };
 SubMenu.displayName = 'SubMenu';
-export default SubMenu
+export default SubMenu;

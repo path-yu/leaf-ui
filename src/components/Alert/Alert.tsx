@@ -1,13 +1,24 @@
 import classNames from 'classnames';
-import { FC, MouseEvent, useRef, useState } from 'react';
+import React, { FC, MouseEvent, useRef, useState } from 'react';
 import Icon from '../Icon';
 import Transition from '../Transition';
 export interface AlertProps {
-  title: string; // Alert 标题
-  description?: string; // 内容描述
-  type?: AlertType; // Alert类型
-  onClose?: (e: MouseEvent<HTMLSpanElement>) => void; // 关闭时触发的回调函数
-  closable?: boolean; // 	默认不显示关闭按钮
+  /** 标题 */
+  title: string;
+  /** 内容描述 */
+  description?: string;
+  /** Alert类型
+   * @default default
+   */
+  type?: 'success' | 'default' | 'danger' | 'warning';
+  /**
+   * 关闭时触发的回调函数
+   */
+  onClose?: (e: MouseEvent<HTMLSpanElement>) => void;
+  /** closable 是否显示关闭按钮
+   * @default true
+   */
+  closable?: boolean;
 }
 
 // * alert弹窗类型
