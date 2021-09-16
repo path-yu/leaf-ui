@@ -12,7 +12,7 @@ export interface IconProps {
     | 'light'
     | 'dark';
   /**
-   * react-fontawesome库props配置项
+   * react-fontawesome库props配置项 更新配置项请查看react-fontawesome文档
    */
   resetProps?: FontAwesomeIconProps;
 }

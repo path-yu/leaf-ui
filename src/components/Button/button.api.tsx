@@ -1,8 +1,4 @@
 import { ReactNode } from 'react';
-
-export type ButtonType = 'primary' | 'default' | 'danger' | 'link';
-export type ButtonSize = 'lg' | 'sm';
-export type ButtonShare = 'circle' | 'round';
 export interface BaseButtonProps {
   /**可扩展的className */
   className?: string;
@@ -15,18 +11,18 @@ export interface BaseButtonProps {
    * 设置Button的大小
    * @default lg
    */
-  size?: ButtonSize;
+  size?: 'lg' | 'sm';
   /**
    * 设置Button的类型
    * @default default
    */
-  btnType?: ButtonType;
+  btnType?: 'primary' | 'default' | 'danger' | 'link';
   children: ReactNode;
   /**当按钮为link类型时的href链接地址 */
   href?: string;
   /**button的形状
    * @default round
    */
-  share?: ButtonShare;
+  share?: 'circle' | 'round';
 }
 export default (props: BaseButtonProps) => () => {};

@@ -10,7 +10,6 @@ import React, {
 } from 'react';
 import { MenuItemProps } from './menu-item';
 
-type MenuMode = 'horizontal' | 'vertical';
 type SelectedCallback = (selectedIndex: string) => void;
 
 interface IMenuContext {
@@ -26,11 +25,11 @@ export interface MenuProps {
   defaultIndex?: string;
   className?: string;
   /**菜单类型 横向或者纵向 */
-  mode?: MenuMode;
+  mode?: 'horizontal' | 'vertical';
   /** 自定义样式 */
   style?: CSSProperties;
   /**  点击菜单项触发的回调 */
-  onSelect?: SelectedCallback;
+  onSelect?: (selectedIndex: string) => void;
   /** 默认展开的下拉菜单 */
   defaultOpenSubMenus?: string[];
 }

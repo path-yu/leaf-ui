@@ -9,7 +9,7 @@ export interface TabPaneProps {
    */
   disabled?: boolean;
   /** 自定义tab标题 */
-  tab?: tabType;
+  tab?: ReactNode | ((index: number) => ReactNode);
 }
 const TabPane: FC<TabPaneProps> = ({ children }) => {
   return <div className="simple-tab-panel">{children}</div>;
