@@ -14,7 +14,7 @@ nav:
 import { Button } from 'react-element';
 ```
 
-默认的的 Button
+### 默认的的 Button
 
 ```tsx
 import React from 'react';
@@ -23,7 +23,7 @@ import { Button } from 'react-element';
 export default () => <Button>Test</Button>;
 ```
 
-不同尺寸的 Button
+### 不同尺寸的 Button
 
 ```tsx
 import React from 'react';
@@ -37,7 +37,7 @@ export default () => (
 );
 ```
 
-不同类型的 Button
+### 不同类型的 Button
 
 ```tsx
 import React from 'react';
@@ -55,7 +55,7 @@ export default () => (
 );
 ```
 
-不同形状的的 Button
+### 不同形状的的 Button
 
 ```tsx
 import React from 'react';
@@ -69,4 +69,4 @@ export default () => (
 );
 ```
 
-<API  src="./Button.api.tsx"></APi>
+<API  src="./button.api.tsx">
