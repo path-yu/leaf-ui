@@ -1,5 +1,3 @@
-import useClickOutSize from '@/hook/useClickOutSize';
-import useDebounce from '@/utils/debunce';
 import classNames from 'classnames';
 import React, {
   ChangeEvent,
@@ -10,6 +8,8 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import useClickOutSize from '../../hook/useClickOutSize';
+import useDebounce from '../../utils/debunce';
 import Icon from '../Icon';
 import Input, { InputProps } from '../Input/input';
 import Transition from '../Transition';
