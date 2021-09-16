@@ -9,7 +9,7 @@ import React, {
   useState,
 } from 'react';
 import useClickOutSize from '../../hook/useClickOutSize';
-import useDebounce from '../../utils/debunce';
+import useDebounce from '../../hook/useDebounce';
 import Icon from '../Icon';
 import Input, { InputProps } from '../Input/input';
 import Transition from '../Transition';

@@ -1,10 +1,8 @@
 module.exports = {
-  propsParser: require('react-docgen-typescript').withDefaultConfig([
-    parserOptions,
-  ]).parse,
+  shouldExtractValuesFromUnion: true,
+  shouldExtractLiteralValuesFromEnum: true,
   propFilter: {
-    skipPropsWithName: ['as', 'id'],
+    skipPropsWithName: ['as', 'id', 'InputHTMLAttributes'],
     skipPropsWithoutDoc: true,
   },
-  shouldExtractLiteralValuesFromEnum: true,
 };
