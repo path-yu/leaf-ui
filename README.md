@@ -2,6 +2,18 @@
 
 ## Getting Started
 
+install
+
+```bash
+$ npm install ease-element
+```
+
+or
+
+```bash
+$ yarn add ease-element
+```
+
 Install dependencies,
 
 ```bash
