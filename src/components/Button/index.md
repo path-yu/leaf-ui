@@ -14,7 +14,7 @@ nav:
 
 ```tsx
 import React from 'react';
-import { Button } from 'react-element';
+import { Button } from 'ease-element';
 
 export default () => <Button>Test</Button>;
 ```
@@ -23,7 +23,7 @@ export default () => <Button>Test</Button>;
 
 ```tsx
 import React from 'react';
-import { Button } from 'react-element';
+import { Button } from 'ease-element';
 
 export default () => (
   <>
@@ -37,7 +37,7 @@ export default () => (
 
 ```tsx
 import React from 'react';
-import { Button } from 'react-element';
+import { Button } from 'ease-element';
 
 export default () => (
   <>
@@ -55,7 +55,7 @@ export default () => (
 
 ```tsx
 import React from 'react';
-import { Button } from 'react-element';
+import { Button } from 'ease-element';
 
 export default () => (
   <>

@@ -1,7 +1,15 @@
 {
-  "private": true,
-  "name": "react-element",
+  "name": "ease-element",
   "version": "1.0.0",
+  "private": false,
+  "description": "React components library",
+  "author": "path-yu",
+  "license": "MIT",
+  "keywords": [
+    "Component",
+    "UI",
+    "React"
+  ],
   "scripts": {
     "start": "dumi dev",
     "docs:build": "dumi build",
@@ -11,13 +19,19 @@
     "release": "npm run build && npm publish",
     "prettier": "prettier --write \"**/*.{js,jsx,tsx,ts,less,md,json}\"",
     "test": "umi-test",
-    "test:coverage": "umi-test --coverage"
+    "test:coverage": "umi-test --coverage",
+    "prepublishOnly": "npm run prettier"
   },
+  "homepage": "http://1.116.124.155/ease-element",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
   "gitHooks": {
     "pre-commit": "lint-staged"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
   },
   "lint-staged": {
     "*.{js,jsx,less,md,json}": [
@@ -31,8 +45,8 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.26",
     "@fortawesome/free-solid-svg-icons": "^5.12.0",
     "@fortawesome/react-fontawesome": "^0.1.8",
+    "axios": "^0.21.4",
     "classnames": "^2.3.1",
-    "react": "^16.12.0",
     "react-transition-group": "^4.3.0"
   },
   "devDependencies": {
@@ -48,6 +62,16 @@
     "gh-pages": "^3.0.0",
     "lint-staged": "^10.0.7",
     "prettier": "^2.2.1",
-    "yorkie": "^2.0.0"
+    "yorkie": "^2.0.0",
+    "react": "^16.12.0"
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://gitee.com/ayuyuyuyu/simple_element",
+    "branch": "master",
+    "platform": "gitee"
   }
 }

@@ -6,7 +6,7 @@
 
 ```tsx
 import React from 'react';
-import { Icon, Button } from 'react-element';
+import { Icon, Button } from 'ease-element';
 const defaultIcons = () => (
   <>
     <Icon icon="check" size="3x" />
@@ -25,7 +25,7 @@ export default defaultIcons;
 
 ```tsx
 import React from 'react';
-import { Icon, Button } from 'react-element';
+import { Icon, Button } from 'ease-element';
 const themeIcons = () => (
   <>
     <Icon icon="check" size="3x" theme="success" />
@@ -41,7 +41,7 @@ export default themeIcons;
 
 ```tsx
 import React from 'react';
-import { Icon, Button } from 'react-element';
+import { Icon, Button } from 'ease-element';
 const customIcons = () => (
   <>
     <Icon icon="spinner" size="3x" theme="primary" spin />

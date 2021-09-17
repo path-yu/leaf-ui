@@ -15,7 +15,7 @@ nav:
 ### 简单演示
 
 ```tsx
-import { Tabs, TabPane } from 'react-element';
+import { Tabs, TabPane } from 'ease-element';
 import React from 'react';
 function action(index) {
   console.log(index);
@@ -34,7 +34,7 @@ export default () => (
 给 Tabs 添加一个居中的样式
 
 ```tsx
-import { Tabs, TabPane } from 'react-element';
+import { Tabs, TabPane } from 'ease-element';
 import React from 'react';
 export default () => (
   <Tabs centered={true}>
@@ -52,7 +52,7 @@ export default () => (
 默认只在 animated 为 true 和 type 为 line 是生效
 
 ```tsx
-import { Tabs, TabPane } from 'react-element';
+import { Tabs, TabPane } from 'ease-element';
 import React from 'react';
 export default () => (
   <div>
@@ -75,7 +75,7 @@ export default () => (
 卡片风格的标签页
 
 ```tsx
-import { Tabs, TabPane } from 'react-element';
+import { Tabs, TabPane } from 'ease-element';
 import React from 'react';
 export default () => (
   <Tabs type="card">
@@ -91,7 +91,7 @@ export default () => (
 tab 属性接受一个 render 函数或 jsx
 
 ```tsx
-import { Tabs, TabPane } from 'react-element';
+import { Tabs, TabPane } from 'ease-element';
 import React from 'react';
 export default () => (
   <Tabs>

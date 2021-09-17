@@ -6,7 +6,7 @@
 
 ```tsx
 import React from 'react';
-import { Alert } from 'react-element';
+import { Alert } from 'ease-element';
 export default () => {
   return <Alert title="this is alert!"></Alert>;
 };
@@ -16,7 +16,7 @@ export default () => {
 
 ```tsx
 import React from 'react';
-import { Alert } from 'react-element';
+import { Alert } from 'ease-element';
 const stylesAlert = () => {
   return (
     <>
@@ -33,7 +33,7 @@ export default stylesAlert;
 
 ```tsx
 import React from 'react';
-import { Alert } from 'react-element';
+import { Alert } from 'ease-element';
 const descriptionAlert = () => (
   <Alert
     title="提示标题欧亲"

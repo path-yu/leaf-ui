@@ -12,7 +12,7 @@ nav:
 
 ```tsx
 import React from 'react';
-import { Input } from 'react-element';
+import { Input } from 'ease-element';
 const handleChange = (e) => {
   console.log(e.target.value);
 };
@@ -26,7 +26,7 @@ export default defaultInput;
 
 ```tsx
 import React from 'react';
-import { Input } from 'react-element';
+import { Input } from 'ease-element';
 const disabledInput = () => <Input placeholder="disabled input" disabled />;
 export default disabledInput;
 ```
@@ -35,7 +35,7 @@ export default disabledInput;
 
 ```tsx
 import React from 'react';
-import { Input } from 'react-element';
+import { Input } from 'ease-element';
 const iconInput = () => <Input placeholder="iconInput input" icon="search" />;
 export default iconInput;
 ```
@@ -44,7 +44,7 @@ export default iconInput;
 
 ```tsx
 import React from 'react';
-import { Input } from 'react-element';
+import { Input } from 'ease-element';
 const sizeInput = () => (
   <>
     <Input defaultValue="large size" size="lg" />
@@ -58,7 +58,7 @@ export default sizeInput;
 
 ```tsx
 import React from 'react';
-import { Input } from 'react-element';
+import { Input } from 'ease-element';
 const handleChange = (e) => {
   console.log(e.target.value);
 };

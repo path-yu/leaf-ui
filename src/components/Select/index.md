@@ -5,7 +5,7 @@
 ## 简单演示
 
 ```tsx
-import { Select } from 'react-element';
+import { Select } from 'ease-element';
 import React from 'react';
 const action = (value) => {
   console.log(value);
@@ -25,7 +25,7 @@ export default defaultSelect;
 ## 多选的 Select
 
 ```tsx
-import { Select } from 'react-element';
+import { Select } from 'ease-element';
 import React from 'react';
 const action = (value) => {
   console.log(value);
@@ -51,7 +51,7 @@ export default multipleSelect;
 ## 被禁用的 Select
 
 ```tsx
-import { Select } from 'react-element';
+import { Select } from 'ease-element';
 import React from 'react';
 
 const disabledSelect = () => (

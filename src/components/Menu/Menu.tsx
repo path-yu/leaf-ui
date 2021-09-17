@@ -11,11 +11,11 @@ import React, {
 import { MenuItemProps } from './menu-item';
 
 type SelectedCallback = (selectedIndex: string) => void;
-
+type MenuMode = 'horizontal' | 'vertical';
 interface IMenuContext {
   index?: string;
   onselect?: SelectedCallback;
-  mode?: MenuMode;
+  mode?: 'horizontal' | 'vertical';
   defaultOpenSubMenus?: string[];
 }
 export const MenuContext = createContext<IMenuContext>({ index: '0' });
