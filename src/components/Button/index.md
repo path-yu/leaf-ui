@@ -4,15 +4,11 @@ nav:
   path: /components
 ---
 
-## Button
+## Button-按钮
 
 页面中最常用的的按钮元素，适合于完成特定的交互，支持 HTML button 和 a 链接 的所有属性
 支持设置不同大小,不同类型,不同形状
 使用
-
-```ts
-import { Button } from 'react-element';
-```
 
 ### 默认的的 Button
 

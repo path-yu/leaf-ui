@@ -1,4 +1,6 @@
-## Alert
+## Alert-警告提示
+
+警告提示，展现需要关注的信息。
 
 ### 一个简单的 Alert
 
@@ -43,4 +45,6 @@ const descriptionAlert = () => (
 export default descriptionAlert;
 ```
 
-<API></API>
+### API
+
+<API hideTitle>

@@ -1,4 +1,6 @@
-## Icon
+## Icon-图标
+
+语义化的矢量图形。使用图标组件,基于 react-fontawesome 二次开发
 
 ### 简单演示
 

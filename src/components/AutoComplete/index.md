@@ -1,4 +1,6 @@
-## AutoComplete
+## AutoComplete 自动完成
+
+输入框自动完成功能。
 
 ### 简单演示
 

@@ -4,7 +4,7 @@ nav:
   path: /components
 ---
 
-# Tabs
+## Tabs-标签页
 
 选项卡切换组件。
 
@@ -12,13 +12,7 @@ nav:
 
 提供平级的区域将大块内容进行收纳和展现，保持界面整洁。
 
-### 引用方法
-
-```ts
-import { Tabs } from 'react-element';
-```
-
-### 基本使用
+### 简单演示
 
 ```tsx
 import { Tabs, TabPane } from 'react-element';
@@ -53,9 +47,9 @@ export default () => (
 
 ### 动画
 
-为 Tabs 切换添加动画
+为 Tabs 切换添加切换动画
 
-activeBarMode 指定底部导航栏的显示模式
+默认只在 animated 为 true 和 type 为 line 是生效
 
 ```tsx
 import { Tabs, TabPane } from 'react-element';
