@@ -1,8 +1,7 @@
 import axios from 'axios';
-import React, { FC, useRef, useState } from 'react';
-import { ChangeEvent } from 'react-router/node_modules/@types/react';
-import Dragger from './drag';
-import UploadList from './upload-list';
+import React, { ChangeEvent, FC, ReactNode, useRef, useState } from 'react';
+import Dragger from './Drag';
+import UploadList from './UploadList';
 export type UploadFileStatus = 'ready' | 'uploading' | 'success' | 'error';
 export interface UploadFile {
   uid: string;
@@ -46,8 +45,9 @@ export interface UploadProps {
   multiple?: boolean;
   /**是否支持拖拽上传 */
   drag?: boolean;
+  children?: ReactNode;
 }
-const UpLoad: FC<UploadProps> = (props) => {
+const Upload: FC<UploadProps> = (props) => {
   const {
     action,
     onError,
@@ -63,8 +63,7 @@ const UpLoad: FC<UploadProps> = (props) => {
     accept,
     multiple,
     children,
-    drag,
-    defaultFileList,
+    drag, defaultFileList,
   } = props;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [fileList, setFileList] = useState<UploadFile[]>(defaultFileList || []);
@@ -82,10 +81,7 @@ const UpLoad: FC<UploadProps> = (props) => {
       onRemove(file);
     }
   };
-  const updateFileList = (
-    updateFile: UploadFile,
-    updateObj: Partial<UploadFile>,
-  ) => {
+  const updateFileList = (updateFile: UploadFile, updateObj: Partial<UploadFile>) => {
     setFileList((prevList) => {
       return prevList.map((file) => {
         if (file.uid === updateFile.uid) {
@@ -115,7 +111,7 @@ const UpLoad: FC<UploadProps> = (props) => {
           result.then((processedFile) => {
             post(processedFile);
           });
-        } else if (result !== false) {
+        } else if (result) {
           post(file);
         }
       }
@@ -203,10 +199,10 @@ const UpLoad: FC<UploadProps> = (props) => {
     </div>
   );
 };
-UpLoad.defaultProps = {
+Upload.defaultProps = {
   name: 'file',
   drag: false,
   withCredentials: false,
   multiple: false,
 };
-export default UpLoad;
+export default Upload;

@@ -1,8 +1,9 @@
 import { fireEvent, render } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import React from 'react';
 import { config } from 'react-transition-group';
-import Option from './option';
-import Select, { SelectProps } from './select';
+import Option from './Option';
+import Select, { SelectProps } from './Select';
 
 config.disabled = true;
 
@@ -81,10 +82,7 @@ describe('test Select component', () => {
     expect(inputEle.placeholder).toEqual('');
     // click 2nd item
     fireEvent.click(secondItem);
-    expect(multipleProps.onChange).toHaveBeenLastCalledWith('id2', [
-      'id1',
-      'id2',
-    ]);
+    expect(multipleProps.onChange).toHaveBeenLastCalledWith('id2', ['id1', 'id2']);
     expect(container.querySelectorAll('.simple-tag').length).toEqual(2);
     //reclick 2nd item
     fireEvent.click(secondItem);

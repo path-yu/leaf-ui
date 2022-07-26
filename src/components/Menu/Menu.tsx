@@ -6,16 +6,17 @@ import React, {
   CSSProperties,
   FC,
   FunctionComponentElement,
+  ReactNode,
   useState,
 } from 'react';
-import { MenuItemProps } from './menu-item';
-
+import { MenuItemProps } from './MenuItem';
+import './_style.scss';
 type SelectedCallback = (selectedIndex: string) => void;
 type MenuMode = 'horizontal' | 'vertical';
 interface IMenuContext {
   index?: string;
   onselect?: SelectedCallback;
-  mode?: 'horizontal' | 'vertical';
+  mode?: MenuMode;
   defaultOpenSubMenus?: string[];
 }
 export const MenuContext = createContext<IMenuContext>({ index: '0' });
@@ -32,18 +33,11 @@ export interface MenuProps {
   onSelect?: (selectedIndex: string) => void;
   /** 默认展开的下拉菜单 */
   defaultOpenSubMenus?: string[];
+  children?: ReactNode;
 }
 
 export const Menu: FC<MenuProps> = (props) => {
-  const {
-    className,
-    mode,
-    style,
-    children,
-    defaultIndex,
-    onSelect,
-    defaultOpenSubMenus,
-  } = props;
+  const { className, mode, style, children, defaultIndex, onSelect, defaultOpenSubMenus } = props;
   const [currentActive, setActive] = useState(defaultIndex);
   const classes = classNames('simple-menu', className, {
     'menu-vertical': mode === 'vertical',
@@ -68,17 +62,13 @@ export const Menu: FC<MenuProps> = (props) => {
           index: index.toString(),
         });
       } else {
-        console.error(
-          'Warning: Menu has a child which is not a MenuItem component',
-        );
+        console.error('Warning: Menu has a child which is not a MenuItem component');
       }
     });
   };
   return (
     <ul className={classes} style={style} data-testid="test-menu">
-      <MenuContext.Provider value={passedContext}>
-        {renderChildren()}
-      </MenuContext.Provider>
+      <MenuContext.Provider value={passedContext}>{renderChildren()}</MenuContext.Provider>
     </ul>
   );
 };

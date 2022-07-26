@@ -1,37 +1,25 @@
 {
-  "name": "ease-element",
-  "version": "1.0.1",
-  "private": false,
-  "description": "React components library",
-  "author": "path-yu",
-  "license": "MIT",
-  "keywords": [
-    "Component",
-    "UI",
-    "React"
-  ],
+  "private": true,
+  "name": "leaf-ui",
+  "version": "1.0.0",
   "scripts": {
     "start": "dumi dev",
     "docs:build": "dumi build",
     "docs:deploy": "gh-pages -d docs-dist",
-    "build": "father-build",
+    "build": "father build",
     "deploy": "npm run docs:build && npm run docs:deploy",
-    "release": "npm run build && npm publish",
     "prettier": "prettier --write \"**/*.{js,jsx,tsx,ts,less,md,json}\"",
-    "test": "umi-test",
+    "test": "umi-test --watchAll",
     "test:coverage": "umi-test --coverage",
-    "prepublishOnly": "npm run prettier"
+    "prepublishOnly": "npm run build"
   },
-  "homepage": "http://1.116.124.155/ease-element",
-  "main": "dist/index.js",
-  "module": "dist/index.esm.js",
-  "typings": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "module": "dist/esm/index.js",
+  "typings": "dist/esm/index.d.ts",
   "gitHooks": {
     "pre-commit": "lint-staged"
-  },
-  "peerDependencies": {
-    "react": ">=16.8.0",
-    "react-dom": ">=16.8.0"
   },
   "lint-staged": {
     "*.{js,jsx,less,md,json}": [
@@ -41,37 +29,36 @@
       "prettier --parser=typescript --write"
     ]
   },
-  "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^1.2.26",
-    "@fortawesome/free-solid-svg-icons": "^5.12.0",
-    "@fortawesome/react-fontawesome": "^0.1.8",
-    "axios": "^0.21.4",
-    "classnames": "^2.3.1",
-    "react-transition-group": "^4.3.0"
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^5.14.1",
-    "@testing-library/react": "^12.1.0",
-    "@types/jest": "^27.0.1",
-    "@types/react": "^17.0.21",
-    "@types/react-transition-group": "^4.4.2",
+    "@testing-library/jest-dom": "^5.15.1",
+    "@testing-library/react": "^13.0.0",
+    "@types/jest": "^27.0.3",
+    "@types/react": "^18.0.15",
+    "@types/react-transition-group": "^4.4.5",
+    "@types/testing-library__jest-dom": "^5.14.5",
+    "@umijs/fabric": "^2.8.1",
     "@umijs/plugin-sass": "^1.1.1",
     "@umijs/test": "^3.0.5",
-    "dumi": "^1.0.16",
-    "father-build": "^1.17.2",
+    "dumi": "^1.1.0",
+    "father": "^4.0.0-rc.2",
     "gh-pages": "^3.0.0",
     "lint-staged": "^10.0.7",
     "prettier": "^2.2.1",
-    "yorkie": "^2.0.0",
-    "react": "^16.12.0"
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "yorkie": "^2.0.0"
   },
-  "files": [
-    "dist"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://gitee.com/ayuyuyuyu/simple_element",
-    "branch": "master",
-    "platform": "gitee"
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.1.1",
+    "@fortawesome/free-solid-svg-icons": "^6.1.1",
+    "@fortawesome/react-fontawesome": "^0.2.0",
+    "axios": "^0.27.2",
+    "classnames": "^2.3.1",
+    "rc-motion": "^2.6.2",
+    "react-transition-group": "^4.4.2"
   }
 }

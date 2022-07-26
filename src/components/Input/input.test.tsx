@@ -1,6 +1,7 @@
 import { fireEvent, render } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import React from 'react';
-import Input, { InputProps } from './input';
+import Input, { InputProps } from './Input';
 
 const defaultProps: InputProps = {
   onChange: jest.fn(),
@@ -9,9 +10,7 @@ const defaultProps: InputProps = {
 describe('test Input component', () => {
   it('should render the correct default Input', () => {
     const wrapper = render(<Input {...defaultProps} />);
-    const testNode = wrapper.getByPlaceholderText(
-      'test-input',
-    ) as HTMLInputElement;
+    const testNode = wrapper.getByPlaceholderText('test-input') as HTMLInputElement;
     expect(testNode).toBeInTheDocument();
     expect(testNode).toHaveClass('simple-input-inner');
     fireEvent.change(testNode, { target: { value: '23' } });
@@ -20,16 +19,12 @@ describe('test Input component', () => {
   });
   it('should render the disabled Input on disabled property', () => {
     const wrapper = render(<Input disabled placeholder="disabled" />);
-    const testNode = wrapper.getByPlaceholderText(
-      'disabled',
-    ) as HTMLInputElement;
+    const testNode = wrapper.getByPlaceholderText('disabled') as HTMLInputElement;
     expect(testNode.disabled).toBeTruthy();
   });
   it('should render different input sizes on size property', () => {
     const wrapper = render(<Input placeholder="sizes" size="lg" />);
-    const testContainer = wrapper.container.querySelector(
-      '.simple-input-wrapper',
-    );
+    const testContainer = wrapper.container.querySelector('.simple-input-wrapper');
     expect(testContainer).toHaveClass('input-size-lg');
   });
   it('should render prepand and append element on prepand/append property', () => {
@@ -37,9 +32,7 @@ describe('test Input component', () => {
       <Input placeholder="pend" prepend="https://" append=".com" />,
     );
     const testContainer = container.querySelector('.simple-input-wrapper');
-    expect(testContainer).toHaveClass(
-      'input-group input-group-append input-group-prepend',
-    );
+    expect(testContainer).toHaveClass('input-group input-group-append input-group-prepend');
     expect(queryByText('https://')).toBeInTheDocument();
     expect(queryByText('.com')).toBeInTheDocument();
   });

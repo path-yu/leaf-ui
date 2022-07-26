@@ -1,16 +1,10 @@
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import classNames from 'classnames';
-import React, {
-  ChangeEvent,
-  forwardRef,
-  InputHTMLAttributes,
-  ReactElement,
-} from 'react';
-import Icon from '../Icon/icon';
-
+import React, { ChangeEvent, forwardRef, InputHTMLAttributes, ReactElement } from 'react';
+import Icon from '../Icon/Icon';
+import './_style.scss';
 type InputSize = 'lg' | 'sm';
-export interface InputProps
-  extends Omit<InputHTMLAttributes<HTMLElement>, 'size'> {
+export interface InputProps extends Omit<InputHTMLAttributes<HTMLElement>, 'size'> {
   /**是否禁用 Input*/
   disabled?: boolean;
   /**设置 input 大小，支持 lg 或者是 sm  */
@@ -26,7 +20,7 @@ export interface InputProps
 
 const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
   const { disabled, size, icon, prepend, append, style, ...restProps } = props;
-  const cnames = classNames('simple-input-wrapper', {
+  const classes = classNames('simple-input-wrapper', {
     [`input-size-${size}`]: size,
     'is-disabled': disabled,
     'input-group': prepend || append,
@@ -46,19 +40,14 @@ const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
     restProps.value = fixControlledValue(props.value);
   }
   return (
-    <div className={cnames} style={style}>
+    <div className={classes} style={style}>
       {prepend && <div className="simple-input-group-prepend">{prepend}</div>}
       {icon && (
         <div className="icon-wrapper">
           <Icon icon={icon} title={`title-${icon}`} />
         </div>
       )}
-      <input
-        ref={ref}
-        className="simple-input-inner"
-        disabled={disabled}
-        {...restProps}
-      />
+      <input ref={ref} className="simple-input-inner" disabled={disabled} {...restProps} />
       {append && <div className="simple-input-group-append">{append}</div>}
     </div>
   );

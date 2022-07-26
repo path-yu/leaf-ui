@@ -1,9 +1,10 @@
+@import '../../styles/variable';
+@import '../../styles/common';
 .simple-select {
   position: relative;
 
   .simple-input-wrapper {
     cursor: pointer;
-
     &:hover {
       input {
         border-color: $primary !important;
@@ -43,17 +44,7 @@
 }
 
 .simple-select-dropdown {
-  list-style: none;
-  padding-left: 0;
-  white-space: nowrap;
-  position: absolute;
-  background: $white;
-  z-index: 100;
-  top: calc(100% + 8px);
-  left: 0;
-  border: $menu-border-width solid $menu-border-color;
-  box-shadow: $submenu-box-shadow;
-  width: 100%;
+  @extend .container-list;
 
   .simple-select-item {
     padding: $menu-item-padding-y $menu-item-padding-x;

@@ -4,15 +4,16 @@ import React, {
   FC,
   FunctionComponentElement,
   MouseEvent,
+  ReactNode,
   useEffect,
   useRef,
   useState,
 } from 'react';
 import useClickOutSize from '../..//hook/useClickOutSize';
-import Icon from '../Icon';
-import Input from '../Input';
-import Transition from '../Transition';
-import { SelectOptionProps } from './option';
+import Icon from '../Icon/Icon';
+import Input from '../Input/Input';
+import Transition from '../Transition/Transition';
+import { SelectOptionProps } from './Option';
 
 export interface SelectProps {
   /**指定默认选中的条目	 可以是是字符串或者字符串数组*/
@@ -29,6 +30,7 @@ export interface SelectProps {
   onChange?: (selectedValue: string, selectedValues: string[]) => void;
   /**下拉框出现/隐藏时触发 */
   onVisibleChange?: (visible: boolean) => void;
+  children?: ReactNode;
 }
 export interface ISelectContext {
   onSelect?: (value: string, isSelected?: boolean) => void;
@@ -58,9 +60,7 @@ const Select: FC<SelectProps> = (props) => {
   const [selectedValues, setSelectedValues] = useState<string[]>(
     Array.isArray(defaultValue) ? defaultValue : [],
   );
-  const [value, setValue] = useState(
-    typeof defaultValue === 'string' ? defaultValue : '',
-  );
+  const [value, setValue] = useState(typeof defaultValue === 'string' ? defaultValue : '');
   useClickOutSize(containerRef, () => {
     setMenuOpen(false);
     if (onVisibleChange && menuOpen) {
@@ -80,8 +80,7 @@ const Select: FC<SelectProps> = (props) => {
   }, [selectedValues, multiple, placeholder]);
   useEffect(() => {
     if (containerRef.current) {
-      containerWidth.current =
-        containerRef.current.getBoundingClientRect().width;
+      containerWidth.current = containerRef.current.getBoundingClientRect().width;
     }
   });
   const handleClick = (e: MouseEvent) => {
@@ -125,9 +124,7 @@ const Select: FC<SelectProps> = (props) => {
           index: `select-${i}`,
         });
       } else {
-        console.error(
-          'Warning: Select has a child which is not a Option component',
-        );
+        console.error('Warning: Select has a child which is not a Option component');
       }
     });
   };
@@ -155,10 +152,7 @@ const Select: FC<SelectProps> = (props) => {
         </Transition>
       </SelectContext.Provider>
       {multiple && (
-        <div
-          className="simple-selected-tags"
-          style={{ maxWidth: containerWidth.current - 32 }}
-        >
+        <div className="simple-selected-tags" style={{ maxWidth: containerWidth.current - 32 }}>
           {selectedValues.map((value, index) => {
             return (
               <span className="simple-tag" key={`tag-${index}`}>

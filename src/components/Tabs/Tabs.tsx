@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import classNames from 'classnames';
 import * as React from 'react';
 import {
@@ -12,8 +11,8 @@ import {
   useRef,
   useState,
 } from 'react';
-import { TabPaneProps } from './tab-pane';
-
+import { TabPaneProps } from './TabPane';
+import './_style.scss';
 export interface TabsProps {
   /** 初始化选中面板的 key，如果没有设置 activeKey */
   defaultIndex?: number;
@@ -29,22 +28,15 @@ export interface TabsProps {
   activeBarMode?: 'center' | 'fill';
   /** 标签居中显示*/
   centered?: boolean;
+  children?: ReactNode;
 }
 interface IActiveBarStyle {
   width?: string;
   left?: string;
 }
 const Tabs: FC<TabsProps> = (props) => {
-  const {
-    defaultIndex,
-    onChange,
-    className,
-    children,
-    type,
-    animated,
-    activeBarMode,
-    centered,
-  } = props;
+  const { defaultIndex, onChange, className, children, type, animated, activeBarMode, centered } =
+    props;
   const [activeIndex, setActiveIndex] = useState(defaultIndex);
   const [activeBarStyle, setActiveBarStyle] = useState<IActiveBarStyle>();
   const tabsListRef = useRef<HTMLUListElement>(null);
@@ -63,9 +55,7 @@ const Tabs: FC<TabsProps> = (props) => {
   useEffect(() => {
     // 如果animated为true 则初始化设置底部导航栏样式 否者使用border-bottom作为底部导航栏
     if (animated && tabStyle.opacity === 0 && type === 'line') {
-      const parentElement = tabsListRef.current!.children[
-        defaultIndex as number
-      ] as HTMLLIElement;
+      const parentElement = tabsListRef.current!.children[defaultIndex as number] as HTMLLIElement;
       tabsItemWidth.current = parentElement.offsetWidth;
       const target = parentElement.children[0] as HTMLHtmlElement;
       inItActiveBarStyle(parentElement, target);
@@ -75,10 +65,7 @@ const Tabs: FC<TabsProps> = (props) => {
   }, []);
 
   // 初始化计算底部导航栏样式
-  const inItActiveBarStyle = (
-    parentElement: HTMLLIElement,
-    target: HTMLSpanElement,
-  ) => {
+  const inItActiveBarStyle = (parentElement: HTMLLIElement, target: HTMLSpanElement) => {
     // 计算单个tabItem长度
     let barStyle: IActiveBarStyle = {};
     const parentElementOffSetWith = parentElement.offsetWidth;
@@ -115,11 +102,7 @@ const Tabs: FC<TabsProps> = (props) => {
     };
     setActiveBarStyle(style);
   };
-  const handleClick = (
-    e: MouseEvent,
-    index: number,
-    disabled: boolean | undefined,
-  ) => {
+  const handleClick = (e: MouseEvent, index: number, disabled: boolean | undefined) => {
     if (!disabled) {
       setActiveIndex(index);
       if (type === 'line' && animated) {
@@ -171,25 +154,17 @@ const Tabs: FC<TabsProps> = (props) => {
       }
       // 判断是否需要渲染child, 减少不必要的渲染开销
       const isRenderChild = cacheChildrenIndex.current.includes(index);
-      return (
-        <div style={{ display: displayStyle }}>{isRenderChild && child}</div>
-      );
+      return <div style={{ display: displayStyle }}>{isRenderChild && child}</div>;
     });
   };
   const renderAnimateBar = () => {
     return (
-      <div
-        className="simple-tabs-ink-bar simple-ink-bar-animated"
-        style={activeBarStyle}
-      ></div>
+      <div className="simple-tabs-ink-bar simple-ink-bar-animated" style={activeBarStyle}></div>
     );
   };
 
   return (
-    <div
-      style={tabStyle}
-      className={`simple-tabs ${className ? classNames : ''}`}
-    >
+    <div style={tabStyle} className={`simple-tabs ${className ? classNames : ''}`}>
       <div className={navClass} style={centerStyle}>
         <ul ref={tabsListRef} className="tabsList">
           {renderNavLinks()}

@@ -1,13 +1,9 @@
-import {
-  fireEvent,
-  render,
-  RenderResult,
-  waitFor,
-} from '@testing-library/react';
+import { fireEvent, render, RenderResult, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import React from 'react';
 import Menu, { MenuProps } from './menu';
-import { MenuItem } from './menu-item';
-import SubMenu from './sub-menu';
+import { MenuItem } from './MenuItem';
+import SubMenu from './SubMenu';
 
 const testProps: MenuProps = {
   defaultIndex: '0',

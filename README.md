@@ -1,18 +1,6 @@
-# dumi
+# leaf-ui
 
 ## Getting Started
-
-install
-
-```bash
-$ npm install ease-element
-```
-
-or
-
-```bash
-$ yarn add ease-element
-```
 
 Install dependencies,
 
@@ -32,7 +20,13 @@ Build documentation,
 $ npm run docs:build
 ```
 
-Build library via `father-build`,
+Run test,
+
+```bash
+$ npm test
+```
+
+Build library via `father`,
 
 ```bash
 $ npm run build

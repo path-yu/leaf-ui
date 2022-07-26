@@ -1,21 +1,12 @@
+@import '../../styles/variable';
+@import '../../styles/common';
 .simple-auto-complete {
   position: relative;
 }
 
 .simple-suggestion-list {
-  list-style: none;
-  padding-left: 0;
-  white-space: nowrap;
-  position: absolute;
-  background: $white;
-  z-index: 100;
-  top: calc(100% + 8px);
-  left: 0;
-  border: $menu-border-width solid $menu-border-color;
-  box-shadow: $submenu-box-shadow;
-  width: 100%;
-
-  .suggstions-loading-icon {
+  @extend .container-list;
+  .suggestions-loading-icon {
     display: flex;
     align-items: center;
     justify-content: center;

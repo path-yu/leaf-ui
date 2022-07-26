@@ -1,9 +1,9 @@
 import { ReactNode } from 'react';
 export interface BaseButtonProps {
-  /**可扩展的className */
+  /** 可扩展的className */
   className?: string;
   /**
-   * 是否禁用 Button
+   * @description 是否禁用 Button
    * @default false
    */
   disabled?: boolean;
@@ -13,16 +13,17 @@ export interface BaseButtonProps {
    */
   size?: 'lg' | 'sm';
   /**
-   * 设置Button的类型
+   * @description 设置Button的类型
    * @default default
    */
   btnType?: 'primary' | 'default' | 'danger' | 'link';
-  children: ReactNode;
   /**当按钮为link类型时的href链接地址 */
   href?: string;
-  /**button的形状
+  /**
+   * @description button的形状
    * @default round
    */
   share?: 'circle' | 'round';
+  children: ReactNode;
 }
 export default (props: BaseButtonProps) => () => {};

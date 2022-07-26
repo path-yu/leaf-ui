@@ -1,0 +1,14 @@
+@import "variable";
+.container-list{
+  list-style: none;
+  padding-left: 0;
+  white-space: nowrap;
+  position: absolute;
+  background: $white;
+  z-index: 100;
+  top: calc(100% + 8px);
+  left: 0;
+  border: $menu-border-width solid $menu-border-color;
+  box-shadow: $submenu-box-shadow;
+  width: 100%;
+}

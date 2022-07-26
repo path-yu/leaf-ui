@@ -1,13 +1,9 @@
 import '@testing-library/jest-dom/extend-expect';
-import {
-  fireEvent,
-  render,
-  RenderResult,
-  waitFor,
-} from '@testing-library/react';
+import '@testing-library/jest-dom';
+import { fireEvent, render, RenderResult, waitFor } from '@testing-library/react';
 import axios from 'axios';
 import React from 'react';
-import Upload, { UploadProps } from './upload';
+import Upload, { UploadProps } from './Upload';
 
 // mock icon的实现, 将icon图标显示为文字
 jest.mock('../Icon/icon', () => {
@@ -30,9 +26,7 @@ const testFile = new File(['xyz'], 'test.png', { type: 'image/png' });
 describe('test upload component', () => {
   beforeEach(() => {
     wrapper = render(<Upload {...testProps}>Click to upload</Upload>);
-    fileInput = wrapper.container.querySelector(
-      '.simple-file-input',
-    ) as HTMLInputElement;
+    fileInput = wrapper.container.querySelector('.simple-file-input') as HTMLInputElement;
     uploadArea = wrapper.queryByText('Click to upload') as HTMLElement;
   });
   it('upload process should works fine', async () => {
@@ -45,8 +39,8 @@ describe('test upload component', () => {
     expect(queryByText('spinner')).toBeInTheDocument();
     await waitFor(() => {
       expect(queryByText('test.png')).toBeInTheDocument();
+      expect(queryByText('check-circle')).toBeInTheDocument();
     });
-    expect(queryByText('check-circle')).toBeInTheDocument();
     expect(testProps.onSuccess).toHaveBeenCalledWith(
       'cool',
       expect.objectContaining({

@@ -1,3 +1,4 @@
+@import '../../styles/variable';
 .simple-menu {
   display: flex;
   flex-wrap: wrap;
@@ -75,9 +76,6 @@
       }
     }
   }
-  //  .menu-opened {
-  //    display: block;
-  //  }
 }
 
 .menu-horizontal {

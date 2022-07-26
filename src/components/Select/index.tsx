@@ -1,7 +1,7 @@
 import { FC } from 'react';
-import Option, { SelectOptionProps } from './option';
-import Select, { SelectProps } from './select';
-
+import Option, { SelectOptionProps } from './Option';
+import Select, { SelectProps } from './Select';
+import './_style.scss';
 export type ISelectComponent = FC<SelectProps> & {
   Option: FC<SelectOptionProps>;
 };

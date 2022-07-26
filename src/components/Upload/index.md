@@ -6,7 +6,7 @@
 
 ```tsx
 import React from 'react';
-import { Upload, Button, Icon } from 'ease-element';
+import { Upload, Button, Icon } from 'leaf-ui';
 const action = (status) => {
   return () => {
     console.log(status);
@@ -32,7 +32,7 @@ export default simpleUpload;
 
 ```tsx
 import React from 'react';
-import { Upload, Button, Icon } from 'ease-element';
+import { Upload, Button, Icon } from 'leaf-ui';
 const checkUpload = () => {
   const checkFileSize = (file: File) => {
     if (Math.round(file.size / 1024) > 50) {
@@ -62,7 +62,7 @@ export default checkUpload;
 
 ```tsx
 import React from 'react';
-import { Upload, Button, Icon } from 'ease-element';
+import { Upload, Button, Icon } from 'leaf-ui';
 const dragUpload = () => (
   <Upload
     action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
@@ -84,4 +84,4 @@ const dragUpload = () => (
 export default dragUpload;
 ```
 
-<API src="./upload.tsx">
+<API src="./Upload.tsx">

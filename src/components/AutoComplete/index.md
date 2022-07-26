@@ -6,7 +6,7 @@
 
 ```tsx
 import React from 'react';
-import { AutoComplete } from 'ease-element';
+import { AutoComplete } from 'leaf-ui';
 const lakers = [
   'bradley',
   'pope',
@@ -22,9 +22,7 @@ const lakers = [
   'rando',
 ];
 const handleFetch = (query: string) => {
-  return lakers
-    .filter((name) => name.includes(query))
-    .map((name) => ({ value: name }));
+  return lakers.filter((name) => name.includes(query)).map((name) => ({ value: name }));
 };
 export default () => (
   <AutoComplete
@@ -41,7 +39,7 @@ export default () => (
 
 ```tsx
 import React from 'react';
-import { AutoComplete } from 'ease-element';
+import { AutoComplete } from 'leaf-ui';
 const lakersWithNumber = [
   { value: 'bradley', number: 11 },
   { value: 'pope', number: 1 },
@@ -82,14 +80,12 @@ export default () => (
 
 ```tsx
 import React from 'react';
-import { AutoComplete } from 'ease-element';
+import { AutoComplete } from 'leaf-ui';
 const handleFetch = (query: string) => {
   return fetch(`https://api.github.com/search/users?q=${query}`)
     .then((res) => res.json())
     .then(({ items }) => {
-      return items
-        .slice(0, 10)
-        .map((item: any) => ({ value: item.login, ...item }));
+      return items.slice(0, 10).map((item: any) => ({ value: item.login, ...item }));
     });
 };
 const renderOption = (item: DataSourceType) => {
@@ -113,4 +109,4 @@ export default () => (
 );
 ```
 
-<API src="./api.tsx">
+<API src="./AutoComplete.Api.tsx">

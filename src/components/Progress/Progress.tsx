@@ -1,5 +1,6 @@
 import React, { CSSProperties, FC } from 'react';
-import { ThemeProps } from '../Icon/icon';
+import './_style.scss';
+
 export interface ProgressProps {
   /** 当前进度值  */
   percent: number;
@@ -10,16 +11,13 @@ export interface ProgressProps {
   /** 自定义的Style */
   styles?: CSSProperties;
   /** 进度条的主题 */
-  theme?: Omit<ThemeProps, 'light'>;
+  theme?: 'primary' | 'secondary' | 'success' | 'info' | 'warning' | 'danger' | 'light' | 'dark';
 }
 const Progress: FC<ProgressProps> = (props) => {
   const { percent, strokeHeight, showText, styles, theme } = props;
   return (
     <div className="simple-progress-bar" style={styles}>
-      <div
-        className="simple-progress-bar-outer"
-        style={{ height: `${strokeHeight}px` }}
-      >
+      <div className="simple-progress-bar-outer" style={{ height: `${strokeHeight}px` }}>
         <div
           className={`simple-progress-bar-inner color-${theme}`}
           style={{ width: `${percent}%` }}

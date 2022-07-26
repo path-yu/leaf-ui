@@ -1,9 +1,3 @@
----
-nav:
-  title: Components
-  path: /components
----
-
 ## Input-输入框
 
 通过鼠标或键盘输入内容，是最基础的表单域的包装。
@@ -12,13 +6,11 @@ nav:
 
 ```tsx
 import React from 'react';
-import { Input } from 'ease-element';
+import { Input } from 'leaf-ui';
 const handleChange = (e) => {
   console.log(e.target.value);
 };
-const defaultInput = () => (
-  <Input onChange={handleChange} placeholder="随便输入点什么吧" />
-);
+const defaultInput = () => <Input onChange={handleChange} placeholder="随便输入点什么吧" />;
 export default defaultInput;
 ```
 
@@ -26,7 +18,7 @@ export default defaultInput;
 
 ```tsx
 import React from 'react';
-import { Input } from 'ease-element';
+import { Input } from 'leaf-ui';
 const disabledInput = () => <Input placeholder="disabled input" disabled />;
 export default disabledInput;
 ```
@@ -35,7 +27,7 @@ export default disabledInput;
 
 ```tsx
 import React from 'react';
-import { Input } from 'ease-element';
+import { Input } from 'leaf-ui';
 const iconInput = () => <Input placeholder="iconInput input" icon="search" />;
 export default iconInput;
 ```
@@ -44,7 +36,7 @@ export default iconInput;
 
 ```tsx
 import React from 'react';
-import { Input } from 'ease-element';
+import { Input } from 'leaf-ui';
 const sizeInput = () => (
   <>
     <Input defaultValue="large size" size="lg" />
@@ -58,21 +50,17 @@ export default sizeInput;
 
 ```tsx
 import React from 'react';
-import { Input } from 'ease-element';
+import { Input } from 'leaf-ui';
 const handleChange = (e) => {
   console.log(e.target.value);
 };
 const pandInput = () => (
   <>
-    <Input
-      defaultValue="prepend text"
-      prepend="https://"
-      onChange={handleChange}
-    />
+    <Input defaultValue="prepend text" prepend="https://" onChange={handleChange} />
     <Input defaultValue="google" append=".com" />
   </>
 );
 export default pandInput;
 ```
 
-<API src="./input.api.tsx">
+<API src="./Input.Api.tsx">

@@ -5,7 +5,7 @@
 ## 简单演示
 
 ```tsx
-import { Select } from 'ease-element';
+import { Select } from 'leaf-ui';
 import React from 'react';
 const action = (value) => {
   console.log(value);
@@ -25,7 +25,7 @@ export default defaultSelect;
 ## 多选的 Select
 
 ```tsx
-import { Select } from 'ease-element';
+import { Select } from 'leaf-ui';
 import React from 'react';
 const action = (value) => {
   console.log(value);
@@ -51,7 +51,7 @@ export default multipleSelect;
 ## 被禁用的 Select
 
 ```tsx
-import { Select } from 'ease-element';
+import { Select } from 'leaf-ui';
 import React from 'react';
 
 const disabledSelect = () => (
@@ -67,8 +67,8 @@ export default disabledSelect;
 
 ### SelectApi
 
-<API hideTitle src="./select.tsx">
+<API hideTitle src="./Select.tsx">
 
 ### OptionApi
 
-<API hideTitle src="./option.tsx">
+<API hideTitle src="./Option.tsx">

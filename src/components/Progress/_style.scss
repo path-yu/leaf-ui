@@ -1,3 +1,4 @@
+@import '../../styles/variable';
 .simple-progress-bar {
   width: 100%;
   box-sizing: border-box;
@@ -9,7 +10,7 @@
     position: relative;
   }
 
-   
+
   .simple-progress-bar-inner {
     position: absolute;
     left: 0;
@@ -21,7 +22,7 @@
     border-radius: $progress-border-radius;
     line-height: 1;
     transition: $progress-bar-transition;
-   
+
     .inner-text {
       color: $progress-bar-color;
       font-size: $progress-font-size;
@@ -35,5 +36,5 @@
       background-color: $val;
     }
   }
- 
+
 }

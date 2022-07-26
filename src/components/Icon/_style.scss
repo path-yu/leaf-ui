@@ -1,3 +1,4 @@
+@import '../../styles/variable';
 @each $key,
 $val in $theme-colors {
   .icon-#{$key} {
