@@ -1,6 +1,5 @@
 import React, {
   CSSProperties,
-  EventHandler,
   FC,
   ImgHTMLAttributes,
   SyntheticEvent,
@@ -10,7 +9,6 @@ import React, {
 } from 'react';
 import { ImageProps } from './Api/Image.api';
 import './_style.scss';
-import { addpx } from '../../utils/core/addpx';
 const Image: FC<Partial<ImageProps & ImgHTMLAttributes<HTMLImageElement>>> = (props) => {
   const {
     width,
