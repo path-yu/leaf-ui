@@ -44,6 +44,7 @@ const Collapse: FC<CollapseProps> = (props) => {
     onItemHeaderClick,
     onUpdateExpandedNames,
     defaultExpandedNames,
+    ...restProps
   } = props;
   const calcDefaultExpend = () => {
     let defaultExpand: (string | number)[] = [];
@@ -70,7 +71,11 @@ const Collapse: FC<CollapseProps> = (props) => {
       _onItemHeaderClick: onItemHeaderClick,
     });
   });
-  return <div>{newChildren}</div>;
+  return (
+    <div className="collapse-container" {...restProps}>
+      {newChildren}
+    </div>
+  );
 };
 
 Collapse.defaultProps = {

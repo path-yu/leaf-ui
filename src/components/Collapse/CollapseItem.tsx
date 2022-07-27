@@ -8,6 +8,7 @@ import React, {
   useEffect,
   MouseEvent,
   Children,
+  ReactElement,
 } from 'react';
 import { Icon } from '../../index';
 
@@ -40,7 +41,6 @@ export interface CollapseItemProps {
   [key: string]: any;
 }
 export interface privateRestProps {
-  _parentDisplayDirective: 'if' | 'show';
   _arrowPlacement: 'left' | 'right';
   _accordion: boolean;
   _expendList: (string | number)[];
@@ -53,8 +53,7 @@ export interface privateRestProps {
   }) => void;
 }
 const CollapseItem: FC<CollapseItemProps> = (props) => {
-  let { children, title, name, displayDirective, showArrow, icon, headerExtra, ...restProps } =
-    props;
+  let { children, title, name, showArrow, icon, headerExtra, ...restProps } = props;
   let {
     _arrowPlacement,
     _accordion,
@@ -109,17 +108,17 @@ const CollapseItem: FC<CollapseItemProps> = (props) => {
         style={{ justifyContent: headerExtra ? 'space-between' : 'flex-start' }}
       >
         <div style={{ display: 'flex' }}>
-          <div className="icon-transition" style={rotateExpandedStyle}>
-            {_arrowPlacement === 'left' &&
-              showArrow &&
-              (icon ? icon : <Icon icon="chevron-right" />)}
-          </div>
+          {showArrow && _arrowPlacement === 'left' && (
+            <div className="icon-transition" style={rotateExpandedStyle}>
+              {icon ? icon : <Icon icon="chevron-right" />}
+            </div>
+          )}
           <span style={titleStyle}>{title}</span>
-          <div className="icon-transition" style={rotateExpandedStyle}>
-            {_arrowPlacement === 'right' &&
-              showArrow &&
-              (icon ? icon : <Icon icon="chevron-right" />)}
-          </div>
+          {showArrow && _arrowPlacement === 'right' && (
+            <div className="icon-transition" style={rotateExpandedStyle}>
+              {icon ? icon : <Icon icon="chevron-right" />}
+            </div>
+          )}
         </div>
         {headerExtra && headerExtra}
       </div>
