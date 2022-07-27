@@ -8,7 +8,6 @@ import React, {
   useEffect,
   MouseEvent,
   Children,
-  ReactElement,
 } from 'react';
 import { Icon } from '../../index';
 

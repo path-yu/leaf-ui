@@ -17,6 +17,9 @@ export default defineConfig({
         children: ['/components/Space/index.md'],
       },
       {
+        children: ['/components/Image/index.md'],
+      },
+      {
         children: ['/components/Select/index.md'],
       },
       {
