@@ -1,15 +1,29 @@
 import React, {
   CSSProperties,
+  Dispatch,
   FC,
   ImgHTMLAttributes,
+  RefObject,
+  SetStateAction,
   SyntheticEvent,
   useEffect,
   useRef,
   useState,
+  MouseEvent,
 } from 'react';
 import { ImageProps } from './Api/Image.api';
-import './_style.scss';
-const Image: FC<Partial<ImageProps & ImgHTMLAttributes<HTMLImageElement>>> = (props) => {
+import './style/image.scss';
+import ImagePreview, { ImagePreviewExpose } from './ImagePreview';
+import { deleteProps } from '../../utils/core/deleteProps';
+
+interface privateProps {
+  isWrapGroup?: boolean;
+  setShowPreview?: Dispatch<SetStateAction<boolean>>;
+  imagePreviewRef?: RefObject<ImagePreviewExpose>;
+  index?: number;
+}
+type NativeImageProps = ImageProps & Partial<ImgHTMLAttributes<HTMLImageElement>>;
+const Image: FC<NativeImageProps> = (props) => {
   const {
     width,
     height,
@@ -25,14 +39,44 @@ const Image: FC<Partial<ImageProps & ImgHTMLAttributes<HTMLImageElement>>> = (pr
     onError,
     onLoad,
     placeHolder,
+    triggerPreviewEventType,
     ...restProps
   } = props;
+
+  const imgProps = Object.assign({}, restProps);
+  // delete privateProps
+  const privateProps = deleteProps<privateProps>(imgProps, [
+    'isWrapGroup',
+    'setShowPreview',
+    'imagePreviewRef',
+    'index',
+  ]);
+
   const [loadStatus, setLoadStatus] = useState<'waiting' | 'loading' | 'success' | 'error'>(
     lazy ? 'waiting' : 'loading',
   );
   const isSuccess = loadStatus === 'success';
   const imageRef = useRef<HTMLImageElement>(null);
+  const imagePreviewRef = useRef<ImagePreviewExpose>(null);
   const [loadSrc, setLoadSrc] = useState(src || '');
+  const [showPreview, setShowPreview] = useState(false);
+  const triggerEvent = (event: MouseEvent<HTMLImageElement>) => {
+    if (privateProps.isWrapGroup && privateProps.setShowPreview) {
+      privateProps.imagePreviewRef?.current?.setThumbnailEl(imageRef.current!);
+      privateProps.imagePreviewRef?.current?.setPreviewCurrentIndex(restProps.index!);
+      privateProps.setShowPreview(true);
+    } else {
+      setShowPreview(true);
+      imagePreviewRef.current?.setThumbnailEl(imageRef.current!);
+    }
+    if (triggerPreviewEventType === 'onClick') {
+      imgProps.onClick && imgProps.onClick(event);
+    }
+    if (triggerPreviewEventType === 'onDoubleClick') {
+      imgProps.onDoubleClick && imgProps.onDoubleClick(event);
+    }
+  };
+  let previewEvent = previewDisabled ? {} : { [triggerPreviewEventType!]: triggerEvent };
 
   useEffect(() => {
     // add intersectionObserver
@@ -59,6 +103,7 @@ const Image: FC<Partial<ImageProps & ImgHTMLAttributes<HTMLImageElement>>> = (pr
   const obverseCallback = (entries: IntersectionObserverEntry[]) => {
     if (entries[0].isIntersecting) {
       setLoadStatus('loading');
+      observe?.disconnect();
     }
   };
   let observe = lazy
@@ -76,7 +121,7 @@ const Image: FC<Partial<ImageProps & ImgHTMLAttributes<HTMLImageElement>>> = (pr
     if (width) {
       style.width = width + 'px';
     }
-    if (height && !imageRef.current?.style.height) {
+    if (height) {
       style.height = height + 'px';
     }
     return style;
@@ -90,9 +135,19 @@ const Image: FC<Partial<ImageProps & ImgHTMLAttributes<HTMLImageElement>>> = (pr
         src={lazy ? (loadStatus === 'waiting' ? '' : loadSrc) : loadSrc}
         alt={alt}
         style={computedImgStyle()}
-        {...restProps}
+        {...imgProps}
+        {...previewEvent}
       />
       {(loadStatus === 'loading' || loadStatus === 'waiting') && placeHolder}
+      {!previewDisabled && !restProps.isWrapGroup && (
+        <ImagePreview
+          ref={imagePreviewRef}
+          setShow={setShowPreview}
+          show={showPreview}
+          previewSrcList={[previewSrc ? previewSrc : loadSrc]}
+          showToolBar={showToolbar}
+        />
+      )}
     </div>
   );
 };
@@ -101,6 +156,7 @@ Image.defaultProps = {
   objectFit: 'fill',
   previewDisabled: false,
   showToolbar: true,
+  triggerPreviewEventType: 'onClick',
   placeHolder: (
     <div
       style={{
@@ -112,8 +168,9 @@ Image.defaultProps = {
         background: '#0001',
       }}
     >
-      Loading
+      loading...
     </div>
   ),
 };
+Image.displayName = 'Image';
 export default Image;

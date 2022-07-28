@@ -59,7 +59,7 @@ const Collapse: FC<CollapseProps> = (props) => {
   const [expendList, setExpendList] = useState<(string | number)[]>(calcDefaultExpend());
   const newChildren = Children.map(children, (child, index) => {
     const childElement = child as FunctionComponentElement<CollapseItemProps>;
-    if (childElement.type.displayName !== 'CollapseItem') {
+    if (childElement.type?.displayName !== 'CollapseItem') {
       console.error('Warning: Collapse has a child which is not a CollapseItem component');
     }
     return cloneElement(childElement, {

@@ -1,5 +1,6 @@
-import { ReactNode, SyntheticEvent } from 'react';
+import React, { ReactNode, SyntheticEvent } from 'react';
 import { BaseButtonProps } from '../../Button/Button.api';
+import Image from '../Image';
 
 export interface ImageProps {
   /**
@@ -57,6 +58,20 @@ export interface ImageProps {
   /**
    * @description 图像没有加载成功时候的占位
    */
-  placeHolder: ReactNode;
+  placeHolder?: ReactNode;
+  /**
+   * @description 图片预览绑定事件类型
+   */
+  triggerPreviewEventType?: 'onClick' | 'onDoubleClick';
+  [key: string]: any;
 }
-export default (props: ImageProps) => {};
+
+const ImageApi = (props: ImageProps) => {};
+ImageApi.defaultProps = {
+  lazy: false,
+  objectFit: 'fill',
+  previewDisabled: false,
+  showToolbar: true,
+  triggerPreviewEventType: 'onClick',
+};
+export default ImageApi;

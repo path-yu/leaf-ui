@@ -1,4 +1,47 @@
+@import "variable";
 @include zoom-animation('top', scaleY(0), scaleY(1), center top);
 @include zoom-animation('left', scale(.45, .45), scale(1, 1), top left);
 @include zoom-animation('right', scale(.45, .45), scale(1, 1), top right);
 @include zoom-animation('bottom', scaleY(0), scaleY(1), center bottom);
+
+
+$duration:0.3s;
+.fade {
+  transition: opacity $duration $cubicBezierEaseInOut;
+  &.fade-appear,
+  &.fade-enter {
+    opacity: 0;
+  }
+
+  &.fade-appear.fade-appear-active,
+  &.fade-enter.fade-enter-active {
+    opacity: 1;
+  }
+
+  &.fade-leave-active {
+    opacity: 0;
+  }
+}
+
+.fade-in-scale-up{
+  &.fade-in-scale-up-leave.fade-in-scale-up-leave-active{
+    transform-origin: inherit;
+    transition: opacity $duration $cubicBezierEaseIn, transform $duration $cubicBezierEaseIn;
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  &.fade-in-scale-up-enter.fade-in-scale-up-enter-active{
+    transform-origin: inherit;
+    transition: opacity $duration $cubicBezierEaseOut, transform $duration $cubicBezierEaseOut;
+    opacity: 1;
+    transform: scale(1);
+  }
+  &.fade-in-scale-up-enter{
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  &.fade-in-scale-up-leave{
+    opacity: 1;
+    transform: scale(1);
+  }
+}

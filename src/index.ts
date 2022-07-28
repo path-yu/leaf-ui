@@ -14,3 +14,4 @@ export { default as Space } from './components/Space/Space';
 export { default as Collapse } from './components/Collapse/Collapse';
 export { default as CollapseItem } from './components/Collapse/CollapseItem';
 export { default as Image } from './components/Image/Image';
+export { default as ImageGroup } from './components/Image/ImageGroup';
