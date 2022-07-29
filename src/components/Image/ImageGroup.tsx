@@ -21,7 +21,6 @@ const ImageGroup: FC<ImageGroupProps> = (props) => {
   let { children, showToolBar } = props;
   let previewSrcList: string[] = [];
   const imagePreviewRef = useRef<ImagePreviewExpose>(null);
-  const [showPreview, setShowPreview] = useState(false);
 
   const newChildRen = Children.map(children, (child, index) => {
     const childElement = child as FunctionComponentElement<ImageProps>;
@@ -29,7 +28,6 @@ const ImageGroup: FC<ImageGroupProps> = (props) => {
       previewSrcList.push(childElement.props.src);
       return cloneElement(childElement, {
         isWrapGroup: true,
-        setShowPreview,
         imagePreviewRef,
         index: index,
       });
@@ -42,8 +40,6 @@ const ImageGroup: FC<ImageGroupProps> = (props) => {
       {newChildRen}
       <ImagePreview
         ref={imagePreviewRef}
-        setShow={setShowPreview}
-        show={showPreview}
         showToolBar={showToolBar}
         previewSrcList={previewSrcList}
       />

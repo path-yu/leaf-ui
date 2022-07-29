@@ -18,7 +18,6 @@ import { deleteProps } from '../../utils/core/deleteProps';
 
 interface privateProps {
   isWrapGroup?: boolean;
-  setShowPreview?: Dispatch<SetStateAction<boolean>>;
   imagePreviewRef?: RefObject<ImagePreviewExpose>;
   index?: number;
 }
@@ -59,15 +58,14 @@ const Image: FC<NativeImageProps> = (props) => {
   const imageRef = useRef<HTMLImageElement>(null);
   const imagePreviewRef = useRef<ImagePreviewExpose>(null);
   const [loadSrc, setLoadSrc] = useState(src || '');
-  const [showPreview, setShowPreview] = useState(false);
   const triggerEvent = (event: MouseEvent<HTMLImageElement>) => {
-    if (privateProps.isWrapGroup && privateProps.setShowPreview) {
+    if (privateProps.isWrapGroup) {
       privateProps.imagePreviewRef?.current?.setThumbnailEl(imageRef.current!);
       privateProps.imagePreviewRef?.current?.setPreviewCurrentIndex(restProps.index!);
-      privateProps.setShowPreview(true);
+      privateProps.imagePreviewRef?.current?.openPreview();
     } else {
-      setShowPreview(true);
       imagePreviewRef.current?.setThumbnailEl(imageRef.current!);
+      imagePreviewRef.current?.openPreview();
     }
     if (triggerPreviewEventType === 'onClick') {
       imgProps.onClick && imgProps.onClick(event);
@@ -142,8 +140,6 @@ const Image: FC<NativeImageProps> = (props) => {
       {!previewDisabled && !restProps.isWrapGroup && (
         <ImagePreview
           ref={imagePreviewRef}
-          setShow={setShowPreview}
-          show={showPreview}
           previewSrcList={[previewSrc ? previewSrc : loadSrc]}
           showToolBar={showToolbar}
         />

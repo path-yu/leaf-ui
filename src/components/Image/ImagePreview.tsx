@@ -1,7 +1,5 @@
 import React, {
-  Dispatch,
   MouseEvent,
-  SetStateAction,
   useImperativeHandle,
   useRef,
   useState,
@@ -24,31 +22,30 @@ import {
   zoomIn,
   closeIcon,
 } from './ToolBarIcon';
-import Image from './Image';
 interface ImagePreviewProps {
-  show: boolean;
-  setShow: Dispatch<SetStateAction<boolean>>;
   previewSrcList: string[];
   showToolBar?: boolean;
 }
 export interface ImagePreviewExpose {
   setThumbnailEl: (el: HTMLImageElement) => void;
   setPreviewCurrentIndex: (index: number) => void;
+  openPreview: () => void;
 }
 const ImagePreview: ForwardRefRenderFunction<ImagePreviewExpose, ImagePreviewProps> = (
   props,
   ref,
 ) => {
   let thumbnailEl = useRef<HTMLImageElement>();
-  const { previewSrcList, setShow, show, showToolBar = true } = props;
+  const { previewSrcList, showToolBar = true } = props;
   let maxCurrent = previewSrcList.length - 1;
   const [current, setCurrent] = useState(0);
+  const [previewShow, setPreviewShow] = useState(false);
   const previewWrapperRef = useRef<HTMLDivElement>(null);
-  const previewContainerRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const { handleMouseDown } = useDragMove(imageRef, true);
   const [scale, setScale] = useState(1);
   const [rotate, setRotate] = useState(0);
+  const [isMount, setIsMount] = useState(false);
   let scaleMap: { [key: string]: { increment: number | null; reduce: number | null } } = {
     1: {
       increment: 1.5,
@@ -98,14 +95,14 @@ const ImagePreview: ForwardRefRenderFunction<ImagePreviewExpose, ImagePreviewPro
     ...exposedMethods,
   }));
   useEffect(() => {
-    if (show) {
-      previewContainerRef.current!.style.display = 'block';
+    if (isMount) {
+      setPreviewShow(true);
     }
-  }, [show]);
+  }, [isMount]);
   const handleContainerClick = (event: MouseEvent<HTMLDivElement>) => {
     let target = event.target as HTMLElement;
     if (target.classList.contains('image-preview-overlay')) {
-      setShow(false);
+      setPreviewShow(false);
     }
   };
   const exposedMethods: ImagePreviewExpose = {
@@ -114,6 +111,9 @@ const ImagePreview: ForwardRefRenderFunction<ImagePreviewExpose, ImagePreviewPro
     },
     setPreviewCurrentIndex(index) {
       setCurrent(index);
+    },
+    openPreview() {
+      setIsMount(true);
     },
   };
   const syncTransformOrigin = () => {
@@ -134,88 +134,85 @@ const ImagePreview: ForwardRefRenderFunction<ImagePreviewExpose, ImagePreviewPro
   let commonMotionProps = {
     removeOnLeave: false,
     leavedClassName: 'hidden',
-    visible: show,
+    visible: previewShow,
   };
   return createPortal(
-    <div
-      className="image-preview-container"
-      onClick={handleContainerClick}
-      style={{ display: 'none' }}
-      ref={previewContainerRef}
-    >
-      <CSSMotion
-        {...commonMotionProps}
-        motionName="fade"
-        onLeaveEnd={() => {
-          previewContainerRef.current!.style.display = 'none';
-        }}
-      >
-        {({ className, style }) => (
-          <div style={style} className={classNames('image-preview-overlay', className)} />
-        )}
-      </CSSMotion>
-      <CSSMotion
-        {...commonMotionProps}
-        motionName="fade-in-scale-up"
-        onEnterStart={syncTransformOrigin}
-        onLeaveStart={syncTransformOrigin}
-        onLeaveEnd={handleLeaveEnd}
-      >
-        {({ className, style }) => (
-          <div
-            className={classNames('image-preview-wrapper', className)}
-            ref={previewWrapperRef}
-            style={style}
-          >
-            <div style={{ transform: `scale(${scale}) rotate(${rotate}deg)`, margin: 'auto' }}>
-              <img
-                onMouseDown={handleMouseDown}
-                src={previewSrcList[current]}
-                alt=""
-                ref={imageRef}
-                onDragStart={(e) => e.preventDefault()}
-              />
-            </div>
-          </div>
-        )}
-      </CSSMotion>
-      {showToolBar && (
-        <CSSMotion {...commonMotionProps} motionName="fade">
+    isMount && (
+      <div className="image-preview-container" onClick={handleContainerClick}>
+        <CSSMotion
+          {...commonMotionProps}
+          motionName="fade"
+          onLeaveEnd={() => {
+            setIsMount(false);
+          }}
+        >
           {({ className, style }) => (
-            <div style={style} className={classNames('image-preview-toolbar', className)}>
-              {previewSrcList.length > 1 && (
-                <>
-                  <div onClick={handlePrevClick} className="base-icon">
-                    {prevIcon}
-                  </div>
-                  <div onClick={handleNextClick} className="base-icon">
-                    {nextIcon}
-                  </div>
-                </>
-              )}
-              <div onClick={() => setRotate(rotate - averageRotate)} className="base-icon">
-                {counterclockwise}
-              </div>
-              <div onClick={() => setRotate(rotate + averageRotate)} className="base-icon">
-                {clockwise}
-              </div>
-              <div onClick={() => setScale(1)} className="base-icon">
-                {originalSize}
-              </div>
-              <div onClick={handleZoomOutClick} className="base-icon">
-                {zoomOut}
-              </div>
-              <div onClick={handleZoomInClick} className="base-icon">
-                {zoomIn}
-              </div>
-              <div onClick={() => setShow(false)} className="base-icon">
-                {closeIcon}
+            <div style={style} className={classNames('image-preview-overlay', className)} />
+          )}
+        </CSSMotion>
+        <CSSMotion
+          {...commonMotionProps}
+          motionName="fade-in-scale-up"
+          onEnterStart={syncTransformOrigin}
+          onLeaveStart={syncTransformOrigin}
+          onLeaveEnd={handleLeaveEnd}
+        >
+          {({ className, style }) => (
+            <div
+              className={classNames('image-preview-wrapper', className)}
+              ref={previewWrapperRef}
+              style={style}
+            >
+              <div style={{ transform: `scale(${scale}) rotate(${rotate}deg)`, margin: 'auto' }}>
+                <img
+                  onMouseDown={handleMouseDown}
+                  src={previewSrcList[current]}
+                  alt=""
+                  ref={imageRef}
+                  onDragStart={(e) => e.preventDefault()}
+                />
               </div>
             </div>
           )}
         </CSSMotion>
-      )}
-    </div>,
+        {showToolBar && (
+          <CSSMotion {...commonMotionProps} motionName="fade">
+            {({ className, style }) => (
+              <div style={style} className={classNames('image-preview-toolbar', className)}>
+                {previewSrcList.length > 1 && (
+                  <>
+                    <div onClick={handlePrevClick} className="base-icon">
+                      {prevIcon}
+                    </div>
+                    <div onClick={handleNextClick} className="base-icon">
+                      {nextIcon}
+                    </div>
+                  </>
+                )}
+                <div onClick={() => setRotate(rotate - averageRotate)} className="base-icon">
+                  {counterclockwise}
+                </div>
+                <div onClick={() => setRotate(rotate + averageRotate)} className="base-icon">
+                  {clockwise}
+                </div>
+                <div onClick={() => setScale(1)} className="base-icon">
+                  {originalSize}
+                </div>
+                <div onClick={handleZoomOutClick} className="base-icon">
+                  {zoomOut}
+                </div>
+                <div onClick={handleZoomInClick} className="base-icon">
+                  {zoomIn}
+                </div>
+                <div onClick={() => setPreviewShow(false)} className="base-icon">
+                  {closeIcon}
+                </div>
+              </div>
+            )}
+          </CSSMotion>
+        )}
+      </div>
+    ),
     document.body,
   );
 };
