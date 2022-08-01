@@ -1,4 +1,4 @@
-import React, { AnchorHTMLAttributes, ButtonHTMLAttributes, FC, ReactNode } from 'react';
+import React, { AnchorHTMLAttributes, ButtonHTMLAttributes, FC } from 'react';
 import classNames from 'classnames';
 //  将原生的button和a元素的props熟悉和自定义props属性进行联合
 type NativeButtonProps = BaseButtonProps & ButtonHTMLAttributes<HTMLElement>;

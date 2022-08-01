@@ -1,6 +1,4 @@
-import React, { ReactNode, SyntheticEvent } from 'react';
-import { BaseButtonProps } from '../../Button/Button.api';
-import Image from '../Image';
+import { ReactNode, SyntheticEvent } from 'react';
 
 export interface ImageProps {
   /**

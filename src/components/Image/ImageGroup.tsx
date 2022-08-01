@@ -5,7 +5,6 @@ import React, {
   FunctionComponentElement,
   ReactNode,
   useRef,
-  useState,
 } from 'react';
 import { ImageProps } from './Api/Image.api';
 import ImagePreview, { ImagePreviewExpose } from './ImagePreview';
