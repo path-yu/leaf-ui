@@ -7,7 +7,6 @@ type AnchorButtonProps = BaseButtonProps & AnchorHTMLAttributes<HTMLElement>;
 export type ButtonProps = Partial<NativeButtonProps & AnchorButtonProps>;
 import './_style.scss';
 import { BaseButtonProps } from './Button.api';
-import { CollapseItem } from '../../index';
 const Button: FC<ButtonProps> = (props) => {
   const { className, btnType, disabled, size, children, share, href, ...resetProps } = props;
   const classes = classNames('btn', className, {

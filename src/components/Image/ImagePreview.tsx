@@ -59,7 +59,7 @@ const ImagePreview: ForwardRefRenderFunction<ImagePreviewExpose, ImagePreviewPro
       increment: 0.666667,
       reduce: null,
     },
-    '1.5': {
+    1.5: {
       increment: 2.25,
       reduce: 1,
     },
