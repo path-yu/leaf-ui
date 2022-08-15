@@ -17,6 +17,9 @@ export default defineConfig({
         children: ['/components/Space/index.md'],
       },
       {
+        children: ['/components/Switch/index.md'],
+      },
+      {
         children: ['/components/Image/index.md'],
       },
       {
@@ -51,5 +54,8 @@ export default defineConfig({
       },
     ],
   },
-  // more config: https://d.umijs.org/config
+  // more config: https://d.umijs.org/config,
+  cssModulesTypescriptLoader: {
+    mode: 'emit',
+  },
 });

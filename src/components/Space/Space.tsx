@@ -2,7 +2,6 @@ import React, { CSSProperties, FC, ReactNode, Children } from 'react';
 import gapMaps from './_common';
 import { createKey, delpx, getGap } from '../../utils';
 import { ensureSupportFlexGap } from './utils';
-
 export interface SpaceProps {
   /**
    * @description 垂直排列方式

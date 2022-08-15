@@ -1,0 +1,90 @@
+$rail-color: rgba(0, 0, 0, 0.14);
+$button-box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.3), inset 0 0 1px 0 rgba(0, 0, 0, 0.05);
+$bezier: cubic-bezier(0.4, 0, 0.2, 1);
+$box-shadow-focus: 0 0 0 2px rgba(165,144,255, 0.2);
+.switch {
+  display: inline-flex;
+  user-select: none;
+  vertical-align: middle;
+  cursor: pointer;
+  transition: opacity ease-in 0.3s;
+  & .switch_rail {
+    position: relative;
+    width: 100%;
+    background: $rail-color;
+    border-radius: 11px;
+    transition: background-color 0.3s $bezier;
+  }
+  &:focus .switch_rail {
+    box-shadow: $box-shadow-focus;
+  }
+  & .switch_button {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    background: white;
+    box-shadow: $button-box-shadow;
+    transition: background-color 0.3s $bezier, left 0.3s $bezier, opacity 0.3s $bezier,
+      width 0.3s $bezier, box-shadow 0.3s $bezier;
+  }
+}
+.switch_loading_icon {
+  position: absolute;
+  top: 2px;
+  color: #1890ff;
+  vertical-align: top;
+  display: inline-flex;
+  animation: spin 0.6s infinite linear;
+}
+
+@mixin switch_size($sizeName, $minWidth, $minHeight, $buttonSize, $borderRadius, $loadingFontSize,$marginLeft,$marginRight) {
+  .switch_#{$sizeName} {
+    min-width: $minWidth;
+    height: $minHeight;
+    .switch_rail {
+      border-radius: $borderRadius;
+      .switch_button {
+        width: $buttonSize;
+        height: $buttonSize;
+      }
+      .switch_inner {
+        display: flex;
+        align-items: center;
+        margin: 0 $marginRight 0 $marginLeft;
+        color: #fff;
+        font-size: 12px;
+        height: 100%;
+        transition: margin 0.2s ease-in;
+      }
+      .switch_button_active {
+        left: calc(100% - $buttonSize - 2px);
+        border-radius: $buttonSize / 2;
+        & + .switch_inner {
+          margin: 0 $marginLeft 0 $marginRight;
+        }
+      }
+      &:active .switch_button {
+        width: $buttonSize + 4px;
+      }
+      &:active .switch_button_active {
+        left: calc(100% - $buttonSize - 6px);
+      }
+      .switch_loading_icon {
+        font-size: $loadingFontSize;
+      }
+    }
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@include switch_size('small', 32px, 18px, 14px, 9px, 10px,25px,7px);
+@include switch_size('medium', 40px, 22px, 18px, 11px, 14px,29px,7px);
+@include switch_size('large', 48px, 26px, 22px, 13px, 18px,33px,7px);
