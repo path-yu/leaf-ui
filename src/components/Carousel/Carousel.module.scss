@@ -1,0 +1,71 @@
+
+.carousel{
+  --n-bezier: cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  width: 100%;
+  height: 100%;
+  touch-action: pan-y;
+  overflow: hidden;
+  .carousel_slides{
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition-timing-function: var(--n-bezier);
+    transition-property: transform;
+    //transition-duration: 300ms;
+  }
+  .carousel_slide{
+    flex-shrink: 0;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    outline: none;
+    overflow: hidden;
+  }
+  .carousel_dots{
+    position: absolute;
+    --bezier: cubic-bezier(0.4, 0, 0.2, 1);
+    --dot-color: rgba(255, 255, 255, 0.3);
+    --dot-color-focus: rgba(255, 255, 255, 0.5);
+    --dot-color-active: rgba(255, 255, 255, 1);
+    --dot-size: 8px;
+    --dot-line-width: 16px;
+    --dot-line-width-active: 24px;
+    .carousel_dots_dot{
+      height: var(--dot-size);
+      width: var(--dot-size);
+      background-color: var(--dot-color);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: box-shadow .3s var(--bezier), background-color .3s var(--bezier);
+      outline: none;
+    }
+    .carousel_dots_line{
+      border-radius: 9999px;
+      width: var(--dot-line-width);
+      height: 4px;
+      background-color: var(--dot-color);
+      cursor: pointer;
+      transition: width .3s var(--bezier), box-shadow .3s var(--bezier), background-color .3s var(--bezier);
+      outline: none;
+    }
+
+    .carousel_dots_active{
+      background-color: var(--dot-color-active);
+    }
+    .carousel_dots_line_active{
+      width: var(--dot-line-width-active);
+      background-color: var(--dot-color-active);
+    }
+  }
+  .carousel_dots_vertical{
+    .carousel_dots_line{
+      width: 4px;
+      height: var(--dot-line-width);
+    }
+    .carousel_dots_line_active{
+      height: var(--dot-line-width-active);
+      background-color: var(--dot-color-active);
+    }
+  }
+}

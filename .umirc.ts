@@ -20,6 +20,9 @@ export default defineConfig({
         children: ['/components/Switch/index.md'],
       },
       {
+        children: ['/components/Carousel/index.md'],
+      },
+      {
         children: ['/components/Image/index.md'],
       },
       {
