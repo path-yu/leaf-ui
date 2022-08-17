@@ -116,7 +116,7 @@ export default () => {
 };
 ```
 ### 垂直
-将direction指定为vertical即可
+将`direction`指定为`vertical`即可
 ```tsx
 import { Carousel } from 'leaf-ui';
 import React from 'react';
@@ -192,7 +192,7 @@ export default () => {
 };
 ```
 ### 鼠标经过指示点切换轮播图
-设定 trigger 为 hover 鼠标经过指示点时触发切换。
+设定`trigger`为`hover`鼠标经过指示点时触发切换。
 ```tsx
 import { Carousel } from 'leaf-ui';
 import React from 'react';
@@ -230,7 +230,7 @@ export default () => {
 };
 ```
 ### 指定默认显示页
-设定defaultIndex对应页数即可
+设定`defaultIndex`对应页数即可
 ```tsx
 import { Carousel } from 'leaf-ui';
 import React from 'react';
@@ -267,3 +267,45 @@ export default () => {
   );
 };
 ```
+### 循环播放
+开启循环播放，会在前后各复制一个 slide ，让轮播图看上去切换上循环的，默认开启，通过`loop={false}`来关闭。
+```tsx
+import { Carousel } from 'leaf-ui';
+import React from 'react';
+
+export default () => {
+  const contentStyle: React.CSSProperties = {
+    width: '100%',
+    height: '160px',
+    color: '#fff',
+    lineHeight: '160px',
+    textAlign: 'center',
+    background: '#364d79',
+    margin: '0',
+  };
+  return (
+    <Carousel width="400px" loop={false} autoplay>
+      <img
+        style={contentStyle}
+        src="https://naive-ui.oss-cn-beijing.aliyuncs.com/carousel-img/carousel1.jpeg"
+      />
+      <img
+        style={contentStyle}
+        src="https://naive-ui.oss-cn-beijing.aliyuncs.com/carousel-img/carousel2.jpeg"
+      />
+      <img
+        style={contentStyle}
+        src="https://naive-ui.oss-cn-beijing.aliyuncs.com/carousel-img/carousel3.jpeg"
+      />
+      <img
+        style={contentStyle}
+        src="https://naive-ui.oss-cn-beijing.aliyuncs.com/carousel-img/carousel4.jpeg"
+      />
+    </Carousel>
+  );
+};
+```
+### 拖拽切换
+
+## Carousel Api
+<API src="./Carousel.tsx" hideTitle>
