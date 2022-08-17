@@ -16,7 +16,7 @@ export default () => {
     background: '#364d79',
   };
   return (
-    <Carousel  dotPosition="bottom" width="400px" defaultIndex={0} onChange={(index,oldIndex) => {
+    <Carousel direction="verticl"  dotPosition="bottom" width="400px" defaultIndex={0} onChange={(index,oldIndex) => {
         console.log(index,oldIndex)
     }}>
       <img

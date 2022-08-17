@@ -22,6 +22,10 @@ export interface CarouselProps {
    */
   dotPosition?: 'top' | 'bottom' | 'left' | 'right';
   /**
+   * @description 轮播图显示的方向
+   */
+  direction: 'vertical' | 'horizontal';
+  /**
    * @description 指示点样式
    */
   dotType?: 'dot' | 'line';
@@ -73,6 +77,7 @@ const Carousel: FC<PropsWithChildren & CarouselProps> = (props) => {
     defaultIndex,
     autoplay,
     dotPosition,
+    direction,
     dotType,
     interval,
     loop,
@@ -92,7 +97,8 @@ const Carousel: FC<PropsWithChildren & CarouselProps> = (props) => {
   const [current, setCurrent] = useState<number>(_defaultIndex);
   const containerRef = useRef<HTMLDivElement>(null);
   const slidesEleRef = useRef<HTMLDivElement>(null);
-  const containerWidth = useRef<number>(0);
+  const containerSize = useRef({ width: 0, height: 0 });
+  const [containerHeight, setContainerHeight] = useState('0');
   const prevIndex = useRef<null | number>(_defaultIndex);
   const isEnd = current === childrenCount - 1;
   let autoPlayMode = useRef<'reverse' | 'order'>(isEnd ? 'reverse' : 'order');
@@ -127,8 +133,14 @@ const Carousel: FC<PropsWithChildren & CarouselProps> = (props) => {
   };
 
   useEffect(() => {
-    containerWidth.current = containerRef.current!.offsetWidth;
+    let slideRefEle = slidesEleRef.current as HTMLDivElement;
+    let realHeight = slideRefEle.children[0].scrollHeight;
+    containerSize.current = {
+      width: slideRefEle.children[0].scrollWidth,
+      height: slideRefEle.children[0].scrollHeight,
+    };
     setCurrent(_defaultIndex!);
+    setContainerHeight(realHeight + 'px');
     toggleSlideTransitionDuration(false);
     updateSlideStyle(loop ? _defaultIndex + 1 : _defaultIndex);
     let timer: any;
@@ -142,17 +154,30 @@ const Carousel: FC<PropsWithChildren & CarouselProps> = (props) => {
     };
   }, []);
 
-  const handleDotClick = (index: number) => {
+  const handleDotTriggerEvent = (index: number) => {
     toggleSlideTransitionDuration(true);
     prevIndex.current = current!;
     setCurrent(index);
     updateSlideStyle(index + 1);
     onChange?.(index, current);
   };
+  const dotEvent = (index: number) => {
+    return trigger === 'click'
+      ? {
+          onClick: () => handleDotTriggerEvent(index),
+        }
+      : {
+          onMouseEnter: () => handleDotTriggerEvent(index),
+        };
+  };
   const updateSlideStyle = (index: number) => {
-    setSlidesStyle({
-      transform: `translateX(-${index * containerWidth.current}px)`,
-    });
+    let style: CSSProperties = {};
+    if (direction === 'horizontal') {
+      style = { transform: `translateX(-${index * containerSize.current.width}px)` };
+    } else {
+      style = { transform: `translateY(-${index * 160}px)` };
+    }
+    setSlidesStyle(style);
   };
   const toggleSlideTransitionDuration = (enable = true) => {
     let slideEle = slidesEleRef.current as HTMLDivElement;
@@ -212,8 +237,16 @@ const Carousel: FC<PropsWithChildren & CarouselProps> = (props) => {
   };
 
   return (
-    <div className={cssStyle.carousel} style={{ width }} ref={containerRef}>
-      <div style={slidesStyle} className={cssStyle.carousel_slides} ref={slidesEleRef}>
+    <div
+      className={cssStyle.carousel}
+      style={{ width, height: containerHeight }}
+      ref={containerRef}
+    >
+      <div
+        style={{ ...slidesStyle, flexDirection: direction === 'horizontal' ? 'row' : 'column' }}
+        className={cssStyle.carousel_slides}
+        ref={slidesEleRef}
+      >
         {renderSlides()}
       </div>
       {showDots && (
@@ -236,7 +269,7 @@ const Carousel: FC<PropsWithChildren & CarouselProps> = (props) => {
                 style={{
                   margin: dotPositionIsHorizontal ? '0 4px' : '4px 0',
                 }}
-                onClick={() => handleDotClick(index)}
+                {...dotEvent(index)}
               ></div>
             );
           })}
@@ -249,6 +282,7 @@ Carousel.defaultProps = {
   autoplay: false,
   defaultIndex: 0,
   dotPosition: 'bottom',
+  direction: 'horizontal',
   dotType: 'dot',
   interval: 2000,
   draggable: false,
