@@ -12,6 +12,7 @@ import React, {
 import cssStyle from './Carousel.module.scss';
 import classNames from 'classnames';
 import { useElementHover } from '../../hook/useElementHover';
+import { useDragAble } from './hook/useDragable';
 export interface CarouselProps {
   /**
    * @description 是否自动播放
@@ -75,7 +76,7 @@ const Carousel: FC<PropsWithChildren & CarouselProps> = (props) => {
     direction,
     dotType,
     interval,
-    loop,
+    loop = true,
     trigger,
     showDots,
     effect,
@@ -94,10 +95,11 @@ const Carousel: FC<PropsWithChildren & CarouselProps> = (props) => {
   const [containerHeight, setContainerHeight] = useState('0');
   const prevIndex = useRef<null | number>(_defaultIndex);
   const isEnd = current === childrenCount - 1;
+  const isFist = current === 0;
   let autoPlayMode = useRef<'reverse' | 'order'>(isEnd ? 'reverse' : 'order');
-  const { isHoverRef } = useElementHover(containerRef);
   const [slidesStyle, setSlidesStyle] = useState<CSSProperties>({});
   const dotPositionIsHorizontal = dotPosition === 'top' || dotPosition === 'bottom';
+  const { isHoverRef } = useElementHover(containerRef);
   const dotStyle: () => CSSProperties = () => {
     if (dotPositionIsHorizontal) {
       let css: CSSProperties = {
@@ -124,6 +126,7 @@ const Carousel: FC<PropsWithChildren & CarouselProps> = (props) => {
       return css;
     }
   };
+
   useEffect(() => {}, [current]);
   useEffect(() => {
     let slideRefEle = slidesEleRef.current as HTMLDivElement;
@@ -151,9 +154,96 @@ const Carousel: FC<PropsWithChildren & CarouselProps> = (props) => {
     effect === 'slide' && toggleSlideTransitionDuration(true);
     prevIndex.current = current!;
     setCurrent(index);
-    updateSlidesStyle(index + 1);
+    if (loop) {
+      updateSlidesStyle(index + 1);
+    } else {
+      updateSlidesStyle(index);
+    }
     onChange?.(index, current);
   };
+  const toggleNext = (effectFn?: () => void) => {
+    effect === 'slide' && toggleSlideTransitionDuration(true);
+    if (loop) {
+      toggleLoopNext();
+    } else {
+      toggleOriginalNext(effectFn);
+    }
+  };
+  const togglePrev = (effectFn?: () => void) => {
+    effect === 'slide' && toggleSlideTransitionDuration(true);
+    if (loop) {
+      toggleLoopPrev();
+    } else {
+      toggleOriginalPrev(effectFn);
+    }
+  };
+  const toggleLoopNext = () => {
+    setCurrent((prev) => {
+      prevIndex.current = prev;
+      let resultIndex = prev === childrenCount - 1 ? 0 : prev + 1;
+      if (prev === childrenCount - 1) {
+        updateSlidesStyle(childrenCount + 1);
+        setTimeout(() => {
+          toggleSlideTransitionDuration(false);
+          updateSlidesStyle(1);
+        }, duration + 50);
+      } else {
+        updateSlidesStyle(resultIndex + 1);
+      }
+      onChange?.(resultIndex, prev);
+      return resultIndex;
+    });
+  };
+  const toggleLoopPrev = () => {
+    setCurrent((prev) => {
+      prevIndex.current = prev;
+      let resultIndex = prev === 0 ? childrenCount - 1 : prev - 1;
+      if (prev === 0) {
+        updateSlidesStyle(0);
+        setTimeout(() => {
+          toggleSlideTransitionDuration(false);
+          updateSlidesStyle(childrenCount);
+        }, duration + 50);
+      } else {
+        updateSlidesStyle(prev);
+      }
+      onChange?.(resultIndex, prev);
+      return resultIndex;
+    });
+  };
+  const toggleOriginalNext = (effectFn?: () => void) => {
+    setCurrent((prev) => {
+      let isEnd = prev === childrenCount - 1;
+      isEnd && effectFn?.();
+      let resultIndex = isEnd ? prev : prev + 1;
+      prev !== resultIndex && onChange?.(resultIndex, prev);
+      updateSlidesStyle(isEnd ? prev : resultIndex);
+      return resultIndex;
+    });
+  };
+  const toggleOriginalPrev = (effectFn?: () => void) => {
+    setCurrent((prev) => {
+      let isFirst = prev === 0;
+      isFirst && effectFn?.();
+      let resultIndex = isFirst ? 0 : prev - 1;
+      prev !== resultIndex && onChange?.(resultIndex, prev);
+      updateSlidesStyle(isFirst ? 0 : prev - 1);
+      return resultIndex;
+    });
+  };
+
+  let eventMaps: {} = useDragAble({
+    target: slidesEleRef,
+    threshold: 50,
+    direction,
+    toggleNext,
+    togglePrev,
+    loop,
+  });
+  //是否开启拖拽切换
+  if (!draggable) {
+    eventMaps = {};
+  }
   const dotEvent = (index: number) => {
     return trigger === 'click'
       ? {
@@ -182,21 +272,7 @@ const Carousel: FC<PropsWithChildren & CarouselProps> = (props) => {
     effect === 'slide' && toggleSlideTransitionDuration(true);
     if (isHoverRef.current) return;
     if (loop) {
-      setCurrent((prev) => {
-        prevIndex.current = prev;
-        let resultIndex = prev === childrenCount - 1 ? 0 : prev + 1;
-        if (prevIndex.current === childrenCount - 1) {
-          updateSlidesStyle(childrenCount + 1);
-          setTimeout(() => {
-            toggleSlideTransitionDuration(false);
-            updateSlidesStyle(1);
-          }, duration + 50);
-        } else {
-          updateSlidesStyle(resultIndex + 1);
-        }
-        onChange?.(resultIndex, prev);
-        return resultIndex;
-      });
+      toggleLoopNext();
     } else {
       setCurrent((prev) => {
         if (prev === 0) {
@@ -255,6 +331,7 @@ const Carousel: FC<PropsWithChildren & CarouselProps> = (props) => {
         className={classNames(cssStyle.carousel_slides, {
           [cssStyle.carousel__fade]: effect === 'fade',
         })}
+        {...eventMaps}
         ref={slidesEleRef}
       >
         {renderSlides()}
@@ -277,6 +354,7 @@ const Carousel: FC<PropsWithChildren & CarouselProps> = (props) => {
             return (
               <div
                 className={classes}
+                data-is-dot="1"
                 style={{ margin: dotPositionIsHorizontal ? '0 4px' : '4px 0' }}
                 {...dotEvent(index)}
               ></div>
