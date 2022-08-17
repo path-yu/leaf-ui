@@ -30,10 +30,6 @@ export interface CarouselProps {
    */
   dotType?: 'dot' | 'line';
   /**
-   * @description 当前显示页
-   */
-  currentIndex?: number;
-  /**
    * @description 默认显示页
    */
   defaultIndex?: number;
@@ -52,7 +48,7 @@ export interface CarouselProps {
   /**
    * @description 轮播图切换时的过渡效果
    */
-  effect?: 'slide' | 'fade' | 'card' | 'custom';
+  effect?: 'slide' | 'fade';
   /**
    * @description 指示点触发切换的方式
    */
@@ -73,7 +69,6 @@ export interface CarouselProps {
 const Carousel: FC<PropsWithChildren & CarouselProps> = (props) => {
   const {
     children,
-    currentIndex,
     defaultIndex,
     autoplay,
     dotPosition,
@@ -91,9 +86,7 @@ const Carousel: FC<PropsWithChildren & CarouselProps> = (props) => {
   let _defaultIndex = defaultIndex!;
   let childrenCount = Children.count(children);
   const duration = 300;
-  const wrapChild = (child: ReactNode, index?: number) => (
-    <div className={cssStyle.carousel_slide}>{child}</div>
-  );
+
   const [current, setCurrent] = useState<number>(_defaultIndex);
   const containerRef = useRef<HTMLDivElement>(null);
   const slidesEleRef = useRef<HTMLDivElement>(null);
@@ -131,7 +124,7 @@ const Carousel: FC<PropsWithChildren & CarouselProps> = (props) => {
       return css;
     }
   };
-
+  useEffect(() => {}, [current]);
   useEffect(() => {
     let slideRefEle = slidesEleRef.current as HTMLDivElement;
     let realHeight = slideRefEle.children[0].scrollHeight;
@@ -142,7 +135,7 @@ const Carousel: FC<PropsWithChildren & CarouselProps> = (props) => {
     setCurrent(_defaultIndex!);
     setContainerHeight(realHeight + 'px');
     toggleSlideTransitionDuration(false);
-    updateSlideStyle(loop ? _defaultIndex + 1 : _defaultIndex);
+    updateSlidesStyle(loop ? _defaultIndex + 1 : _defaultIndex);
     let timer: any;
     // 开启自动播放
     if (autoplay) {
@@ -155,10 +148,10 @@ const Carousel: FC<PropsWithChildren & CarouselProps> = (props) => {
   }, []);
 
   const handleDotTriggerEvent = (index: number) => {
-    toggleSlideTransitionDuration(true);
+    effect === 'slide' && toggleSlideTransitionDuration(true);
     prevIndex.current = current!;
     setCurrent(index);
-    updateSlideStyle(index + 1);
+    updateSlidesStyle(index + 1);
     onChange?.(index, current);
   };
   const dotEvent = (index: number) => {
@@ -170,35 +163,36 @@ const Carousel: FC<PropsWithChildren & CarouselProps> = (props) => {
           onMouseEnter: () => handleDotTriggerEvent(index),
         };
   };
-  const updateSlideStyle = (index: number) => {
+  const updateSlidesStyle = (index: number) => {
     let style: CSSProperties = {};
-    if (direction === 'horizontal') {
-      style = { transform: `translateX(-${index * containerSize.current.width}px)` };
-    } else {
-      style = { transform: `translateY(-${index * 160}px)` };
+    if (effect === 'slide') {
+      if (direction === 'horizontal') {
+        style = { transform: `translateX(-${index * containerSize.current.width}px)` };
+      } else {
+        style = { transform: `translateY(-${index * containerSize.current.height}px)` };
+      }
+      setSlidesStyle(style);
     }
-    setSlidesStyle(style);
   };
   const toggleSlideTransitionDuration = (enable = true) => {
     let slideEle = slidesEleRef.current as HTMLDivElement;
     slideEle.style.transitionDuration = enable ? `${duration}ms` : '';
   };
   const startAutoPlay = () => {
-    let slideEle = slidesEleRef.current as HTMLDivElement;
-    slideEle.style.transitionDuration = `${duration}ms`;
+    effect === 'slide' && toggleSlideTransitionDuration(true);
     if (isHoverRef.current) return;
     if (loop) {
       setCurrent((prev) => {
         prevIndex.current = prev;
         let resultIndex = prev === childrenCount - 1 ? 0 : prev + 1;
         if (prevIndex.current === childrenCount - 1) {
-          updateSlideStyle(childrenCount + 1);
+          updateSlidesStyle(childrenCount + 1);
           setTimeout(() => {
             toggleSlideTransitionDuration(false);
-            updateSlideStyle(1);
+            updateSlidesStyle(1);
           }, duration + 50);
         } else {
-          updateSlideStyle(resultIndex + 1);
+          updateSlidesStyle(resultIndex + 1);
         }
         onChange?.(resultIndex, prev);
         return resultIndex;
@@ -213,13 +207,23 @@ const Carousel: FC<PropsWithChildren & CarouselProps> = (props) => {
         }
         prevIndex.current = prev;
         let resultIndex = autoPlayMode.current === 'order' ? prev! + 1 : prev! - 1;
-        updateSlideStyle(resultIndex);
+        updateSlidesStyle(resultIndex);
         onChange?.(resultIndex, prev);
         return resultIndex;
       });
     }
   };
-
+  const wrapChild = (child: ReactNode, index?: number) => {
+    let style: CSSProperties = {};
+    if (effect === 'fade') {
+      style.opacity = index === current ? '1' : '0';
+    }
+    return (
+      <div className={cssStyle.carousel_slide} style={style}>
+        {child}
+      </div>
+    );
+  };
   const renderSlides = () => {
     let wrapChildren = Children.map(children, wrapChild);
     if (loop) {
@@ -243,8 +247,14 @@ const Carousel: FC<PropsWithChildren & CarouselProps> = (props) => {
       ref={containerRef}
     >
       <div
-        style={{ ...slidesStyle, flexDirection: direction === 'horizontal' ? 'row' : 'column' }}
-        className={cssStyle.carousel_slides}
+        style={{
+          ...slidesStyle,
+          flexDirection: direction === 'horizontal' ? 'row' : 'column',
+          display: effect === 'slide' ? 'flex' : 'block',
+        }}
+        className={classNames(cssStyle.carousel_slides, {
+          [cssStyle.carousel__fade]: effect === 'fade',
+        })}
         ref={slidesEleRef}
       >
         {renderSlides()}
@@ -263,12 +273,11 @@ const Carousel: FC<PropsWithChildren & CarouselProps> = (props) => {
               [cssStyle.carousel_dots_dot]: dotType === 'dot',
               [cssStyle.carousel_dots_line]: dotType === 'line',
             });
+
             return (
               <div
                 className={classes}
-                style={{
-                  margin: dotPositionIsHorizontal ? '0 4px' : '4px 0',
-                }}
+                style={{ margin: dotPositionIsHorizontal ? '0 4px' : '4px 0' }}
                 {...dotEvent(index)}
               ></div>
             );
