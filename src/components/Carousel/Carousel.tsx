@@ -72,7 +72,7 @@ export interface CarouselProps {
    */
   onChange?: (currentIndex: number, prevIndex: number) => void;
   /**
-   * @description 是否循环播放
+   * @description 是否循环播放，类似无缝轮播
    * @default true
    */
   loop?: boolean;
@@ -303,7 +303,7 @@ const Carousel: ForwardRefRenderFunction<CarouselExpose, CarouselProps & PropsWi
   };
   const toggleSlideTransitionDuration = (enable = true) => {
     let slideEle = slidesEleRef.current as HTMLDivElement;
-    slideEle.style.transitionDuration = enable ? `${duration}ms` : '';
+    slideEle && (slideEle.style.transitionDuration = enable ? `${duration}ms` : '');
   };
   const startAutoPlay = () => {
     effect === 'slide' && toggleSlideTransitionDuration(true);
