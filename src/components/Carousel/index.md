@@ -252,7 +252,7 @@ export default () => {
 
 ### 循环播放
 
-开启循环播放，会在前后各复制一个 slide ，让轮播图看上去切换上循环的，默认开启，通过`loop={false}`来关闭。
+开启循环播放，会在前后各复制一个 slide ，让轮播图看上去切换上循环的，类似无缝轮播，默认开启，通过`loop={false}`来关闭。
 
 ```tsx
 import { Carousel } from 'leaf-ui';
@@ -288,7 +288,7 @@ export default () => {
 
 ### 拖拽切换
 
-通过 `draggable={true}`来开启拖拽切换轮播图，根据当前支持 pc 端移动端
+通过 `draggable={true}`来开启拖拽切换轮播图，同时支持 pc 端移动端
 
 ```tsx
 import { Carousel, Button, CarouselExpose } from 'leaf-ui';
