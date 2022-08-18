@@ -1,4 +1,4 @@
-import React, {
+import {
   RefObject,
   useRef,
   useEffect,
@@ -10,14 +10,22 @@ import { isMobile } from '../../../utils/core/isMobile';
 let _isMobile = isMobile();
 export function useDragAble(data: {
   target: RefObject<HTMLElement>;
-  threshold: number;
+  getThreshold: () => number;
   direction: 'horizontal' | 'vertical';
-  toggleNext: (effectFn?: () => void) => void;
-  togglePrev: (effectFn?: () => void) => void;
+  toggleNext: () => void;
+  togglePrev: () => void;
   duration?: number;
-  loop: boolean;
+  enable: boolean;
 }) {
-  const { target, threshold, direction, toggleNext, togglePrev, duration = 300, loop } = data;
+  const {
+    target,
+    getThreshold,
+    direction,
+    toggleNext,
+    togglePrev,
+    duration = 300,
+    enable = false,
+  } = data;
   let trigger = useRef(false);
   let mouseOrTouchPosition = useRef({ x: 0, y: 0 });
   let moveDiff = useRef({ x: 0, y: 0 });
@@ -42,11 +50,11 @@ export function useDragAble(data: {
     }
   };
   useEffect(() => {
-    !_isMobile && document.body.addEventListener('mousemove', handleTriggerMove);
-    !_isMobile && document.body.addEventListener('mouseup', handleTriggerEnd);
+    !_isMobile && enable && document.body.addEventListener('mousemove', handleTriggerMove);
+    !_isMobile && enable && document.body.addEventListener('mouseup', handleTriggerEnd);
     return () => {
-      !_isMobile && document.body.removeEventListener('mousemove', handleTriggerMove);
-      !_isMobile && document.body.removeEventListener('mouseup', handleTriggerEnd);
+      !_isMobile && enable && document.body.removeEventListener('mousemove', handleTriggerMove);
+      !_isMobile && enable && document.body.removeEventListener('mouseup', handleTriggerEnd);
     };
   }, []);
   const handleTriggerMove = (event: ReactTouchEvent | MouseEvent) => {
@@ -70,12 +78,21 @@ export function useDragAble(data: {
     resetData();
   };
   const validateRebound = () => {
-    if (direction === 'horizontal' && moveDiff.current.x !== 0) {
+    let threshold = getThreshold();
+    if (
+      direction === 'horizontal' &&
+      moveDiff.current.x !== 0 &&
+      Math.abs(moveDiff.current.x) < threshold
+    ) {
       //回弹
-      if (Math.abs(moveDiff.current.x)) {
-        reboundEle();
-        console.log('reset');
-      }
+      reboundEle();
+    }
+    if (
+      direction === 'vertical' &&
+      moveDiff.current.y !== 0 &&
+      Math.abs(moveDiff.current.y) < threshold
+    ) {
+      reboundEle();
     }
   };
   const resetData = () => {
@@ -102,44 +119,48 @@ export function useDragAble(data: {
       (originStyle.current as string) + ` transition-duration: ${duration}ms`;
   };
   const moveEle = () => {
-    //水平移动
-    if (direction === 'horizontal') {
-      let x = moveDiff.current.x;
-      let startTranslateX = startTranslate.current.x!;
-      // 向右
-      if (x > 0) {
-        // 达到阈值 切换下一张
-        if (x >= threshold) {
-          target.current!.style.transitionDuration = '';
-          togglePrev(reboundEle);
-          resetData();
-        } else {
-          let moveX = startTranslateX + x;
-          // 移动dom
-          target.current!.style.transform = `translateX(${moveX}px)`;
-        }
+    let threshold = getThreshold();
+    let moveDist = direction === 'horizontal' ? moveDiff.current.x : moveDiff.current.y;
+    let startTranslateDist =
+      direction === 'horizontal' ? startTranslate.current.x! : startTranslate.current.y!;
+    let translatePosition = direction === 'horizontal' ? 'x' : 'y';
+    //向右滑动或向上
+    if (moveDist > 0) {
+      // 达到阈值 切换下一张
+      if (moveDist >= threshold) {
+        target.current!.style.transitionDuration = '';
+        togglePrev();
+        resetData();
       } else {
-        // 向左
-        if (Math.abs(x) >= threshold) {
-          target.current!.style.transitionDuration = '';
-          toggleNext(reboundEle);
-          resetData();
-        } else {
-          let moveX = startTranslateX - Math.abs(x);
-          target.current!.style.transform = `translateX(${moveX}px)`;
-        }
+        target.current!.style.transform = `translate${translatePosition}(${
+          startTranslateDist + moveDist
+        }px)`;
+      }
+    } else {
+      // 向左或向下
+      if (Math.abs(moveDist) >= threshold) {
+        target.current!.style.transitionDuration = '';
+        toggleNext();
+        resetData();
+      } else {
+        target.current!.style.transform = `translate${translatePosition}(${
+          startTranslateDist - Math.abs(moveDist)
+        }px)`;
       }
     }
   };
+  if (!enable) return {};
   if (_isMobile) {
     return {
       onTouchStart: handleTriggerStart,
       onTouchMove: handleTriggerMove,
       onTouchEnd: handleTriggerEnd,
+      reboundEle,
     };
   } else {
     return {
       onMouseDown: handleTriggerStart,
+      reboundEle,
     };
   }
 }

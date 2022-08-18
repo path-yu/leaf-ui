@@ -1,6 +1,5 @@
 import React, {
   PropsWithChildren,
-  FC,
   Children,
   useState,
   useEffect,
@@ -8,50 +7,64 @@ import React, {
   CSSProperties,
   ReactNode,
   cloneElement,
+  forwardRef,
+  ForwardRefRenderFunction,
+  useImperativeHandle,
 } from 'react';
 import cssStyle from './Carousel.module.scss';
 import classNames from 'classnames';
 import { useElementHover } from '../../hook/useElementHover';
 import { useDragAble } from './hook/useDragable';
+import { CarouselExpose } from './Api/CarouselMethods.api';
 export interface CarouselProps {
   /**
    * @description 是否自动播放
+   * @default false
    */
   autoplay?: boolean;
   /**
    * @description 面板指示点位置，可选 top bottom left right
+   * @default bottom
    */
   dotPosition?: 'top' | 'bottom' | 'left' | 'right';
   /**
    * @description 轮播图显示的方向
+   * @default horizontal
    */
-  direction: 'vertical' | 'horizontal';
+  direction?: 'vertical' | 'horizontal';
   /**
    * @description 指示点样式
+   * @default dot
    */
   dotType?: 'dot' | 'line';
   /**
    * @description 默认显示页
+   * @default 0
    */
   defaultIndex?: number;
   /**
    * @description 自动播放的间隔（ms）
+   * @default 2000
    */
   interval?: number;
   /**
    * @description 是否通过鼠标拖拽切换轮播图
+   * @default false
    */
   draggable?: boolean;
   /**
    * @description 是否展示指示点
+   * @default true
    */
   showDots?: boolean;
   /**
    * @description 轮播图切换时的过渡效果
+   * @default slide
    */
   effect?: 'slide' | 'fade';
   /**
    * @description 指示点触发切换的方式
+   * @default click
    */
   trigger?: 'click' | 'hover';
   /**
@@ -60,43 +73,63 @@ export interface CarouselProps {
   onChange?: (currentIndex: number, prevIndex: number) => void;
   /**
    * @description 是否循环播放
+   * @default true
    */
   loop?: boolean;
   /**
-   * @description 轮播图宽度
+   * @description 轮播图宽度，默认100%
+   * @default 100%
    */
   width?: string;
+  /**
+   * @description 轮播图宽度，默认根据子元素高度设置，可不传
+   * @default 100%
+   */
+  height?: string;
+  /**
+   * @description 拖拽切换阈值比例，基于轮播图宽度，默认0.5
+   * @default 0.5
+   */
+  thresholdRatio?: number;
+  /**
+   * @description 过渡时间 单位ms
+   * @default 300
+   */
+  duration?: number;
 }
-const Carousel: FC<PropsWithChildren & CarouselProps> = (props) => {
+const Carousel: ForwardRefRenderFunction<CarouselExpose, CarouselProps & PropsWithChildren> = (
+  props,
+  ref,
+) => {
   const {
     children,
-    defaultIndex,
-    autoplay,
-    dotPosition,
-    direction,
-    dotType,
-    interval,
+    defaultIndex = 0,
+    autoplay = false,
+    dotPosition = 'bottom',
+    direction = 'horizontal',
+    dotType = 'dot',
+    interval = 2000,
     loop = true,
-    trigger,
-    showDots,
-    effect,
-    draggable,
+    trigger = 'click',
+    showDots = true,
+    effect = 'slide',
+    draggable = false,
     onChange,
-    width,
+    width = '100%',
+    height = '100%',
+    thresholdRatio = 0.5,
+    duration = 300,
   } = props;
   let _defaultIndex = defaultIndex!;
   let childrenCount = Children.count(children);
-  const duration = 300;
-
   const [current, setCurrent] = useState<number>(_defaultIndex);
   const containerRef = useRef<HTMLDivElement>(null);
   const slidesEleRef = useRef<HTMLDivElement>(null);
   const containerSize = useRef({ width: 0, height: 0 });
-  const [containerHeight, setContainerHeight] = useState('0');
-  const prevIndex = useRef<null | number>(_defaultIndex);
-  const isEnd = current === childrenCount - 1;
-  const isFist = current === 0;
-  let autoPlayMode = useRef<'reverse' | 'order'>(isEnd ? 'reverse' : 'order');
+  const [containerHeight, setContainerHeight] = useState(height !== '100%' ? height : '0');
+  let autoPlayMode = useRef<'reverse' | 'order'>(
+    current === childrenCount - 1 ? 'reverse' : 'order',
+  );
   const [slidesStyle, setSlidesStyle] = useState<CSSProperties>({});
   const dotPositionIsHorizontal = dotPosition === 'top' || dotPosition === 'bottom';
   const { isHoverRef } = useElementHover(containerRef);
@@ -127,7 +160,6 @@ const Carousel: FC<PropsWithChildren & CarouselProps> = (props) => {
     }
   };
 
-  useEffect(() => {}, [current]);
   useEffect(() => {
     let slideRefEle = slidesEleRef.current as HTMLDivElement;
     let realHeight = slideRefEle.children[0].scrollHeight;
@@ -136,7 +168,9 @@ const Carousel: FC<PropsWithChildren & CarouselProps> = (props) => {
       height: slideRefEle.children[0].scrollHeight,
     };
     setCurrent(_defaultIndex!);
-    setContainerHeight(realHeight + 'px');
+    if (height === '100%') {
+      setContainerHeight(realHeight + 'px');
+    }
     toggleSlideTransitionDuration(false);
     updateSlidesStyle(loop ? _defaultIndex + 1 : _defaultIndex);
     let timer: any;
@@ -149,10 +183,18 @@ const Carousel: FC<PropsWithChildren & CarouselProps> = (props) => {
       clearInterval(timer);
     };
   }, []);
+  useImperativeHandle(ref, () => {
+    return {
+      next: () => toggleNext(),
+      prev: () => togglePrev(),
+      getCurrentIndex: () => current,
+      to: (index) => toCurrent(index),
+    };
+  });
 
-  const handleDotTriggerEvent = (index: number) => {
+  const toCurrent = (index: number) => {
+    if (index < 0 || index >= childrenCount) return;
     effect === 'slide' && toggleSlideTransitionDuration(true);
-    prevIndex.current = current!;
     setCurrent(index);
     if (loop) {
       updateSlidesStyle(index + 1);
@@ -161,12 +203,12 @@ const Carousel: FC<PropsWithChildren & CarouselProps> = (props) => {
     }
     onChange?.(index, current);
   };
-  const toggleNext = (effectFn?: () => void) => {
+  const toggleNext = () => {
     effect === 'slide' && toggleSlideTransitionDuration(true);
     if (loop) {
       toggleLoopNext();
     } else {
-      toggleOriginalNext(effectFn);
+      toggleOriginalNext();
     }
   };
   const togglePrev = (effectFn?: () => void) => {
@@ -174,19 +216,19 @@ const Carousel: FC<PropsWithChildren & CarouselProps> = (props) => {
     if (loop) {
       toggleLoopPrev();
     } else {
-      toggleOriginalPrev(effectFn);
+      toggleOriginalPrev();
     }
   };
   const toggleLoopNext = () => {
     setCurrent((prev) => {
-      prevIndex.current = prev;
       let resultIndex = prev === childrenCount - 1 ? 0 : prev + 1;
       if (prev === childrenCount - 1) {
         updateSlidesStyle(childrenCount + 1);
         setTimeout(() => {
+          //关闭过渡，切换到原始位置
           toggleSlideTransitionDuration(false);
           updateSlidesStyle(1);
-        }, duration + 50);
+        }, duration);
       } else {
         updateSlidesStyle(resultIndex + 1);
       }
@@ -196,14 +238,13 @@ const Carousel: FC<PropsWithChildren & CarouselProps> = (props) => {
   };
   const toggleLoopPrev = () => {
     setCurrent((prev) => {
-      prevIndex.current = prev;
       let resultIndex = prev === 0 ? childrenCount - 1 : prev - 1;
       if (prev === 0) {
         updateSlidesStyle(0);
         setTimeout(() => {
           toggleSlideTransitionDuration(false);
           updateSlidesStyle(childrenCount);
-        }, duration + 50);
+        }, duration);
       } else {
         updateSlidesStyle(prev);
       }
@@ -211,46 +252,42 @@ const Carousel: FC<PropsWithChildren & CarouselProps> = (props) => {
       return resultIndex;
     });
   };
-  const toggleOriginalNext = (effectFn?: () => void) => {
+  const toggleOriginalNext = () => {
     setCurrent((prev) => {
       let isEnd = prev === childrenCount - 1;
-      isEnd && effectFn?.();
+      isEnd && reboundEle?.();
       let resultIndex = isEnd ? prev : prev + 1;
       prev !== resultIndex && onChange?.(resultIndex, prev);
-      updateSlidesStyle(isEnd ? prev : resultIndex);
+      updateSlidesStyle(resultIndex);
       return resultIndex;
     });
   };
-  const toggleOriginalPrev = (effectFn?: () => void) => {
+  const toggleOriginalPrev = () => {
     setCurrent((prev) => {
       let isFirst = prev === 0;
-      isFirst && effectFn?.();
+      isFirst && reboundEle?.();
       let resultIndex = isFirst ? 0 : prev - 1;
       prev !== resultIndex && onChange?.(resultIndex, prev);
-      updateSlidesStyle(isFirst ? 0 : prev - 1);
+      updateSlidesStyle(resultIndex);
       return resultIndex;
     });
   };
 
-  let eventMaps: {} = useDragAble({
+  let { reboundEle, ...eventMaps } = useDragAble({
     target: slidesEleRef,
-    threshold: 50,
+    getThreshold: () => containerSize.current?.width * thresholdRatio!,
     direction,
     toggleNext,
     togglePrev,
-    loop,
+    enable: effect === 'slide' && draggable,
   });
-  //是否开启拖拽切换
-  if (!draggable) {
-    eventMaps = {};
-  }
   const dotEvent = (index: number) => {
     return trigger === 'click'
       ? {
-          onClick: () => handleDotTriggerEvent(index),
+          onClick: () => toCurrent(index),
         }
       : {
-          onMouseEnter: () => handleDotTriggerEvent(index),
+          onMouseEnter: () => toCurrent(index),
         };
   };
   const updateSlidesStyle = (index: number) => {
@@ -281,7 +318,6 @@ const Carousel: FC<PropsWithChildren & CarouselProps> = (props) => {
         if (prev === childrenCount - 1) {
           autoPlayMode.current = 'reverse';
         }
-        prevIndex.current = prev;
         let resultIndex = autoPlayMode.current === 'order' ? prev! + 1 : prev! - 1;
         updateSlidesStyle(resultIndex);
         onChange?.(resultIndex, prev);
@@ -327,6 +363,7 @@ const Carousel: FC<PropsWithChildren & CarouselProps> = (props) => {
           ...slidesStyle,
           flexDirection: direction === 'horizontal' ? 'row' : 'column',
           display: effect === 'slide' ? 'flex' : 'block',
+          touchAction: direction === 'horizontal' ? 'pan-x' : 'pan-y',
         }}
         className={classNames(cssStyle.carousel_slides, {
           [cssStyle.carousel__fade]: effect === 'fade',
@@ -365,18 +402,4 @@ const Carousel: FC<PropsWithChildren & CarouselProps> = (props) => {
     </div>
   );
 };
-Carousel.defaultProps = {
-  autoplay: false,
-  defaultIndex: 0,
-  dotPosition: 'bottom',
-  direction: 'horizontal',
-  dotType: 'dot',
-  interval: 2000,
-  draggable: false,
-  loop: true,
-  trigger: 'click',
-  showDots: true,
-  effect: 'slide',
-  width: '100%',
-};
-export default Carousel;
+export default forwardRef(Carousel);
