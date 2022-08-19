@@ -1,10 +1,8 @@
 import React, {
   CSSProperties,
-  Dispatch,
   FC,
   ImgHTMLAttributes,
   RefObject,
-  SetStateAction,
   SyntheticEvent,
   useEffect,
   useRef,

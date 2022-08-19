@@ -23,6 +23,9 @@ export default defineConfig({
         children: ['/components/Carousel/index.md'],
       },
       {
+        children: ['/components/InfiniteScroll/index.md'],
+      },
+      {
         children: ['/components/Image/index.md'],
       },
       {

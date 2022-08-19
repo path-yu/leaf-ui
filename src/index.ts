@@ -17,4 +17,5 @@ export { default as Image } from './components/Image/Image';
 export { default as ImageGroup } from './components/Image/ImageGroup';
 export { default as Switch } from './components/Switch/Switch';
 export { default as Carousel } from './components/Carousel/Carousel';
+export { default as InfiniteScroll } from './components/InfiniteScroll/InfiniteScroll';
 export { type CarouselExpose } from './components/Carousel/Api/CarouselMethods.api';
