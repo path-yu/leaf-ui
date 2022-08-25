@@ -26,6 +26,9 @@ export default defineConfig({
         children: ['/components/InfiniteScroll/index.md'],
       },
       {
+        children: ['/components/AnimateList/index.md'],
+      },
+      {
         children: ['/components/Image/index.md'],
       },
       {

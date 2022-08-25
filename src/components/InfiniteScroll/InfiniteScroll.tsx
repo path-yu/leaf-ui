@@ -1,6 +1,4 @@
 import React, { CSSProperties, FC, PropsWithChildren, ReactNode, UIEvent, useState } from 'react';
-import { throttle } from '../../utils/core/throttle';
-
 export interface InfiniteScrollProps {
   /**
    * @description 触发加载的距离阈值，单位为px
