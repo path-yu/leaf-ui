@@ -3,7 +3,7 @@
 ### 基础演示
 
 ```tsx
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { AnimateList, Button, Space } from 'leaf-ui';
 
 export default () => {
@@ -112,13 +112,17 @@ export default () => {
   );
 };
 ```
-### 开启flip动画
+
+### 开启 flip 动画
+
 ```tsx
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { AnimateList, Button, Space } from 'leaf-ui';
 
 export default () => {
   let [list, setList] = useState(['react', 'vue', 'angular']);
+  const animateListRef = useRef();
+
   function randomSort(arr) {
     let cloneArr = arr.slice();
     for (let i = 0, len = arr.length; i < len; i++) {
@@ -134,6 +138,7 @@ export default () => {
       <AnimateList
         items={list}
         effect="side-slide"
+        ref={animateListRef}
         keys={(item) => item}
         buildItem={(item, index) => {
           return (
@@ -168,10 +173,19 @@ export default () => {
         >
           add
         </Button>
-        <Button onClick={() => setList(randomSort)}>shuffle</Button>
+        <Button
+          onClick={() => {
+            //  更新动画列表内部当前的的boundlingRect, 用于跟重新render后的boundingRect进行对比
+            animateListRef.current.setLastBoundRect();
+            setList(randomSort);
+          }}
+        >
+          shuffle
+        </Button>
       </Space>
     </div>
   );
 };
 ```
+
 <API src="./AnimateList.tsx">

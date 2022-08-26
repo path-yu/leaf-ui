@@ -1,4 +1,13 @@
-import React, { FC, ReactNode, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import React, {
+  ReactNode,
+  useEffect,
+  useImperativeHandle,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  forwardRef,
+  ForwardRefRenderFunction,
+} from 'react';
 import { animated, useTransition, UseTransitionProps } from '@react-spring/web';
 import { useIsFirstMount } from '../../hook/useIsFirstMount';
 
@@ -41,8 +50,10 @@ interface AnimateListProps {
    */
   enableFlip?: boolean;
 }
-
-const AnimateList: FC<AnimateListProps> = (props) => {
+export interface AnimateListExpose {
+  setLastBoundRect: () => void;
+}
+const AnimateList: ForwardRefRenderFunction<AnimateListExpose, AnimateListProps> = (props, ref) => {
   const {
     items,
     buildItem,
@@ -54,27 +65,36 @@ const AnimateList: FC<AnimateListProps> = (props) => {
     appear = false,
     enableFlip = true,
   } = props;
-  console.log(enableFlip);
   const refMap = useMemo(() => new Map(), []);
   const wrapRef = useRef<HTMLDivElement>(null);
   const lastRef = useRef<Map<HTMLElement, DOMRect>>(new Map());
   const prevItems = useRef<any[]>([...items]);
   const { isMount } = useIsFirstMount();
 
+  useImperativeHandle(ref, () => {
+    return {
+      setLastBoundRect() {
+        lastRef.current = createELeRectMap(wrapRef.current!);
+      },
+    };
+  });
   useEffect(() => {
     prevItems.current = items;
   }, [items]);
   useLayoutEffect(() => {
     if (prevItems.current.length !== items.length || !enableFlip) return;
+    triggerFlip();
+  }, [items]);
+  const triggerFlip = () => {
     let currentRectMap = createELeRectMap(wrapRef.current!);
     lastRef.current.forEach((preNodeRect, node) => {
       let currentRect = currentRectMap.get(node) as DOMRect;
+      console.log(currentRect, preNodeRect);
       if (!currentRect) return;
       let invert = {
         top: preNodeRect.top - currentRect.top,
         left: preNodeRect.left - currentRect.left,
       };
-      console.log(invert);
       let keyframes = [
         { transform: `translate(${invert.left}px,${invert.top}px)` },
         { transform: 'translate(0,0)' },
@@ -84,8 +104,7 @@ const AnimateList: FC<AnimateListProps> = (props) => {
         easing: 'linear',
       });
     });
-    lastRef.current = currentRectMap;
-  }, [items]);
+  };
   const createELeRectMap = (wrapNode: HTMLElement) => {
     let childNode = Array.from(wrapNode.childNodes) as HTMLElement[];
     return new Map(childNode.map((node) => [node, node.getBoundingClientRect()]));
@@ -160,4 +179,4 @@ const AnimateList: FC<AnimateListProps> = (props) => {
   );
 };
 
-export default AnimateList;
+export default forwardRef(AnimateList);
