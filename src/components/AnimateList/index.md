@@ -1,4 +1,5 @@
 ## AnimateList-动画列表
+一个基于react-spring封装的动画列表组件，支持collapse，slideDown，sideSlide三种过渡，列表顺序变化时开启flip动画。
 
 ### 基础演示
 
@@ -60,16 +61,6 @@ import { AnimateList, Button, Space } from 'leaf-ui';
 
 export default () => {
   let [list, setList] = useState(['react', 'vue', 'angular']);
-  function randomSort(arr) {
-    let cloneArr = arr.slice();
-    for (let i = 0, len = arr.length; i < len; i++) {
-      let rand = parseInt(Math.random() * len);
-      let temp = cloneArr[rand];
-      cloneArr[rand] = cloneArr[i];
-      cloneArr[i] = temp;
-    }
-    return cloneArr;
-  }
   return (
     <div>
       <AnimateList

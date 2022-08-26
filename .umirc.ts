@@ -32,6 +32,9 @@ export default defineConfig({
         children: ['/components/Image/index.md'],
       },
       {
+        children: ['/components/Message/index.md'],
+      },
+      {
         children: ['/components/Select/index.md'],
       },
       {

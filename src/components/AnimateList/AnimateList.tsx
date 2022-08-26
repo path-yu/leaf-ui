@@ -7,6 +7,7 @@ import React, {
   useRef,
   forwardRef,
   ForwardRefRenderFunction,
+  CSSProperties,
 } from 'react';
 import { animated, useTransition, UseTransitionProps } from '@react-spring/web';
 import { useIsFirstMount } from '../../hook/useIsFirstMount';
@@ -49,6 +50,10 @@ interface AnimateListProps {
    * @description 列表顺序变化时开启flip动画
    */
   enableFlip?: boolean;
+  /**
+   * 子项包裹元素额外style
+   */
+  wrapItemStyle?: CSSProperties;
 }
 export interface AnimateListExpose {
   setLastBoundRect: () => void;
@@ -64,6 +69,7 @@ const AnimateList: ForwardRefRenderFunction<AnimateListExpose, AnimateListProps>
     sideSlideDistance = 100,
     appear = false,
     enableFlip = true,
+    wrapItemStyle = {},
   } = props;
   const refMap = useMemo(() => new Map(), []);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -170,7 +176,10 @@ const AnimateList: ForwardRefRenderFunction<AnimateListExpose, AnimateListProps>
       {transitions((style, item, o, i) => {
         return (
           // @ts-ignore
-          <animated.div ref={(ref: HTMLDivElement) => ref && refMap.set(item, ref)} style={style}>
+          <animated.div
+            ref={(ref: HTMLDivElement) => ref && refMap.set(item, ref)}
+            style={{ ...style, ...wrapItemStyle }}
+          >
             {buildItem(item, i)}
           </animated.div>
         );

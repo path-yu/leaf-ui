@@ -21,6 +21,7 @@ specifiers:
   father: ^4.0.0-rc.2
   gh-pages: ^3.0.0
   lint-staged: ^10.0.7
+  nanoid: ^4.0.0
   prettier: ^2.2.1
   rc-motion: ^2.6.2
   react: ^18.0.0
@@ -35,6 +36,7 @@ dependencies:
   '@react-spring/web': 9.5.2_biqbaboplfbrettd7655fr4n2y
   axios: 0.27.2
   classnames: 2.3.1
+  nanoid: 4.0.0
   rc-motion: 2.6.2_biqbaboplfbrettd7655fr4n2y
   react-transition-group: 4.4.2_biqbaboplfbrettd7655fr4n2y
 
@@ -9577,6 +9579,12 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
     dev: true
+
+  /nanoid/4.0.0:
+    resolution: {integrity: sha512-IgBP8piMxe/gf73RTQx7hmnhwz0aaEXYakvqZyE302IXW3HyVNhdNGC+O2MwMAVhLEnvXlvKtGbtJf6wvHihCg==}
+    engines: {node: ^14 || ^16 || >=18}
+    hasBin: true
+    dev: false
 
   /nanomatch/1.2.13:
     resolution: {integrity: sha512-fpoe2T0RbHwBTBUOftAfBPaDEi06ufaUai0mE6Yn1kacc3SnTErfb/h+X94VXzI64rKFHYImXSvdwGGCmwOqCA==}

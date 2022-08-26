@@ -20,3 +20,5 @@ export { default as Carousel } from './components/Carousel/Carousel';
 export { default as InfiniteScroll } from './components/InfiniteScroll/InfiniteScroll';
 export { default as AnimateList } from './components/AnimateList/AnimateList';
 export { type CarouselExpose } from './components/Carousel/Api/CarouselMethods.api';
+export { type AnimateListExpose } from './components/AnimateList/AnimateList';
+export { default as message } from './components/Message/Message';
