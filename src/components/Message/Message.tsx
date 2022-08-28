@@ -35,10 +35,12 @@ interface MessageProviderExpose {
   addMessage: (args: ArgsProps) => MessageType;
 }
 type actionType = 'info' | 'success' | 'error' | 'warning' | 'loading';
-export interface MessageType extends Promise<unknown> {
+export interface MessageType extends PromiseLike<unknown> {
   (): void;
 }
-
+export interface ThenableArgument {
+  (val: any): void;
+}
 type JointContent = ReactNode | ArgsProps;
 const message = {
   info(content: JointContent, duration = 3, onClose?: voidFn) {
@@ -124,25 +126,26 @@ const MessageProvider = forwardRef<MessageProviderExpose, MessageProvideProps>((
           onClick,
           icon,
         };
-        let resolveFn: (value: unknown) => void;
-        const closeMessage = () => {
+        let resolveFn: Function;
+        let callback: Function;
+        const result = () => {
           onClose && onClose();
-          resolveFn && resolveFn(true);
+          callback && callback();
           setMessageList((prev) => prev.filter((value) => value.key !== item.key));
         };
+        let closePromise = new Promise((resolve) => {
+          callback = () => {
+            onClose && onClose();
+            return resolve(true);
+          };
+        });
+        result.then = (filled: ThenableArgument, rejected: ThenableArgument) =>
+          closePromise.then(filled, rejected);
         if (duration !== 0) {
-          setTimeout(() => {
-            closeMessage();
-          }, duration);
+          setTimeout(result, duration);
         }
         setMessageList((prev) => [...prev, item]);
-        if (duration === 0) {
-          return closeMessage as MessageType;
-        } else {
-          return new Promise((resolve, reject) => {
-            resolveFn = resolve;
-          }) as MessageType;
-        }
+        return result as MessageType;
       },
     }),
     [messageList],
