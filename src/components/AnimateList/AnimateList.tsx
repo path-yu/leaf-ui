@@ -8,10 +8,12 @@ import React, {
   forwardRef,
   ForwardRefRenderFunction,
   CSSProperties,
+  DragEvent,
+  MutableRefObject,
+  useState,
 } from 'react';
 import { animated, useTransition, UseTransitionProps } from '@react-spring/web';
 import { useIsFirstMount } from '../../hook/useIsFirstMount';
-
 interface AnimateListProps {
   /** 列表数据 */
   items: any[];
@@ -48,12 +50,31 @@ interface AnimateListProps {
   appear?: boolean;
   /**
    * @description 列表顺序变化时开启flip动画
+   * @default true
    */
   enableFlip?: boolean;
   /**
    * 子项包裹元素额外style
    */
   wrapItemStyle?: CSSProperties;
+  /**
+   * @description 拖拽交换数据setState
+   */
+  dropSwap?: (data: { dropIndex: number; originIndex: number; newList: any[] }) => void;
+  /**
+   * @description 拖拽交换数据触发的事件类型, 默认是onDragEnter, 可选onDrop
+   * @default enter
+   */
+  dragSwapEventType: 'enter' | 'drop';
+  /**
+   * @description 触发flip动画过渡曲线, 默认ease-in
+   * @default ease-in
+   */
+  flipEasing?: string;
+  /**
+   * @description 开启拖拽切换锚点子元素map
+   */
+  dragAbleTargetElementMap?: MutableRefObject<Map<any, HTMLElement>>;
 }
 export interface AnimateListExpose {
   setLastBoundRect: () => void;
@@ -70,18 +91,21 @@ const AnimateList: ForwardRefRenderFunction<AnimateListExpose, AnimateListProps>
     appear = false,
     enableFlip = true,
     wrapItemStyle = {},
+    dropSwap,
+    dragSwapEventType = 'enter',
+    flipEasing = 'ease-in',
+    dragAbleTargetElementMap,
   } = props;
   const refMap = useMemo(() => new Map(), []);
   const wrapRef = useRef<HTMLDivElement>(null);
   const lastRef = useRef<Map<HTMLElement, DOMRect>>(new Map());
   const prevItems = useRef<any[]>([...items]);
+  const originIndex = useRef<number | null>(null);
+  const [dragAble, setDragAble] = useState(false);
   const { isMount } = useIsFirstMount();
-
   useImperativeHandle(ref, () => {
     return {
-      setLastBoundRect() {
-        lastRef.current = createELeRectMap(wrapRef.current!);
-      },
+      setLastBoundRect,
     };
   });
   useEffect(() => {
@@ -91,11 +115,30 @@ const AnimateList: ForwardRefRenderFunction<AnimateListExpose, AnimateListProps>
     if (prevItems.current.length !== items.length || !enableFlip) return;
     triggerFlip();
   }, [items]);
+  useEffect(() => {
+    let targetElementMap = dragAbleTargetElementMap?.current;
+    targetElementMap &&
+      targetElementMap.forEach((node) => {
+        if (!node) return;
+        node.onmousedown = handleDragAbleTargetMouseDown;
+        node.addEventListener('mousedown', handleDragAbleTargetMouseDown);
+      });
+    return () => {
+      targetElementMap &&
+        targetElementMap.forEach((node) => {
+          if (!node) return;
+          node.removeEventListener('mousedown', handleDragAbleTargetMouseDown);
+        });
+    };
+  }, [items]);
+  const handleDragAbleTargetMouseDown = (event: MouseEvent) => {
+    event.stopPropagation();
+    setDragAble(true);
+  };
   const triggerFlip = () => {
     let currentRectMap = createELeRectMap(wrapRef.current!);
     lastRef.current.forEach((preNodeRect, node) => {
       let currentRect = currentRectMap.get(node) as DOMRect;
-      console.log(currentRect, preNodeRect);
       if (!currentRect) return;
       let invert = {
         top: preNodeRect.top - currentRect.top,
@@ -107,7 +150,7 @@ const AnimateList: ForwardRefRenderFunction<AnimateListExpose, AnimateListProps>
       ];
       node.animate(keyframes, {
         duration,
-        easing: 'linear',
+        easing: flipEasing,
       });
     });
   };
@@ -171,14 +214,80 @@ const AnimateList: ForwardRefRenderFunction<AnimateListExpose, AnimateListProps>
     },
     keys,
   });
+  let resetOpacityEffect: Function;
+  const setLastBoundRect = () => {
+    lastRef.current = createELeRectMap(wrapRef.current!);
+  };
+  const getDropIndex = (event: DragEvent) => {
+    return parseInt(event.currentTarget.getAttribute('data-index')!);
+  };
+  const filterOriginDrop = (event: DragEvent) => {
+    let newIndex = getDropIndex(event);
+    return newIndex === originIndex.current || originIndex.current === null;
+  };
+  const handleDragStart = (event: DragEvent, i: number) => {
+    originIndex.current = i;
+    let currentTarget = event.currentTarget as HTMLElement;
+    currentTarget.style.transition = `opacity ${duration} ${flipEasing}`;
+    setTimeout(() => {
+      currentTarget.style.opacity = '0.5';
+    });
+    resetOpacityEffect = () => {
+      currentTarget.style.opacity = '1';
+      currentTarget.style.transition = '';
+    };
+  };
+  let swapList = (newIndex: number, oldIndex: number) => {
+    let list = [...items];
+    let temp = list[oldIndex];
+    list[oldIndex] = list[newIndex];
+    list[newIndex] = temp;
+    return list;
+  };
+  const triggerSwap = (event: DragEvent) => {
+    let dropIndex = getDropIndex(event);
+    enableFlip && setLastBoundRect();
+    if (dropSwap) {
+      let origin = originIndex.current!;
+      dropSwap({
+        originIndex: origin,
+        dropIndex: dropIndex,
+        newList: swapList(dropIndex, origin),
+      });
+    }
+    if (dragSwapEventType === 'enter') {
+      originIndex.current = dropIndex;
+    } else {
+      originIndex.current = null;
+    }
+  };
+  const handleDragEnter = (event: DragEvent) => {
+    if (!filterOriginDrop(event) && dragSwapEventType === 'enter') {
+      triggerSwap(event);
+    }
+  };
+  const handleDrop = (event: DragEvent) => {
+    event.preventDefault();
+    if (!filterOriginDrop(event) && dragSwapEventType === 'drop') {
+      triggerSwap(event);
+    }
+    setDragAble(false);
+    resetOpacityEffect && resetOpacityEffect();
+  };
   return (
     <div ref={wrapRef}>
       {transitions((style, item, o, i) => {
         return (
-          // @ts-ignore
           <animated.div
+            draggable={dragAble}
+            className="drag-item"
+            data-index={i}
             ref={(ref: HTMLDivElement) => ref && refMap.set(item, ref)}
             style={{ ...style, ...wrapItemStyle }}
+            onDragStart={(e) => handleDragStart(e, i)}
+            onDragOver={(ev) => ev.preventDefault()}
+            onDrop={handleDrop}
+            onDragEnter={handleDragEnter}
           >
             {buildItem(item, i)}
           </animated.div>
@@ -187,5 +296,4 @@ const AnimateList: ForwardRefRenderFunction<AnimateListExpose, AnimateListProps>
     </div>
   );
 };
-
 export default forwardRef(AnimateList);

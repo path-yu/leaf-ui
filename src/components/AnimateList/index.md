@@ -1,11 +1,12 @@
 ## AnimateList-动画列表
-一个基于react-spring封装的动画列表组件，支持collapse，slideDown，sideSlide三种过渡，列表顺序变化时开启flip动画。
+
+一个基于 react-spring 封装的动画列表组件，支持 collapse，slideDown，sideSlide 三种过渡，列表顺序变化时开启 flip 动画。
 
 ### 基础演示
 
 ```tsx
 import React, { useRef, useState } from 'react';
-import { AnimateList, Button, Space } from 'leaf-ui';
+import { AnimateList, Button, Space, Icon } from 'leaf-ui';
 
 export default () => {
   let [list, setList] = useState(['react', 'vue', 'angular']);
@@ -20,14 +21,13 @@ export default () => {
               style={{
                 background: 'lightgray',
                 padding: '5px',
-                textAlign: 'center',
                 color: 'black',
                 width: '400px',
                 lineHeight: '40px',
                 marginTop: index === 0 ? '0' : '10px',
               }}
               onClick={() => {
-                setList((prev) => prev.filter((v) => v !== item));
+                // setList((prev) => prev.filter((v) => v !== item));
               }}
             >
               {item}
@@ -172,6 +172,75 @@ export default () => {
           }}
         >
           shuffle
+        </Button>
+      </Space>
+    </div>
+  );
+};
+```
+
+### 拖拽切换
+
+```tsx
+import React, { useRef, useState } from 'react';
+import { AnimateList, Button, Space, Icon } from 'leaf-ui';
+
+export default () => {
+  let [list, setList] = useState(['react', 'vue', 'angular']);
+  const dragAbleTargetMapRef = useRef<Map<any, HTMLElement>>(new Map());
+  return (
+    <div>
+      <AnimateList
+        items={list}
+        keys={(item) => item}
+        dragSwapEventType="drop"
+        dropSwap={({ newList }) => setList(newList)}
+        dragAbleTargetElementMap={dragAbleTargetMapRef}
+        buildItem={(item, index) => {
+          return (
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                background: 'aliceblue',
+                padding: '5px 15px',
+                color: 'black',
+                width: '400px',
+                lineHeight: '40px',
+                marginTop: index === 0 ? '0' : '10px',
+              }}
+              onClick={(event) => {
+                let target = event.target as HTMLElement;
+                // 过滤拖拽元素点击
+                if (target.classList.contains('triggerDrag') || target.classList.contains('fa-list')) {
+                  return;
+                }
+                setList((prev) => prev.filter((v) => v !== item));
+              }}
+            >
+              {item}
+              <span
+                class="triggerDrag"
+                ref={(ref: HTMLElement) => dragAbleTargetMapRef.current.set(item, ref)}
+              >
+                <Icon icon="list"></Icon>
+              </span>
+            </div>
+          );
+        }}
+      />
+      <Space style={{ marginTop: '20px' }} itemStyle={{ marginTop: '10px' }}>
+        <Button
+          onClick={() => {
+            setList((prev) => {
+              let arr = [...prev];
+              arr.splice(1, 0, Math.random());
+              return arr;
+            });
+          }}
+        >
+          add
         </Button>
       </Space>
     </div>
