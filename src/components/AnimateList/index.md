@@ -193,7 +193,6 @@ export default () => {
       <AnimateList
         items={list}
         keys={(item) => item}
-        dragSwapEventType="drop"
         dropSwap={({ newList }) => setList(newList)}
         dragAbleTargetElementMap={dragAbleTargetMapRef}
         buildItem={(item, index) => {
@@ -221,7 +220,7 @@ export default () => {
             >
               {item}
               <span
-                class="triggerDrag"
+                className="triggerDrag"
                 ref={(ref: HTMLElement) => dragAbleTargetMapRef.current.set(item, ref)}
               >
                 <Icon icon="list"></Icon>

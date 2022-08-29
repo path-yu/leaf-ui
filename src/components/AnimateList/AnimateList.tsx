@@ -103,6 +103,7 @@ const AnimateList: ForwardRefRenderFunction<AnimateListExpose, AnimateListProps>
   const originIndex = useRef<number | null>(null);
   const [dragAble, setDragAble] = useState(false);
   const { isMount } = useIsFirstMount();
+  const enterSwapLock = useRef(false);
   useImperativeHandle(ref, () => {
     return {
       setLastBoundRect,
@@ -218,11 +219,7 @@ const AnimateList: ForwardRefRenderFunction<AnimateListExpose, AnimateListProps>
   const setLastBoundRect = () => {
     lastRef.current = createELeRectMap(wrapRef.current!);
   };
-  const getDropIndex = (event: DragEvent) => {
-    return parseInt(event.currentTarget.getAttribute('data-index')!);
-  };
-  const filterOriginDrop = (event: DragEvent) => {
-    let newIndex = getDropIndex(event);
+  const filterOriginDrop = (newIndex: number) => {
     return newIndex === originIndex.current || originIndex.current === null;
   };
   const handleDragStart = (event: DragEvent, i: number) => {
@@ -244,32 +241,36 @@ const AnimateList: ForwardRefRenderFunction<AnimateListExpose, AnimateListProps>
     list[newIndex] = temp;
     return list;
   };
-  const triggerSwap = (event: DragEvent) => {
-    let dropIndex = getDropIndex(event);
+  const triggerSwap = (index: number) => {
     enableFlip && setLastBoundRect();
     if (dropSwap) {
       let origin = originIndex.current!;
       dropSwap({
         originIndex: origin,
-        dropIndex: dropIndex,
-        newList: swapList(dropIndex, origin),
+        dropIndex: index,
+        newList: swapList(index, origin),
       });
     }
     if (dragSwapEventType === 'enter') {
-      originIndex.current = dropIndex;
+      originIndex.current = index;
+      enterSwapLock.current = true;
+      setTimeout(() => {
+        enterSwapLock.current = false;
+      }, duration);
     } else {
       originIndex.current = null;
     }
   };
-  const handleDragEnter = (event: DragEvent) => {
-    if (!filterOriginDrop(event) && dragSwapEventType === 'enter') {
-      triggerSwap(event);
+  const handleDragEnter = (event: DragEvent, i: number) => {
+    if (!filterOriginDrop(i) && dragSwapEventType === 'enter' && !enterSwapLock.current) {
+      triggerSwap(i);
     }
+    resetOpacityEffect && resetOpacityEffect();
   };
-  const handleDrop = (event: DragEvent) => {
+  const handleDrop = (event: DragEvent, i: number) => {
     event.preventDefault();
-    if (!filterOriginDrop(event) && dragSwapEventType === 'drop') {
-      triggerSwap(event);
+    if (!filterOriginDrop(i) && dragSwapEventType === 'drop') {
+      triggerSwap(i);
     }
     setDragAble(false);
     resetOpacityEffect && resetOpacityEffect();
@@ -281,13 +282,12 @@ const AnimateList: ForwardRefRenderFunction<AnimateListExpose, AnimateListProps>
           <animated.div
             draggable={dragAble}
             className="drag-item"
-            data-index={i}
             ref={(ref: HTMLDivElement) => ref && refMap.set(item, ref)}
             style={{ ...style, ...wrapItemStyle }}
             onDragStart={(e) => handleDragStart(e, i)}
             onDragOver={(ev) => ev.preventDefault()}
-            onDrop={handleDrop}
-            onDragEnter={handleDragEnter}
+            onDrop={(e) => handleDrop(e, i)}
+            onDragEnter={(e) => handleDragEnter(e, i)}
           >
             {buildItem(item, i)}
           </animated.div>
