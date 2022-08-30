@@ -65,7 +65,7 @@ interface AnimateListProps {
    * @description 拖拽交换数据触发的事件类型, 默认是onDragEnter, 可选onDrop
    * @default enter
    */
-  dragSwapEventType: 'enter' | 'drop';
+  dragSwapEventType?: 'enter' | 'drop';
   /**
    * @description 触发flip动画过渡曲线, 默认ease-in
    * @default ease-in

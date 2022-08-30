@@ -126,7 +126,6 @@ const MessageProvider = forwardRef<MessageProviderExpose, MessageProvideProps>((
           onClick,
           icon,
         };
-        let resolveFn: Function;
         let callback: Function;
         const result = () => {
           onClose && onClose();
