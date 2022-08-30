@@ -75,6 +75,18 @@ interface AnimateListProps {
    * @description 开启拖拽切换锚点子元素map
    */
   dragAbleTargetElementMap?: MutableRefObject<Map<any, HTMLElement>>;
+  /**
+   * @description 进入拖拽元素触发回调
+   */
+  dragEnter?: (event: DragEvent) => void;
+  /**
+   * @description 将元素放置有效拖拽区触发
+   */
+  drop?: (event: DragEvent) => void;
+  /**
+   * @description 拖拽开始回调
+   */
+  dropStart?: (event: DragEvent, startIndex: number) => void;
 }
 export interface AnimateListExpose {
   setLastBoundRect: () => void;
@@ -95,6 +107,9 @@ const AnimateList: ForwardRefRenderFunction<AnimateListExpose, AnimateListProps>
     dragSwapEventType = 'enter',
     flipEasing = 'ease-in',
     dragAbleTargetElementMap,
+    dragEnter,
+    drop,
+    dropStart,
   } = props;
   const refMap = useMemo(() => new Map(), []);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -168,7 +183,7 @@ const AnimateList: ForwardRefRenderFunction<AnimateListExpose, AnimateListProps>
         return isMount ? from : {};
       }
     },
-    enter: (item) => async (next, cancel) => {
+    enter: (item) => async (next) => {
       await next({ opacity: 1, height: getRealHeight(item), y: 0 });
     },
     leave: { opacity: 0, height: 0 },
@@ -233,6 +248,7 @@ const AnimateList: ForwardRefRenderFunction<AnimateListExpose, AnimateListProps>
       currentTarget.style.opacity = '1';
       currentTarget.style.transition = '';
     };
+    dropStart?.(event, i);
   };
   let swapList = (newIndex: number, oldIndex: number) => {
     let list = [...items];
@@ -262,18 +278,20 @@ const AnimateList: ForwardRefRenderFunction<AnimateListExpose, AnimateListProps>
     }
   };
   const handleDragEnter = (event: DragEvent, i: number) => {
-    if (!filterOriginDrop(i) && dragSwapEventType === 'enter' && !enterSwapLock.current) {
-      triggerSwap(i);
+    if (!filterOriginDrop(i) && !enterSwapLock.current) {
+      dragSwapEventType === 'enter' && triggerSwap(i);
+      dragEnter?.(event);
     }
-    resetOpacityEffect && resetOpacityEffect();
+    resetOpacityEffect?.();
   };
   const handleDrop = (event: DragEvent, i: number) => {
     event.preventDefault();
-    if (!filterOriginDrop(i) && dragSwapEventType === 'drop') {
-      triggerSwap(i);
+    if (!filterOriginDrop(i)) {
+      dragSwapEventType === 'drop' && triggerSwap(i);
+      drop?.(event);
     }
     setDragAble(false);
-    resetOpacityEffect && resetOpacityEffect();
+    resetOpacityEffect?.();
   };
   return (
     <div ref={wrapRef}>
