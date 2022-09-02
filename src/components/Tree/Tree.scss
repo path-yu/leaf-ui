@@ -1,0 +1,19 @@
+
+.tree{
+  .tree-switcher{
+    position: relative;
+    flex: none;
+    align-self: stretch;
+    width: 24px;
+    margin: 0;
+    line-height: 24px;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    .anticon-icon{
+      display: inline-block;
+      font-size: 10px;
+      vertical-align: baseline;
+    }
+  }
+}

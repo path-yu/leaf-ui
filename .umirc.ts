@@ -41,6 +41,9 @@ export default defineConfig({
         children: ['/components/Collapse/index.md'],
       },
       {
+        children: ['/components/Tree/index.md'],
+      },
+      {
         children: ['/components/Icon/index.md'],
       },
       {

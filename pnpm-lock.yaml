@@ -8,6 +8,7 @@ specifiers:
   '@testing-library/jest-dom': ^5.15.1
   '@testing-library/react': ^13.0.0
   '@types/jest': ^27.0.3
+  '@types/lodash': ^4.14.184
   '@types/react': ^18.0.15
   '@types/react-dom': ^18.0.6
   '@types/react-transition-group': ^4.4.5
@@ -21,6 +22,7 @@ specifiers:
   father: ^4.0.0-rc.2
   gh-pages: ^3.0.0
   lint-staged: ^10.0.7
+  lodash: ^4.17.21
   nanoid: ^4.0.0
   prettier: ^2.2.1
   rc-motion: ^2.6.2
@@ -36,6 +38,7 @@ dependencies:
   '@react-spring/web': 9.5.2_biqbaboplfbrettd7655fr4n2y
   axios: 0.27.2
   classnames: 2.3.1
+  lodash: 4.17.21
   nanoid: 4.0.0
   rc-motion: 2.6.2_biqbaboplfbrettd7655fr4n2y
   react-transition-group: 4.4.2_biqbaboplfbrettd7655fr4n2y
@@ -44,6 +47,7 @@ devDependencies:
   '@testing-library/jest-dom': 5.16.4
   '@testing-library/react': 13.3.0_biqbaboplfbrettd7655fr4n2y
   '@types/jest': 27.5.2
+  '@types/lodash': 4.14.184
   '@types/react': 18.0.15
   '@types/react-dom': 18.0.6
   '@types/react-transition-group': 4.4.5
@@ -2593,6 +2597,10 @@ packages:
     resolution: {integrity: sha512-BQ5aZNSCpj7D6K2ksrRCTmKRLEpnPvWDiLPfoGyhZ++8YtiK9d/3DBKPJgry359X/P1PfruyYwvnvwFjuEiEIg==}
     dependencies:
       '@types/node': 18.0.6
+    dev: true
+
+  /@types/lodash/4.14.184:
+    resolution: {integrity: sha512-RoZphVtHbxPZizt4IcILciSWiC6dcn+eZ8oX9IWEYfDMcocdd42f7NPI6fQj+6zI8y4E0L7gu2pcZKLGTRaV9Q==}
     dev: true
 
   /@types/mathjax/0.0.36:
@@ -8965,7 +8973,6 @@ packages:
 
   /lodash/4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
-    dev: true
 
   /log-symbols/2.2.0:
     resolution: {integrity: sha512-VeIAFslyIerEJLXHziedo2basKbMKtTw3vfn5IzG0XTjhAVEJyNHnL2p7vc+wBDSdQuUpNw3M2u6xb9QsAY5Eg==}

@@ -14,6 +14,7 @@ import React, {
 } from 'react';
 import { animated, useTransition, UseTransitionProps } from '@react-spring/web';
 import { useIsFirstMount } from '../../hook/useIsFirstMount';
+
 interface AnimateListProps {
   /** 列表数据 */
   items: any[];
@@ -117,7 +118,7 @@ const AnimateList: ForwardRefRenderFunction<AnimateListExpose, AnimateListProps>
   const prevItems = useRef<any[]>([...items]);
   const originIndex = useRef<number | null>(null);
   const [dragAble, setDragAble] = useState(false);
-  const { isMount } = useIsFirstMount();
+  const { isMount } = useIsFirstMount(items);
   const enterSwapLock = useRef(false);
   useImperativeHandle(ref, () => {
     return {

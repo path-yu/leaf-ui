@@ -22,3 +22,5 @@ export { default as AnimateList } from './components/AnimateList/AnimateList';
 export { type CarouselExpose } from './components/Carousel/Api/CarouselMethods.api';
 export { type AnimateListExpose } from './components/AnimateList/AnimateList';
 export { default as message } from './components/Message/Message';
+export { default as Tree } from './components/Tree/Tree';
+export { type DataNode } from './components/Tree/Tree';
