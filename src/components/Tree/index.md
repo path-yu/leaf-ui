@@ -79,7 +79,7 @@ export default () => {
     <Tree
       checkable
       onExpand={onExpand}
-      defaultExpandedKeys={['0-0-0', '0-0-1','0-1']}
+      defaultExpandedKeys={['0-0-0', '0-0-1']}
       onSelect={onSelect}
       onCheck={onCheck}
       treeData={treeData}

@@ -24,3 +24,5 @@ export { type AnimateListExpose } from './components/AnimateList/AnimateList';
 export { default as message } from './components/Message/Message';
 export { default as Tree } from './components/Tree/Tree';
 export { type DataNode } from './components/Tree/Tree';
+export { default as Checkbox } from './components/Checkbox/Checkbox';
+export { default as CheckBoxGroup } from './components/Checkbox/CheckboxGroup';

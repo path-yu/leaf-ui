@@ -44,6 +44,9 @@ export default defineConfig({
         children: ['/components/Tree/index.md'],
       },
       {
+        children: ['/components/Checkbox/index.md'],
+      },
+      {
         children: ['/components/Icon/index.md'],
       },
       {

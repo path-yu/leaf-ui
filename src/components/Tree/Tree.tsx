@@ -12,7 +12,7 @@ interface DataNodeItem {
   disabled?: boolean;
   disableCheckbox?: boolean;
 }
-interface DataNodeListItem extends DataNodeItem {
+export interface DataNodeListItem extends DataNodeItem {
   indent: number;
   hasChildren: boolean;
   expand?: boolean; //是否展开 默认为true
@@ -82,11 +82,9 @@ function handleTreeExpand(
     }
     return current;
   });
-  let minTreeCount = newTreeList.filter((item) => item.parent === undefined).length;
-
   expendNodeChildListMap.forEach((item, current) => {
     // 不展开则删除对应的子节点
-    if (!item.expand && newTreeList.length !== minTreeCount) {
+    if (!item.expand) {
       let startIndex = treeListFindByKey(newTreeList, current);
       if (newTreeList[startIndex]) {
         newTreeList.splice(startIndex + 1, item.childList.length);

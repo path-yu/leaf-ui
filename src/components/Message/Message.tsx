@@ -162,6 +162,7 @@ const MessageProvider = forwardRef<MessageProviderExpose, MessageProvideProps>((
         items={messageList}
         keys={(item) => item.key}
         effect="slide-down"
+        appear={true}
         wrapItemStyle={{ display: 'flex', justifyContent: 'center' }}
         buildItem={(item: MessageItemData, index) => {
           return (
