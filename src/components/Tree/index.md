@@ -10,7 +10,7 @@ export default () => {
   };
 
   const onCheck: TreeProps['onCheck'] = (checkedKeys, info) => {
-    console.log('onCheck', checkedKeys, info);
+    console.log('onCheck', checkedKeys);
   };
   const treeData: DataNode[] = [
     {
@@ -80,7 +80,7 @@ export default () => {
       checkable
       onExpand={onExpand}
       defaultExpandedKeys={['0-0-0', '0-0-1']}
-      onSelect={onSelect}
+      defaultCheckedKeys={['0-0-0']}
       onCheck={onCheck}
       treeData={treeData}
     />

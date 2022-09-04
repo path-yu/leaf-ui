@@ -90,7 +90,7 @@ const Checkbox: FC<CheckBoxProps & PropsWithChildren> = (props) => {
         />
         <span className="checkbox-inner"></span>
       </span>
-      <span>{children}</span>
+      {children && <span>{children}</span>}
     </label>
   );
 };

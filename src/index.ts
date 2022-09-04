@@ -24,7 +24,7 @@ export {
 } from './components/AnimateList/AnimateList';
 export { type CarouselExpose } from './components/Carousel/Api/CarouselMethods.api';
 export { default as message } from './components/Message/Message';
-export { default as Tree, type DataNode } from './components/Tree/Tree';
+export { default as Tree, type DataNode, type DataNodeListItem } from './components/Tree/Tree';
 export { default as Checkbox } from './components/Checkbox/Checkbox';
 export {
   default as CheckboxGroup,

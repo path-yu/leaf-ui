@@ -1,7 +1,8 @@
-import React, { FC, Key, ReactNode, useEffect, useMemo, useState } from 'react';
+import React, { ChangeEvent, FC, Key, ReactNode, useEffect, useMemo, useState } from 'react';
 import { cloneDeep } from 'lodash';
 import AnimateList from '../AnimateList/AnimateList';
 import './Tree.scss';
+import { Checkbox } from '../../index';
 
 export interface DataNode extends DataNodeItem {
   children?: DataNode[];
@@ -17,6 +18,8 @@ export interface DataNodeListItem extends DataNodeItem {
   hasChildren: boolean;
   expand?: boolean; //是否展开 默认为true
   parent?: DataNodeListItem | null;
+  checked?: boolean;
+  indeterminate?: boolean;
 }
 export interface TreeProps {
   /**
@@ -26,11 +29,27 @@ export interface TreeProps {
   /**
    * @description 默认展开指定的树节点
    */
-  defaultExpandedKeys: Key[];
+  defaultExpandedKeys?: Key[];
+  /**
+   * @description 默认选中的树节点
+   */
+  defaultCheckedKeys?: Key[];
   /**
    * @description 展开/收起节点时触发
    */
-  onExpand: (expandedKeys: Key[], expand: boolean, node: DataNodeListItem) => void;
+  onExpand?: (expandedKeys: Key[], expand: boolean, node: DataNodeListItem) => void;
+  /**
+   * @description 点击复选框触发
+   */
+  onCheck?: (
+    checkedKeys: Key[],
+    payload: { e: ChangeEvent<HTMLInputElement>; node: DataNodeListItem; checked: boolean },
+  ) => void;
+  /**
+   * @description 节点前添加复选框
+   * @default false
+   */
+  checkable?: boolean;
 }
 function treeToArray({
   tree,
@@ -38,12 +57,16 @@ function treeToArray({
   parent,
   indent,
   defaultExpandedKeys = [],
+  defaultCheckedKeys = [],
+  checkable = false,
 }: {
   tree: DataNode[];
   result?: DataNodeListItem[];
   parent?: DataNodeListItem | null;
   indent?: number;
-  defaultExpandedKeys?: any[];
+  defaultExpandedKeys?: Key[];
+  defaultCheckedKeys?: Key[];
+  checkable?: boolean;
 }) {
   tree.forEach((item, index) => {
     const { children = [], ...props } = item;
@@ -53,8 +76,12 @@ function treeToArray({
       hasChildren: children.length > 0,
       parent,
     };
-    if (children.length > 0) {
+    if (children.length) {
       current.expand = defaultExpandedKeys.includes(current.key);
+    }
+    if (checkable) {
+      current.indeterminate = false;
+      current.checked = defaultCheckedKeys.includes(current.key);
     }
     result.push(current);
     treeToArray({
@@ -63,13 +90,16 @@ function treeToArray({
       parent: current,
       indent: current.indent,
       defaultExpandedKeys,
+      defaultCheckedKeys,
+      checkable,
     });
   });
   return result;
 }
-function handleTreeExpand(
+function handleTreeExpandAndChecked(
   treeList: DataNodeListItem[],
   expendNodeChildListMap: expandNodeChildMap,
+  checkable?: boolean,
 ) {
   let newList = [...treeList];
   let newTreeList = newList.map((current) => {
@@ -91,8 +121,54 @@ function handleTreeExpand(
       }
     }
   });
+  if (checkable) {
+    initTreeChecked(newTreeList, expendNodeChildListMap);
+  }
   return newTreeList;
 }
+const initTreeChecked = (
+  treeList: DataNodeListItem[],
+  expendNodeChildListMap: expandNodeChildMap,
+) => {
+  treeList.forEach((item) => {
+    // 父节点已选中, 选中子节点
+    if (item.hasChildren && item.checked) {
+      let { childList } = expendNodeChildListMap.get(item.key)!;
+      childList.forEach((child) => (child.checked = true));
+    }
+  });
+  handleChildNodeCheckParent(treeList, expendNodeChildListMap);
+};
+const handleChildNodeCheckParent = (
+  treeList: DataNodeListItem[],
+  expendNodeChildListMap: expandNodeChildMap,
+) => {
+  treeList.forEach((item) => {
+    if (item.hasChildren) {
+      let { childList } = expendNodeChildListMap.get(item.key)!;
+      // 子节点选中 和父节点进行联动
+      let checkedList = childList.filter((child) => child.checked);
+      item.checked = checkedList.length === childList.length;
+      item.indeterminate = !!checkedList.length && checkedList.length < childList.length;
+    }
+  });
+};
+const updateExpandNodeChildListChecked = (
+  expendNodeChildListMap: expandNodeChildMap,
+  targetKey: Key,
+  checked: boolean,
+  parentKey?: Key,
+) => {
+  expendNodeChildListMap.forEach((item) => {
+    item.childList.forEach((child) => {
+      if (child.key === targetKey || child.key === parentKey) {
+        child.checked = checked;
+      }
+    });
+    // 更新父节点
+    item.checked = item.childList.every((c) => c.checked);
+  });
+};
 const computedExpandNodeChildListMap = (treeList: DataNodeListItem[]) => {
   let map = new Map();
   treeList.forEach((item, index) => {
@@ -102,6 +178,7 @@ const computedExpandNodeChildListMap = (treeList: DataNodeListItem[]) => {
       map.set(item.key, {
         childList,
         expand: item.expand,
+        checked: item.checked,
       });
     }
   });
@@ -121,11 +198,21 @@ const getCurrentChildrenTreeList = (list: DataNodeListItem[], target: DataNodeLi
   }
   return result;
 };
-type expandNodeChildMap = Map<any, { childList: DataNodeListItem[]; expand: boolean }>;
+type expandNodeChildMap = Map<
+  any,
+  { childList: DataNodeListItem[]; expand: boolean; checked: boolean }
+>;
 const Tree: FC<TreeProps> = (props) => {
-  const { treeData, onExpand, defaultExpandedKeys } = props;
+  const {
+    treeData,
+    onExpand,
+    defaultExpandedKeys = [],
+    defaultCheckedKeys = [],
+    checkable = false,
+    onCheck,
+  } = props;
   let flatTreeList = useMemo(
-    () => treeToArray({ tree: treeData, defaultExpandedKeys }),
+    () => treeToArray({ tree: treeData, defaultExpandedKeys, defaultCheckedKeys, checkable }),
     [treeData],
   );
   //保存所有可以展开节点的所有子节点列表map
@@ -175,8 +262,35 @@ const Tree: FC<TreeProps> = (props) => {
     }
     setTreeList(newList);
   };
+  const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>, index: number) => {
+    let checked = e.target.checked;
+    let newTreeList = cloneDeep(treeList);
+    let current = newTreeList[index];
+    newTreeList[index].checked = checked;
+    updateExpandNodeChildListChecked(
+      expendNodeChildListMap,
+      current.key,
+      checked,
+      current.parent?.key,
+    );
+    if (current.hasChildren) {
+      let target = expendNodeChildListMap.get(current.key)!;
+      target.checked = checked;
+      target.childList.forEach((child) => (child.checked = checked));
+      newTreeList.forEach((item) => {
+        let isChild = target.childList.find((child) => child.key === item.key);
+        if (isChild) {
+          item.checked = checked;
+        }
+      });
+    }
+    handleChildNodeCheckParent(newTreeList, expendNodeChildListMap);
+    const checkedKeys = newTreeList.filter((item) => item.checked).map((item) => item.key);
+    onCheck?.(checkedKeys, { e, node: current, checked });
+    setTreeList(newTreeList);
+  };
   useEffect(() => {
-    setTreeList(handleTreeExpand(flatTreeList, expendNodeChildListMap));
+    setTreeList(handleTreeExpandAndChecked(flatTreeList, expendNodeChildListMap, checkable));
   }, [treeData]);
   const renderTreeItem = (item: DataNodeListItem, index: number) => {
     return (
@@ -207,8 +321,16 @@ const Tree: FC<TreeProps> = (props) => {
             </span>
           </span>
         )}
+
         {!item.hasChildren && <span style={{ paddingLeft: '20px' }}></span>}
-        {item.title}
+        {checkable && (
+          <Checkbox
+            onChange={(e) => handleCheckboxChange(e, index)}
+            checked={item.checked}
+            indeterminate={item.indeterminate}
+          />
+        )}
+        <span>{item.title}</span>
       </>
     );
   };
