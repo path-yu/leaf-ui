@@ -1,11 +1,4 @@
-import React, {
-  ChangeEvent,
-  DetailedHTMLProps,
-  FC,
-  InputHTMLAttributes,
-  PropsWithChildren,
-  useState,
-} from 'react';
+import React, { ChangeEvent, FC, InputHTMLAttributes, PropsWithChildren, useState } from 'react';
 import './CheckBox.scss';
 import classNames from 'classnames';
 interface CheckBoxProps {

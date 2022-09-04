@@ -18,11 +18,15 @@ export { default as ImageGroup } from './components/Image/ImageGroup';
 export { default as Switch } from './components/Switch/Switch';
 export { default as Carousel } from './components/Carousel/Carousel';
 export { default as InfiniteScroll } from './components/InfiniteScroll/InfiniteScroll';
-export { default as AnimateList } from './components/AnimateList/AnimateList';
+export {
+  default as AnimateList,
+  type AnimateListExpose,
+} from './components/AnimateList/AnimateList';
 export { type CarouselExpose } from './components/Carousel/Api/CarouselMethods.api';
-export { type AnimateListExpose } from './components/AnimateList/AnimateList';
 export { default as message } from './components/Message/Message';
-export { default as Tree } from './components/Tree/Tree';
-export { type DataNode } from './components/Tree/Tree';
+export { default as Tree, type DataNode } from './components/Tree/Tree';
 export { default as Checkbox } from './components/Checkbox/Checkbox';
-export { default as CheckBoxGroup } from './components/Checkbox/CheckboxGroup';
+export {
+  default as CheckboxGroup,
+  type CheckBoxGroupOption,
+} from './components/Checkbox/CheckboxGroup';

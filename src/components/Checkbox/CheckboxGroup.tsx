@@ -1,6 +1,5 @@
-import React, { ChangeEvent, FC, useRef, useState } from 'react';
+import React, { ChangeEvent, FC, useRef } from 'react';
 import Checkbox, { HTMLInputElementProps } from './Checkbox';
-import { Change } from '@react-spring/web';
 
 interface CheckBoxGroupProps {
   /**
@@ -28,7 +27,7 @@ interface CheckBoxGroupProps {
   /**
    * @description 变化时的回调
    */
-  onChange?: (checkedValue: string[]) => void;
+  onChange?: (e: ChangeEvent<HTMLInputElement>, checkedValue: string[]) => void;
 }
 export interface CheckBoxGroupOption {
   value: string;
@@ -46,21 +45,37 @@ const CheckboxGroup: FC<CheckBoxGroupProps> = (props) => {
       restProps.value = item;
       label = checkboxValue = item;
     } else {
+      let { disabled = false } = item;
       checkboxValue = item.value;
       label = item.label;
       restProps.value = checkboxValue;
+      restProps.disabled = disabled;
     }
-    if (defaultValue.includes(checkboxValue) && value.length === 0) {
-      restProps.defaultChecked = true;
+    if (defaultValue.length !== 0) {
+      restProps.defaultChecked = defaultValue.includes(checkboxValue);
+    } else {
+      restProps.defaultChecked = false;
     }
-    if (value.length > 0 && value.includes(checkboxValue)) {
-      restProps.checked = true;
-      delete restProps.defaultChecked;
+    if (value.length !== 0) {
+      restProps.checked = value.includes(checkboxValue);
+    } else {
+      restProps.checked = false;
     }
     if (restProps.defaultChecked || restProps.checked) {
       checkedList.current.push(checkboxValue);
     }
-    disabled !== undefined && (restProps.disabled = disabled);
+
+    // defaultChecked 和 checked 只能二选一
+    if (defaultValue.length > 0) {
+      delete restProps.checked;
+    } else if (value.length > 0) {
+      delete restProps.defaultChecked;
+    }
+    if (disabled !== undefined) {
+      if (typeof item !== 'string' && item.disabled === undefined) {
+        restProps.disabled = disabled;
+      }
+    }
     name && (restProps.name = name);
     return {
       restProps,
@@ -69,14 +84,15 @@ const CheckboxGroup: FC<CheckBoxGroupProps> = (props) => {
   };
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     let target = e.target;
-    if (target.checked) {
+    if (!checkedList.current.includes(target.value)) {
       checkedList.current.push(target.value);
     } else {
       checkedList.current = checkedList.current.filter((item) => item !== target.value);
     }
-    onChange?.(checkedList.current);
+    onChange?.(e, checkedList.current);
   };
   const renderOptions = () => {
+    checkedList.current = [];
     return options.map((item, index) => {
       const { restProps, label } = handleProps(item);
       return (

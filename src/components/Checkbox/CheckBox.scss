@@ -82,6 +82,9 @@
     border-color: #d9d9d9!important;
     cursor:not-allowed;
   }
+  .checkbox-disabled+span{
+    cursor:not-allowed !important;
+  }
   &>.checkbox-disabled .checkbox-input{
     cursor:not-allowed ;
     pointer-events: none;
