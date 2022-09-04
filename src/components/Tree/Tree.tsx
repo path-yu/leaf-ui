@@ -3,6 +3,7 @@ import { cloneDeep } from 'lodash';
 import AnimateList from '../AnimateList/AnimateList';
 import './Tree.scss';
 import { Checkbox } from '../../index';
+import classNames from 'classnames';
 
 export interface DataNode extends DataNodeItem {
   children?: DataNode[];
@@ -79,9 +80,23 @@ function treeToArray({
     if (children.length) {
       current.expand = defaultExpandedKeys.includes(current.key);
     }
+
+    if (item.disableCheckbox === undefined) {
+      current.disableCheckbox = false;
+    }
+    if (item.disabled === undefined) {
+      current.disabled = false;
+    }
+    if (item.disabled) {
+      current.disableCheckbox = true;
+    }
     if (checkable) {
       current.indeterminate = false;
-      current.checked = defaultCheckedKeys.includes(current.key);
+      current.checked = current.disabled
+        ? false
+        : current.disableCheckbox
+        ? false
+        : defaultCheckedKeys.includes(current.key);
     }
     result.push(current);
     treeToArray({
@@ -132,9 +147,13 @@ const initTreeChecked = (
 ) => {
   treeList.forEach((item) => {
     // 父节点已选中, 选中子节点
-    if (item.hasChildren && item.checked) {
+    if (item.hasChildren && item.checked && !item.disabled) {
       let { childList } = expendNodeChildListMap.get(item.key)!;
-      childList.forEach((child) => (child.checked = true));
+      childList.forEach((child) => {
+        if (!child.disableCheckbox) {
+          child.checked = true;
+        }
+      });
     }
   });
   handleChildNodeCheckParent(treeList, expendNodeChildListMap);
@@ -146,10 +165,18 @@ const handleChildNodeCheckParent = (
   treeList.forEach((item) => {
     if (item.hasChildren) {
       let { childList } = expendNodeChildListMap.get(item.key)!;
+      // 过滤掉被禁用元素
+      childList = childList.filter(
+        (child) => !child.parent?.disabled && !child.disabled && !child.disableCheckbox,
+      );
       // 子节点选中 和父节点进行联动
       let checkedList = childList.filter((child) => child.checked);
-      item.checked = checkedList.length === childList.length;
-      item.indeterminate = !!checkedList.length && checkedList.length < childList.length;
+      if (!item.disableCheckbox) {
+        item.checked = checkedList.length === childList.length;
+        item.indeterminate = !!checkedList.length && checkedList.length < childList.length;
+        expendNodeChildListMap.get(item.key)!.checked = item.checked;
+        expendNodeChildListMap.get(item.key)!.rawTarget.checked = item.checked;
+      }
     }
   });
 };
@@ -166,9 +193,12 @@ const updateExpandNodeChildListChecked = (
       }
     });
     // 更新父节点
-    item.checked = item.childList.every((c) => c.checked);
+    item.checked = item.childList
+      .filter((child) => !child.parent?.disabled && !child.disabled && !child.disableCheckbox)
+      .every((c) => c.checked);
   });
 };
+
 const computedExpandNodeChildListMap = (treeList: DataNodeListItem[]) => {
   let map = new Map();
   treeList.forEach((item, index) => {
@@ -179,6 +209,7 @@ const computedExpandNodeChildListMap = (treeList: DataNodeListItem[]) => {
         childList,
         expand: item.expand,
         checked: item.checked,
+        rawTarget: item,
       });
     }
   });
@@ -198,9 +229,12 @@ const getCurrentChildrenTreeList = (list: DataNodeListItem[], target: DataNodeLi
   }
   return result;
 };
+const filterCheckedKeys = (treeList: DataNodeListItem[]) => {
+  return treeList.filter((item) => item.checked).map((item) => item.key);
+};
 type expandNodeChildMap = Map<
   any,
-  { childList: DataNodeListItem[]; expand: boolean; checked: boolean }
+  { childList: DataNodeListItem[]; expand: boolean; checked: boolean; rawTarget: DataNodeListItem }
 >;
 const Tree: FC<TreeProps> = (props) => {
   const {
@@ -276,17 +310,26 @@ const Tree: FC<TreeProps> = (props) => {
     if (current.hasChildren) {
       let target = expendNodeChildListMap.get(current.key)!;
       target.checked = checked;
-      target.childList.forEach((child) => (child.checked = checked));
+      target.childList.forEach((child) => {
+        if (!child.disableCheckbox) {
+          child.checked = checked;
+        }
+      });
       newTreeList.forEach((item) => {
         let isChild = target.childList.find((child) => child.key === item.key);
-        if (isChild) {
+        if (isChild && !item.disableCheckbox) {
           item.checked = checked;
         }
       });
     }
     handleChildNodeCheckParent(newTreeList, expendNodeChildListMap);
-    const checkedKeys = newTreeList.filter((item) => item.checked).map((item) => item.key);
-    onCheck?.(checkedKeys, { e, node: current, checked });
+    let checkedKeys: Key[] = [];
+    expendNodeChildListMap.forEach((item) => {
+      checkedKeys.push(...filterCheckedKeys(item.childList));
+    });
+    let expandNodeList = [...expendNodeChildListMap.values()].map((item) => item.rawTarget);
+    checkedKeys.push(...filterCheckedKeys(expandNodeList));
+    onCheck?.(Array.from([...new Set(checkedKeys)]), { e, node: current, checked });
     setTreeList(newTreeList);
   };
   useEffect(() => {
@@ -294,7 +337,11 @@ const Tree: FC<TreeProps> = (props) => {
   }, [treeData]);
   const renderTreeItem = (item: DataNodeListItem, index: number) => {
     return (
-      <>
+      <div
+        className={classNames('tree-item', {
+          'tree-disabled': item.disabled,
+        })}
+      >
         {<span style={{ paddingLeft: `${item.indent! * 20}px` }}></span>}
         {item.hasChildren && (
           <span
@@ -321,17 +368,17 @@ const Tree: FC<TreeProps> = (props) => {
             </span>
           </span>
         )}
-
         {!item.hasChildren && <span style={{ paddingLeft: '20px' }}></span>}
         {checkable && (
           <Checkbox
             onChange={(e) => handleCheckboxChange(e, index)}
-            checked={item.checked}
+            checked={item.disableCheckbox ? false : item.checked}
             indeterminate={item.indeterminate}
+            disabled={item.disableCheckbox}
           />
         )}
-        <span>{item.title}</span>
-      </>
+        <span className="tree-item-title">{item.title}</span>
+      </div>
     );
   };
   return (

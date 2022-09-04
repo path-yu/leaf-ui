@@ -16,4 +16,13 @@
       vertical-align: baseline;
     }
   }
+  .tree-item{
+    .tree-item-title{
+      user-select: none;
+    }
+  }
+  .tree-disabled .tree-item-title{
+    cursor: not-allowed;
+    color: #00000040;
+  }
 }
