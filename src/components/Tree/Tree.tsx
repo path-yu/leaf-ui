@@ -9,10 +9,18 @@ export interface DataNode extends DataNodeItem {
   children?: DataNode[];
 }
 interface DataNodeItem {
+  //标题
   title: string | ReactNode;
+  // 每个节点独一无二的key
   key: Key;
+  // 禁掉响应
   disabled?: boolean;
+  // 禁掉响应
   disableCheckbox?: boolean;
+  /** icon	自定义图标。可接收组件，*/
+  icon?: ReactNode;
+  // 当树为 checkable 时，设置独立节点是否展示 Checkbox
+  checkable?: boolean;
 }
 export interface DataNodeListItem extends DataNodeItem {
   indent: number;
@@ -77,27 +85,7 @@ function treeToArray({
       hasChildren: children.length > 0,
       parent,
     };
-    if (children.length) {
-      current.expand = defaultExpandedKeys.includes(current.key);
-    }
-
-    if (item.disableCheckbox === undefined) {
-      current.disableCheckbox = false;
-    }
-    if (item.disabled === undefined) {
-      current.disabled = false;
-    }
-    if (item.disabled) {
-      current.disableCheckbox = true;
-    }
-    if (checkable) {
-      current.indeterminate = false;
-      current.checked = current.disabled
-        ? false
-        : current.disableCheckbox
-        ? false
-        : defaultCheckedKeys.includes(current.key);
-    }
+    handleDataNodeParams({ current, item, defaultCheckedKeys, defaultExpandedKeys, checkable });
     result.push(current);
     treeToArray({
       tree: children,
@@ -110,6 +98,35 @@ function treeToArray({
     });
   });
   return result;
+}
+function handleDataNodeParams(data: {
+  current: DataNodeListItem;
+  item: DataNode;
+  defaultExpandedKeys: Key[];
+  defaultCheckedKeys: Key[];
+  checkable: boolean;
+}) {
+  let { item, current, defaultExpandedKeys, defaultCheckedKeys, checkable } = data;
+  if (item.children?.length) {
+    current.expand = defaultExpandedKeys.includes(current.key);
+  }
+
+  if (item.disableCheckbox === undefined) {
+    current.disableCheckbox = false;
+  }
+  if (item.disabled === undefined) {
+    current.disabled = false;
+  }
+  if (item.disabled) {
+    current.disableCheckbox = true;
+  }
+  if (checkable) {
+    current.indeterminate = false;
+    current.checked = defaultCheckedKeys.includes(current.key);
+  }
+  if (item.checkable === undefined) {
+    current.checkable = checkable;
+  }
 }
 function handleTreeExpandAndChecked(
   treeList: DataNodeListItem[],
@@ -147,13 +164,19 @@ const initTreeChecked = (
 ) => {
   treeList.forEach((item) => {
     // 父节点已选中, 选中子节点
-    if (item.hasChildren && item.checked && !item.disabled) {
+    if (item.hasChildren) {
       let { childList } = expendNodeChildListMap.get(item.key)!;
-      childList.forEach((child) => {
-        if (!child.disableCheckbox) {
-          child.checked = true;
-        }
-      });
+      if (item.checked && !item.disabled) {
+        childList.forEach((child) => {
+          if (!child.disableCheckbox) {
+            child.checked = true;
+          }
+        });
+      }
+      // 如果所有子节点被禁用, 则禁用父节点
+      if (childList.every((child) => child.disableCheckbox)) {
+        item.disableCheckbox = true;
+      }
     }
   });
   handleChildNodeCheckParent(treeList, expendNodeChildListMap);
@@ -261,33 +284,43 @@ const Tree: FC<TreeProps> = (props) => {
     let { childList } = target!;
     let newList = cloneDeep(treeList);
     let firstIndex = treeList.findIndex((node) => node.key === current.key);
-    if (current.expand) {
+    newList[index].expand = !newList[index].expand;
+    let expand = newList[index].expand!;
+    target!.expand = newList[index].expand!;
+    expendNodeChildListMap.forEach((item, key) => {
+      item.childList.forEach((child) => {
+        if (child.key === current.key) {
+          child.expand = expand;
+        }
+        if (child.parent?.key === current.key) {
+          child.parent!.expand = expand;
+        }
+      });
+    });
+    if (expand) {
+      let list = childList.filter((item) => {
+        if (item.hasChildren) {
+          return item.parent?.expand;
+        } else {
+          // 向上查找父节点, 直到找到未展开的节点为止
+          let parent = item.parent;
+          while (parent) {
+            if (!parent.expand) {
+              return false;
+            }
+            parent = parent?.parent;
+          }
+          return true;
+        }
+      });
+      newList.splice(firstIndex + 1, 0, ...(list.length ? list : childList));
+    } else {
       let sliceTreeList = getCurrentChildrenTreeList(
         treeList.slice(index + 1, treeList.length + 1),
         current,
       );
       newList.splice(firstIndex + 1, sliceTreeList.length);
-    } else {
-      let list = childList.filter(
-        (item) =>
-          item.expand ||
-          item.parent?.expand ||
-          (item.parent?.expand !== undefined && item.indent === current.indent + 1),
-      );
-      newList.splice(firstIndex + 1, 0, ...(list.length ? list : childList));
     }
-    newList[index].expand = !newList[index].expand;
-    target!.expand = newList[index].expand!;
-    expendNodeChildListMap.forEach((item) => {
-      item.childList.forEach((child) => {
-        if (child.key === current.key) {
-          child.expand = newList[index].expand;
-        }
-        if (child.parent?.key === current.key) {
-          child.parent!.expand = newList[index].expand;
-        }
-      });
-    });
     let expandKeys = Array.from(expendNodeChildListMap.keys()).filter(
       (key) => expendNodeChildListMap.get(key)!.expand,
     );
@@ -369,10 +402,10 @@ const Tree: FC<TreeProps> = (props) => {
           </span>
         )}
         {!item.hasChildren && <span style={{ paddingLeft: '20px' }}></span>}
-        {checkable && (
+        {item.checkable && (
           <Checkbox
             onChange={(e) => handleCheckboxChange(e, index)}
-            checked={item.disableCheckbox ? false : item.checked}
+            checked={item.checked}
             indeterminate={item.indeterminate}
             disabled={item.disableCheckbox}
           />
@@ -384,7 +417,7 @@ const Tree: FC<TreeProps> = (props) => {
   return (
     <div className="tree">
       <AnimateList
-        duration={200}
+        duration={300}
         keys={(item: any) => item.key}
         items={treeList}
         buildItem={renderTreeItem}

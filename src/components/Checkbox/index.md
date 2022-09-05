@@ -10,7 +10,7 @@ export default () => {
   const onChange = (e: ChangeEvent) => {
     console.log(e.target.checked);
   };
-  return <Checkbox onChange={onChange}>check Box</Checkbox>;
+  return <Checkbox onChange={onChange} >check Box</Checkbox>;
 };
 ```
 

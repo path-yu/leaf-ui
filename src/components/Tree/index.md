@@ -3,6 +3,84 @@
 ### 基础演示
 ```tsx
 import React from 'react';
+import { Tree,DataNode } from 'leaf-ui';
+export default () => {
+  const treeData: DataNode[] = [
+    {
+      title: 'parent 1',
+      key: '0-0',
+      children: [
+        {
+          title: 'parent 1-0',
+          key: '0-0-0',
+          children: [
+            {
+              title: 'leaf',
+              key: '0-0-0-0',
+              disableCheckbox: true,
+            },
+            {
+              title: 'leaf',
+              key: '0-0-0-1',
+              // disableCheckbox: true,
+            },
+          ],
+        },
+        {
+          title: 'parent 1-1',
+          key: '0-0-1',
+          children: [{ title: <span style={{ color: '#1890ff' }}>sss</span>, key: '0-0-1-0' }],
+        },
+        {
+          title: 'parent 1-2',
+          key: '0-0-2',
+          children: [
+            {
+              title: '三级节点',
+              key: '0-0-2-0',
+              children:[
+                {
+                  title: <span style={{ color: '#1890ff' }}>4及</span>,
+                  key: '0-0-2-0-0',
+                }
+              ]
+            },
+          ],
+        },
+      ],
+    },
+    {
+      title: 'parent 2',
+      key: '0-1',
+      children: [
+        {
+          title: 'leaf',
+          key: 'test1',
+          disableCheckbox: true,
+        },
+        {
+          title: 'leaf',
+          key: 'test12',
+        },
+      ],
+    },
+  ];
+  const onExpand = (expandedKeysValue: React.Key[]) => {
+    console.log('onExpand', expandedKeysValue);
+  };
+  return (
+    <Tree
+      onExpand={onExpand}
+      defaultExpandedKeys={['0-0-0', '0-0-1']}
+      treeData={treeData}
+    />
+  );
+};
+```
+### 节点前添加复选框
+
+```tsx
+import React from 'react';
 import { Tree } from 'leaf-ui';
 export default () => {
   const onSelect: TreeProps['onSelect'] = (selectedKeys, info) => {
@@ -20,7 +98,6 @@ export default () => {
         {
           title: 'parent 1-0',
           key: '0-0-0',
-          disabled: true,
           children: [
             {
               title: 'leaf',
@@ -30,6 +107,7 @@ export default () => {
             {
               title: 'leaf',
               key: '0-0-0-1',
+              checkable:false
             },
           ],
         },
