@@ -17,8 +17,9 @@ import classNames from 'classnames';
 
 export interface DataNode extends DataNodeItem {
   children?: DataNode[];
+  [key: string]: any;
 }
-interface DataNodeItem {
+export interface DataNodeItem {
   //标题
   title: string | ReactNode;
   // 每个节点独一无二的key
@@ -33,7 +34,6 @@ interface DataNodeItem {
   checkable?: boolean;
   // 	设置节点是否可被选中
   selectable?: boolean;
-  [key: string]: any;
 }
 type iconRenderFn = (props: unknown) => ReactNode;
 export interface SelectNodeEventInfo {
@@ -82,6 +82,9 @@ export interface TreeProps {
     checkedKeys: Key[],
     payload: { e: ChangeEvent<HTMLInputElement>; node: DataNodeListItem; checked: boolean },
   ) => void;
+  /**
+   * @description 选中节点触发
+   */
   onSelect?: (selectedKeys: Key[], info: SelectNodeEventInfo) => void;
   /**
    * @description 节点前添加复选框
@@ -106,123 +109,17 @@ export interface TreeProps {
    * @default false
    */
   multiple?: boolean;
+  /**
+   * @description 默认展开所有节点
+   * @default false
+   */
+  defaultExpandAll?: boolean;
 }
-function treeToArray({
-  tree,
-  result = [],
-  parent,
-  indent,
-  defaultExpandedKeys = [],
-  defaultCheckedKeys = [],
-  checkable = false,
-  keyAlias,
-  titleAlias,
-  selectable,
-  defaultSelectedKeys = [],
-}: {
-  tree: DataNode[];
-  result?: DataNodeListItem[];
-  parent?: DataNodeListItem | null;
-  indent?: number;
-  defaultExpandedKeys?: Key[];
-  defaultCheckedKeys?: Key[];
-  defaultSelectedKeys?: Key[];
-  checkable?: boolean;
-  keyAlias?: string;
-  titleAlias?: string;
-  selectable?: boolean;
-}) {
-  tree.forEach((item, index) => {
-    const { children = [], ...props } = item;
-    let current: DataNodeListItem = {
-      ...props,
-      indent: indent === undefined ? 0 : indent + 1,
-      hasChildren: children.length > 0,
-      parent,
-    };
-    handleDataNodeParams({
-      current,
-      item,
-      defaultCheckedKeys,
-      defaultExpandedKeys,
-      checkable,
-      keyAlias,
-      titleAlias,
-      selectable,
-      defaultSelectedKeys,
-    });
-    result.push(current);
-    treeToArray({
-      tree: children,
-      result,
-      parent: current,
-      indent: current.indent,
-      defaultExpandedKeys,
-      defaultCheckedKeys,
-      checkable,
-      keyAlias,
-      titleAlias,
-      selectable,
-      defaultSelectedKeys,
-    });
-  });
-  return result;
-}
-function handleDataNodeParams(data: {
-  current: DataNodeListItem;
-  item: DataNode;
-  defaultExpandedKeys: Key[];
-  defaultCheckedKeys: Key[];
-  checkable: boolean;
-  keyAlias?: string;
-  titleAlias?: string;
-  selectable?: boolean;
-  defaultSelectedKeys: Key[];
-}) {
-  let {
-    item,
-    current,
-    defaultExpandedKeys,
-    defaultCheckedKeys,
-    defaultSelectedKeys,
-    checkable,
-    titleAlias,
-    keyAlias,
-    selectable,
-  } = data;
-  if (keyAlias !== undefined) {
-    current.key = item[keyAlias];
-  }
-  if (titleAlias !== undefined) {
-    current.title = item[titleAlias];
-  }
-  if (item.children?.length) {
-    current.expand = defaultExpandedKeys.includes(current.key);
-  }
+type expandNodeChildMap = Map<
+  any,
+  { childList: DataNodeListItem[]; expand: boolean; checked: boolean; rawTarget: DataNodeListItem }
+>;
 
-  if (item.disableCheckbox === undefined) {
-    current.disableCheckbox = false;
-  }
-  if (item.disabled === undefined) {
-    current.disabled = false;
-  }
-  if (item.disabled) {
-    current.disableCheckbox = true;
-  }
-  if (checkable) {
-    current.indeterminate = false;
-    current.checked = defaultCheckedKeys.includes(current.key);
-  }
-  if (item.checkable === undefined) {
-    current.checkable = checkable;
-  }
-  if (selectable) {
-    current.selected = defaultSelectedKeys.includes(current.key);
-  }
-  if (item.selectable === undefined) {
-    current.selectable = selectable;
-  }
-}
 function handleTreeExpandAndChecked(
   treeList: DataNodeListItem[],
   expendNodeChildListMap: expandNodeChildMap,
@@ -357,10 +254,6 @@ const getCurrentChildrenTreeList = (list: DataNodeListItem[], target: DataNodeLi
 const filterCheckedKeys = (treeList: DataNodeListItem[]) => {
   return treeList.filter((item) => item.checked).map((item) => item.key);
 };
-type expandNodeChildMap = Map<
-  any,
-  { childList: DataNodeListItem[]; expand: boolean; checked: boolean; rawTarget: DataNodeListItem }
->;
 const Tree: FC<TreeProps> = (props) => {
   const {
     treeData,
@@ -375,19 +268,13 @@ const Tree: FC<TreeProps> = (props) => {
     onSelect,
     onExpand,
     onCheck,
+    defaultExpandAll = false,
   } = props;
   const selectNodeKey = useRef<Key[]>([]);
   const ctrlAndCommandHasClick = useRef(false);
   let flatTreeList = useMemo(() => {
     let treeList = treeToArray({
       tree: treeData,
-      defaultExpandedKeys,
-      defaultCheckedKeys,
-      checkable,
-      keyAlias,
-      titleAlias,
-      selectable,
-      defaultSelectedKeys,
     });
     // 没有设置key, 用index代替
     treeList.forEach((item, index) => {
@@ -481,7 +368,6 @@ const Tree: FC<TreeProps> = (props) => {
     onCheck?.(Array.from([...new Set(checkedKeys)]), { e, node: current, checked });
     setTreeList(newTreeList);
   };
-
   const handleTreeItemClick = (e: ReactMouseEvent, index: number) => {
     let current = treeList[index];
     if (!current.selectable || current.disabled) return;
@@ -519,6 +405,76 @@ const Tree: FC<TreeProps> = (props) => {
     setTreeList(newTreeList);
     onSelect?.(selectNodeKey.current, info);
   };
+  function treeToArray({
+    tree,
+    result = [],
+    parent,
+    indent,
+  }: {
+    tree: DataNode[];
+    result?: DataNodeListItem[];
+    parent?: DataNodeListItem | null;
+    indent?: number;
+  }) {
+    tree.forEach((item, index) => {
+      const { children = [], ...props } = item;
+      let current: DataNodeListItem = {
+        ...props,
+        indent: indent === undefined ? 0 : indent + 1,
+        hasChildren: children.length > 0,
+        parent,
+      };
+      handleDataNodeParams({
+        current,
+        item,
+      });
+      result.push(current);
+      treeToArray({
+        tree: children,
+        result,
+        parent: current,
+        indent: current.indent,
+      });
+    });
+    return result;
+  }
+  function handleDataNodeParams(data: { current: DataNodeListItem; item: DataNode }) {
+    let { item, current } = data;
+    if (keyAlias !== undefined) {
+      current.key = item[keyAlias];
+    }
+    if (titleAlias !== undefined) {
+      current.title = item[titleAlias];
+    }
+    if (item.children?.length) {
+      current.expand = defaultExpandedKeys.includes(current.key);
+      if (defaultExpandAll) {
+        current.expand = true;
+      }
+    }
+    if (item.disableCheckbox === undefined) {
+      current.disableCheckbox = false;
+    }
+    if (item.disabled === undefined) {
+      current.disabled = false;
+    }
+    if (item.disabled) {
+      current.disableCheckbox = true;
+    }
+    if (checkable) {
+      current.indeterminate = false;
+      current.checked = defaultCheckedKeys.includes(current.key);
+    }
+    if (item.checkable === undefined) {
+      current.checkable = checkable;
+    }
+    if (selectable) {
+      current.selected = defaultSelectedKeys.includes(current.key);
+    }
+    if (item.selectable === undefined) {
+      current.selectable = selectable;
+    }
+  }
   const getSelectNode = () => {
     return treeList.reduce((prev, cur) => {
       if (selectNodeKey.current.some((key) => key === cur.key)) {
