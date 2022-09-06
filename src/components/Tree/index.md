@@ -225,6 +225,7 @@ export default () => {
       selectable
       onExpand={onExpand}
       defaultCheckedKeys={['0-0-0', '0-0-1']}
+      defaultSelectedKeys={['0-0-0', '0-0-1']}
       onCheck={onCheck}
       onSelect={onSelect}
       treeData={treeData}
@@ -234,5 +235,7 @@ export default () => {
   );
 };
 ```
+### TreeProps
+<API hideTitle src="./Tree.Tsx">
 
-<API src="./Tree.Tsx">
+### TreeNode Props

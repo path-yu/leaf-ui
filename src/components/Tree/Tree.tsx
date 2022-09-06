@@ -36,7 +36,7 @@ interface DataNodeItem {
   [key: string]: any;
 }
 type iconRenderFn = (props: unknown) => ReactNode;
-interface SelectNodeEventInfo {
+export interface SelectNodeEventInfo {
   event: string;
   nativeEvent: MouseEvent;
   node: DataNodeListItem;
@@ -62,9 +62,15 @@ export interface TreeProps {
    */
   defaultExpandedKeys?: Key[];
   /**
-   * @description 默认选中的树节点
+   * @description 默认选中复选框的树节点
+   * @default []
    */
   defaultCheckedKeys?: Key[];
+  /**
+   * @description 默认选中的树节点
+   * @default []
+   */
+  defaultSelectedKeys?: Key[];
   /**
    * @description 展开/收起节点时触发
    */
@@ -112,6 +118,7 @@ function treeToArray({
   keyAlias,
   titleAlias,
   selectable,
+  defaultSelectedKeys = [],
 }: {
   tree: DataNode[];
   result?: DataNodeListItem[];
@@ -119,6 +126,7 @@ function treeToArray({
   indent?: number;
   defaultExpandedKeys?: Key[];
   defaultCheckedKeys?: Key[];
+  defaultSelectedKeys?: Key[];
   checkable?: boolean;
   keyAlias?: string;
   titleAlias?: string;
@@ -141,6 +149,7 @@ function treeToArray({
       keyAlias,
       titleAlias,
       selectable,
+      defaultSelectedKeys,
     });
     result.push(current);
     treeToArray({
@@ -154,6 +163,7 @@ function treeToArray({
       keyAlias,
       titleAlias,
       selectable,
+      defaultSelectedKeys,
     });
   });
   return result;
@@ -167,12 +177,14 @@ function handleDataNodeParams(data: {
   keyAlias?: string;
   titleAlias?: string;
   selectable?: boolean;
+  defaultSelectedKeys: Key[];
 }) {
   let {
     item,
     current,
     defaultExpandedKeys,
     defaultCheckedKeys,
+    defaultSelectedKeys,
     checkable,
     titleAlias,
     keyAlias,
@@ -204,10 +216,12 @@ function handleDataNodeParams(data: {
   if (item.checkable === undefined) {
     current.checkable = checkable;
   }
+  if (selectable) {
+    current.selected = defaultSelectedKeys.includes(current.key);
+  }
   if (item.selectable === undefined) {
     current.selectable = selectable;
   }
-  current.selected = false;
 }
 function handleTreeExpandAndChecked(
   treeList: DataNodeListItem[],
@@ -350,16 +364,17 @@ type expandNodeChildMap = Map<
 const Tree: FC<TreeProps> = (props) => {
   const {
     treeData,
-    onExpand,
     defaultExpandedKeys = [],
     defaultCheckedKeys = [],
+    defaultSelectedKeys = [],
     checkable = false,
-    onCheck,
+    multiple = false,
+    selectable = true,
     keyAlias,
     titleAlias,
-    selectable = false,
     onSelect,
-    multiple = false,
+    onExpand,
+    onCheck,
   } = props;
   const selectNodeKey = useRef<Key[]>([]);
   const ctrlAndCommandHasClick = useRef(false);
@@ -372,6 +387,7 @@ const Tree: FC<TreeProps> = (props) => {
       keyAlias,
       titleAlias,
       selectable,
+      defaultSelectedKeys,
     });
     // 没有设置key, 用index代替
     treeList.forEach((item, index) => {
