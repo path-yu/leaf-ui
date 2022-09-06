@@ -79,9 +79,7 @@ export default () => {
 import React from 'react';
 import { Tree } from 'leaf-ui';
 export default () => {
-  const onSelect: TreeProps['onSelect'] = (selectedKeys, info) => {
-    console.log('selected', selectedKeys, info);
-  };
+
 
   const onCheck: TreeProps['onCheck'] = (checkedKeys, info) => {
     console.log('onCheck', checkedKeys);
@@ -168,6 +166,9 @@ export default () => {
   const onCheck: TreeProps['onCheck'] = (checkedKeys, info) => {
     console.log('onCheck', checkedKeys);
   };
+  const onSelect: TreeProps['onSelect'] = (selectedKeys, info) => {
+    console.log('selected', selectedKeys, info);
+  };
   const treeData: DataNode[] = [
     {
       name: 'parent 1',
@@ -219,10 +220,13 @@ export default () => {
   };
   return (
     <Tree
+      multiple
       checkable
+      selectable
       onExpand={onExpand}
       defaultCheckedKeys={['0-0-0', '0-0-1']}
       onCheck={onCheck}
+      onSelect={onSelect}
       treeData={treeData}
       titleAlias="name"
       keyAlias="id"

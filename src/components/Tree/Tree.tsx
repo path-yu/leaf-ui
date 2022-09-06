@@ -1,4 +1,14 @@
-import React, { ChangeEvent, FC, Key, ReactNode, useEffect, useMemo, useState } from 'react';
+import React, {
+  ChangeEvent,
+  FC,
+  Key,
+  ReactNode,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  MouseEvent as ReactMouseEvent,
+} from 'react';
 import { cloneDeep } from 'lodash';
 import AnimateList from '../AnimateList/AnimateList';
 import './Tree.scss';
@@ -17,11 +27,21 @@ interface DataNodeItem {
   disabled?: boolean;
   // 禁掉响应
   disableCheckbox?: boolean;
-  // icon	自定义图标。可接收组件
-  icon?: ReactNode;
+  // icon	自定义图标。可接收组件，props 为当前节点 props
+  icon: ReactNode | iconRenderFn;
   // 当树为 checkable 时，设置独立节点是否展示 Checkbox
   checkable?: boolean;
+  // 	设置节点是否可被选中
+  selectable?: boolean;
   [key: string]: any;
+}
+type iconRenderFn = (props: unknown) => ReactNode;
+interface SelectNodeEventInfo {
+  event: string;
+  nativeEvent: MouseEvent;
+  node: DataNodeListItem;
+  selected: boolean;
+  selectNodes: DataNodeListItem[];
 }
 export interface DataNodeListItem extends DataNodeItem {
   indent: number;
@@ -29,6 +49,7 @@ export interface DataNodeListItem extends DataNodeItem {
   expand?: boolean; //是否展开 默认为true
   parent?: DataNodeListItem | null;
   checked?: boolean;
+  selected?: boolean;
   indeterminate?: boolean;
 }
 export interface TreeProps {
@@ -55,6 +76,7 @@ export interface TreeProps {
     checkedKeys: Key[],
     payload: { e: ChangeEvent<HTMLInputElement>; node: DataNodeListItem; checked: boolean },
   ) => void;
+  onSelect?: (selectedKeys: Key[], info: SelectNodeEventInfo) => void;
   /**
    * @description 节点前添加复选框
    * @default false
@@ -73,6 +95,11 @@ export interface TreeProps {
    * @description 节点key属性别名
    */
   keyAlias?: string;
+  /**
+   * @description 支持点选多个节点
+   * @default false
+   */
+  multiple?: boolean;
 }
 function treeToArray({
   tree,
@@ -84,6 +111,7 @@ function treeToArray({
   checkable = false,
   keyAlias,
   titleAlias,
+  selectable,
 }: {
   tree: DataNode[];
   result?: DataNodeListItem[];
@@ -94,6 +122,7 @@ function treeToArray({
   checkable?: boolean;
   keyAlias?: string;
   titleAlias?: string;
+  selectable?: boolean;
 }) {
   tree.forEach((item, index) => {
     const { children = [], ...props } = item;
@@ -111,6 +140,7 @@ function treeToArray({
       checkable,
       keyAlias,
       titleAlias,
+      selectable,
     });
     result.push(current);
     treeToArray({
@@ -123,6 +153,7 @@ function treeToArray({
       checkable,
       keyAlias,
       titleAlias,
+      selectable,
     });
   });
   return result;
@@ -135,16 +166,24 @@ function handleDataNodeParams(data: {
   checkable: boolean;
   keyAlias?: string;
   titleAlias?: string;
+  selectable?: boolean;
 }) {
-  let { item, current, defaultExpandedKeys, defaultCheckedKeys, checkable, titleAlias, keyAlias } =
-    data;
+  let {
+    item,
+    current,
+    defaultExpandedKeys,
+    defaultCheckedKeys,
+    checkable,
+    titleAlias,
+    keyAlias,
+    selectable,
+  } = data;
   if (keyAlias !== undefined) {
     current.key = item[keyAlias];
   }
   if (titleAlias !== undefined) {
     current.title = item[titleAlias];
   }
-  console.log(current.key);
   if (item.children?.length) {
     current.expand = defaultExpandedKeys.includes(current.key);
   }
@@ -165,6 +204,10 @@ function handleDataNodeParams(data: {
   if (item.checkable === undefined) {
     current.checkable = checkable;
   }
+  if (item.selectable === undefined) {
+    current.selectable = selectable;
+  }
+  current.selected = false;
 }
 function handleTreeExpandAndChecked(
   treeList: DataNodeListItem[],
@@ -314,7 +357,12 @@ const Tree: FC<TreeProps> = (props) => {
     onCheck,
     keyAlias,
     titleAlias,
+    selectable = false,
+    onSelect,
+    multiple = false,
   } = props;
+  const selectNodeKey = useRef<Key[]>([]);
+  const ctrlAndCommandHasClick = useRef(false);
   let flatTreeList = useMemo(() => {
     let treeList = treeToArray({
       tree: treeData,
@@ -323,6 +371,7 @@ const Tree: FC<TreeProps> = (props) => {
       checkable,
       keyAlias,
       titleAlias,
+      selectable,
     });
     // 没有设置key, 用index代替
     treeList.forEach((item, index) => {
@@ -346,17 +395,8 @@ const Tree: FC<TreeProps> = (props) => {
     let firstIndex = treeList.findIndex((node) => node.key === current.key);
     newList[index].expand = !newList[index].expand;
     let expand = newList[index].expand!;
-    target!.expand = newList[index].expand!;
-    expendNodeChildListMap.forEach((item, key) => {
-      item.childList.forEach((child) => {
-        if (child.key === current.key) {
-          child.expand = expand;
-        }
-        if (child.parent?.key === current.key) {
-          child.parent!.expand = expand;
-        }
-      });
-    });
+    target!.expand = expand;
+    target!.rawTarget.expand = expand;
     if (expand) {
       let list = childList.filter((item) => {
         if (item.hasChildren) {
@@ -425,10 +465,73 @@ const Tree: FC<TreeProps> = (props) => {
     onCheck?.(Array.from([...new Set(checkedKeys)]), { e, node: current, checked });
     setTreeList(newTreeList);
   };
+
+  const handleTreeItemClick = (e: ReactMouseEvent, index: number) => {
+    let current = treeList[index];
+    if (!current.selectable || current.disabled) return;
+    let newTreeList = [...treeList];
+    let selected = !newTreeList[index].selected;
+    // 单选
+    if (!ctrlAndCommandHasClick.current || !multiple) {
+      console.log('selectNodeKey.current.push(current.key);');
+      if (selected) {
+        selectNodeKey.current = [current.key];
+      } else {
+        selectNodeKey.current = [];
+      }
+      newTreeList.forEach((tree) => (tree.selected = false));
+      if (!multiple) {
+        newTreeList[index].selected = selected;
+      } else {
+        newTreeList[index].selected = true;
+      }
+    } else {
+      if (selected) {
+        selectNodeKey.current.push(current.key);
+      } else {
+        selectNodeKey.current = selectNodeKey.current.filter((key) => key !== current.key);
+      }
+      newTreeList[index].selected = selected;
+    }
+    let info: SelectNodeEventInfo = {
+      event: 'select',
+      nativeEvent: e.nativeEvent,
+      node: cloneDeep(current),
+      selected,
+      selectNodes: selectNodeKey.current.length ? getSelectNode() : [],
+    };
+    setTreeList(newTreeList);
+    onSelect?.(selectNodeKey.current, info);
+  };
+  const getSelectNode = () => {
+    return treeList.reduce((prev, cur) => {
+      if (selectNodeKey.current.some((key) => key === cur.key)) {
+        prev.push(cloneDeep(cur));
+      }
+      return prev;
+    }, [] as DataNodeListItem[]);
+  };
   useEffect(() => {
     setTreeList(handleTreeExpandAndChecked(flatTreeList, expendNodeChildListMap, checkable));
+    multiple && document.body.addEventListener('keydown', handleKeyDown);
+    multiple && document.body.addEventListener('keyup', handleKeyup);
+    return () => {
+      multiple && document.body.removeEventListener('keydown', handleKeyDown);
+      multiple && document.body.removeEventListener('keyup', handleKeyup);
+    };
   }, [treeData]);
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.metaKey || e.ctrlKey) {
+      ctrlAndCommandHasClick.current = true;
+    }
+  };
+  const handleKeyup = () => {
+    if (ctrlAndCommandHasClick.current) {
+      ctrlAndCommandHasClick.current = false;
+    }
+  };
   const renderTreeItem = (item: DataNodeListItem, index: number) => {
+    item.icon;
     return (
       <div
         className={classNames('tree-item', {
@@ -443,23 +546,21 @@ const Tree: FC<TreeProps> = (props) => {
             className="tree-switcher"
           >
             <span className="anticon-icon">
-              {!item.icon && (
-                <svg
-                  viewBox="0 0 1024 1024"
-                  focusable="false"
-                  data-icon="caret-down"
-                  width="1em"
-                  height="1em"
-                  fill="currentColor"
-                  aria-hidden="true"
-                  style={{
-                    transform: `rotate(${item.expand ? 0 : '-90deg'})`,
-                    transition: 'transform ease 300ms',
-                  }}
-                >
-                  <path d="M840.4 300H183.6c-19.7 0-30.7 20.8-18.5 35l328.4 380.8c9.4 10.9 27.5 10.9 37 0L858.9 335c12.2-14.2 1.2-35-18.5-35z"></path>
-                </svg>
-              )}
+              <svg
+                viewBox="0 0 1024 1024"
+                focusable="false"
+                data-icon="caret-down"
+                width="1em"
+                height="1em"
+                fill="currentColor"
+                aria-hidden="true"
+                style={{
+                  transform: `rotate(${item.expand ? 0 : '-90deg'})`,
+                  transition: 'transform ease 300ms',
+                }}
+              >
+                <path d="M840.4 300H183.6c-19.7 0-30.7 20.8-18.5 35l328.4 380.8c9.4 10.9 27.5 10.9 37 0L858.9 335c12.2-14.2 1.2-35-18.5-35z"></path>
+              </svg>
             </span>
           </span>
         )}
@@ -472,7 +573,19 @@ const Tree: FC<TreeProps> = (props) => {
             disabled={item.disableCheckbox}
           />
         )}
-        <span className="tree-item-title">{item.title}</span>
+        <span
+          className={classNames('tree-item-wrapper', {
+            'tree-item-selected': item.selected,
+          })}
+          onClick={(e) => handleTreeItemClick(e, index)}
+        >
+          {item.icon && (
+            <span style={{ fontSize: '14px' }}>
+              {typeof item.icon === 'function' ? item.icon(props) : item.icon}
+            </span>
+          )}
+          <span className="tree-item-title">{item.title}</span>
+        </span>
       </div>
     );
   };
