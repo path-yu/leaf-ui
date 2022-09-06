@@ -136,16 +136,13 @@ export default () => {
     },
     {
       title: 'parent 2',
-      key: '0-1',
       children: [
         {
           title: 'leaf',
-          key: 'test1',
           disableCheckbox: true,
         },
         {
           title: 'leaf',
-          key: 'test12',
         },
       ],
     },

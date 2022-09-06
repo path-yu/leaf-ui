@@ -10,7 +10,7 @@ export default () => {
   const onChange = (e: ChangeEvent) => {
     console.log(e.target.checked);
   };
-  return <Checkbox onChange={onChange} >check Box</Checkbox>;
+  return <Checkbox onChange={onChange}>check Box</Checkbox>;
 };
 ```
 
@@ -56,7 +56,7 @@ export default () => (
 import { CheckboxGroup } from 'leaf-ui';
 import React, { useState } from 'react';
 
-const onChange = (e,checkedValues: CheckboxValueType[]) => {
+const onChange = (e, checkedValues: CheckboxValueType[]) => {
   console.log('checked = ', checkedValues);
 };
 

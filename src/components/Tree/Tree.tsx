@@ -59,6 +59,11 @@ export interface TreeProps {
    * @default false
    */
   checkable?: boolean;
+  /**
+   * @description 是否可选中
+   * @default true
+   */
+  selectable?: boolean;
 }
 function treeToArray({
   tree,
@@ -268,10 +273,22 @@ const Tree: FC<TreeProps> = (props) => {
     checkable = false,
     onCheck,
   } = props;
-  let flatTreeList = useMemo(
-    () => treeToArray({ tree: treeData, defaultExpandedKeys, defaultCheckedKeys, checkable }),
-    [treeData],
-  );
+  let flatTreeList = useMemo(() => {
+    let treeList = treeToArray({
+      tree: treeData,
+      defaultExpandedKeys,
+      defaultCheckedKeys,
+      checkable,
+    });
+    // 没有设置key, 用index代替
+    treeList.forEach((item, index) => {
+      if (!item.key) {
+        item.key = index;
+      }
+    });
+    console.log(treeList);
+    return treeList;
+  }, [treeData]);
   //保存所有可以展开节点的所有子节点列表map
   const expendNodeChildListMap = useMemo<expandNodeChildMap>(
     () => computedExpandNodeChildListMap(flatTreeList),
