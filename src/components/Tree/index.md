@@ -1,9 +1,10 @@
 ### Tree-树形控件
 
 ### 基础演示
+
 ```tsx
 import React from 'react';
-import { Tree,DataNode } from 'leaf-ui';
+import { Tree, DataNode } from 'leaf-ui';
 export default () => {
   const treeData: DataNode[] = [
     {
@@ -38,12 +39,12 @@ export default () => {
             {
               title: '三级节点',
               key: '0-0-2-0',
-              children:[
+              children: [
                 {
                   title: <span style={{ color: '#1890ff' }}>4及</span>,
                   key: '0-0-2-0-0',
-                }
-              ]
+                },
+              ],
             },
           ],
         },
@@ -68,15 +69,10 @@ export default () => {
   const onExpand = (expandedKeysValue: React.Key[]) => {
     console.log('onExpand', expandedKeysValue);
   };
-  return (
-    <Tree
-      onExpand={onExpand}
-      defaultExpandedKeys={['0-0-0', '0-0-1']}
-      treeData={treeData}
-    />
-  );
+  return <Tree onExpand={onExpand} defaultExpandedKeys={['0-0-0', '0-0-1']} treeData={treeData} />;
 };
 ```
+
 ### 节点前添加复选框
 
 ```tsx
@@ -107,7 +103,7 @@ export default () => {
             {
               title: 'leaf',
               key: '0-0-0-1',
-              checkable:false
+              checkable: false,
             },
           ],
         },
@@ -123,12 +119,12 @@ export default () => {
             {
               title: '三级节点',
               key: '0-0-2-0',
-              children:[
+              children: [
                 {
                   title: <span style={{ color: '#1890ff' }}>4及</span>,
                   key: '0-0-2-0-0',
-                }
-              ]
+                },
+              ],
             },
           ],
         },
@@ -155,11 +151,84 @@ export default () => {
       checkable
       onExpand={onExpand}
       defaultExpandedKeys={['0-0-0', '0-0-1']}
-      defaultCheckedKeys={['0-0-0','0-0-1']}
+      defaultCheckedKeys={['0-0-0', '0-0-1']}
       onCheck={onCheck}
       treeData={treeData}
     />
   );
 };
 ```
+
+### 设置属性别名
+
+```tsx
+import React from 'react';
+import { Tree, DataNode } from 'leaf-ui';
+export default () => {
+  const onCheck: TreeProps['onCheck'] = (checkedKeys, info) => {
+    console.log('onCheck', checkedKeys);
+  };
+  const treeData: DataNode[] = [
+    {
+      name: 'parent 1',
+      id: '0-0',
+      children: [
+        {
+          name: 'parent 1-0',
+          id: '0-0-0',
+          children: [
+            {
+              name: 'leaf',
+              id: '0-0-0-0',
+              disableCheckbox: true,
+            },
+            {
+              name: 'leaf',
+              id: '0-0-0-1',
+            },
+          ],
+        },
+        {
+          name: 'parent 1-1',
+          id: '0-0-1',
+          children: [
+            { name: <span style={{ color: '#1890ff' }}>sss</span>, id: '0-0-1-0' },
+            { name: <span style={{ color: '#1890ff' }}>ssss</span>, id: '0-0-1-1' },
+          ],
+        },
+      ],
+    },
+    {
+      name: 'parent 2',
+      id: '000',
+      children: [
+        {
+          name: 'leaf',
+          id: '0001',
+          disableCheckbox: true,
+        },
+        {
+          name: 'leaf',
+          id: '0002',
+        },
+      ],
+    },
+  ];
+  const onExpand = (expandedKeysValue: React.Key[]) => {
+    console.log('onExpand', expandedKeysValue);
+  };
+  return (
+    <Tree
+      checkable
+      onExpand={onExpand}
+      defaultCheckedKeys={['0-0-0', '0-0-1']}
+      onCheck={onCheck}
+      treeData={treeData}
+      titleAlias="name"
+      keyAlias="id"
+    />
+  );
+};
+```
+
 <API src="./Tree.Tsx">

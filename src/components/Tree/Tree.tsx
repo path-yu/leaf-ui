@@ -17,10 +17,11 @@ interface DataNodeItem {
   disabled?: boolean;
   // 禁掉响应
   disableCheckbox?: boolean;
-  /** icon	自定义图标。可接收组件，*/
+  // icon	自定义图标。可接收组件
   icon?: ReactNode;
   // 当树为 checkable 时，设置独立节点是否展示 Checkbox
   checkable?: boolean;
+  [key: string]: any;
 }
 export interface DataNodeListItem extends DataNodeItem {
   indent: number;
@@ -64,6 +65,14 @@ export interface TreeProps {
    * @default true
    */
   selectable?: boolean;
+  /**
+   * @description 节点title属性别名，treeNode默认取title属性作为标题，可以指定不同的属性来设置标题
+   */
+  titleAlias?: string;
+  /**
+   * @description 节点key属性别名
+   */
+  keyAlias?: string;
 }
 function treeToArray({
   tree,
@@ -73,6 +82,8 @@ function treeToArray({
   defaultExpandedKeys = [],
   defaultCheckedKeys = [],
   checkable = false,
+  keyAlias,
+  titleAlias,
 }: {
   tree: DataNode[];
   result?: DataNodeListItem[];
@@ -81,6 +92,8 @@ function treeToArray({
   defaultExpandedKeys?: Key[];
   defaultCheckedKeys?: Key[];
   checkable?: boolean;
+  keyAlias?: string;
+  titleAlias?: string;
 }) {
   tree.forEach((item, index) => {
     const { children = [], ...props } = item;
@@ -90,7 +103,15 @@ function treeToArray({
       hasChildren: children.length > 0,
       parent,
     };
-    handleDataNodeParams({ current, item, defaultCheckedKeys, defaultExpandedKeys, checkable });
+    handleDataNodeParams({
+      current,
+      item,
+      defaultCheckedKeys,
+      defaultExpandedKeys,
+      checkable,
+      keyAlias,
+      titleAlias,
+    });
     result.push(current);
     treeToArray({
       tree: children,
@@ -100,6 +121,8 @@ function treeToArray({
       defaultExpandedKeys,
       defaultCheckedKeys,
       checkable,
+      keyAlias,
+      titleAlias,
     });
   });
   return result;
@@ -110,8 +133,18 @@ function handleDataNodeParams(data: {
   defaultExpandedKeys: Key[];
   defaultCheckedKeys: Key[];
   checkable: boolean;
+  keyAlias?: string;
+  titleAlias?: string;
 }) {
-  let { item, current, defaultExpandedKeys, defaultCheckedKeys, checkable } = data;
+  let { item, current, defaultExpandedKeys, defaultCheckedKeys, checkable, titleAlias, keyAlias } =
+    data;
+  if (keyAlias !== undefined) {
+    current.key = item[keyAlias];
+  }
+  if (titleAlias !== undefined) {
+    current.title = item[titleAlias];
+  }
+  console.log(current.key);
   if (item.children?.length) {
     current.expand = defaultExpandedKeys.includes(current.key);
   }
@@ -139,6 +172,9 @@ function handleTreeExpandAndChecked(
   checkable?: boolean,
 ) {
   let newList = [...treeList];
+  if (checkable) {
+    initTreeChecked(newList, expendNodeChildListMap);
+  }
   let newTreeList = newList.map((current) => {
     let target = expendNodeChildListMap.get(current.key);
     if (target) {
@@ -158,12 +194,17 @@ function handleTreeExpandAndChecked(
       }
     }
   });
-  if (checkable) {
-    initTreeChecked(newTreeList, expendNodeChildListMap);
-  }
+
   return newTreeList;
 }
 const initTreeChecked = (
+  treeList: DataNodeListItem[],
+  expendNodeChildListMap: expandNodeChildMap,
+) => {
+  parentNodeCheckedActiveChild(treeList, expendNodeChildListMap);
+  handleChildNodeCheckParent(treeList, expendNodeChildListMap);
+};
+const parentNodeCheckedActiveChild = (
   treeList: DataNodeListItem[],
   expendNodeChildListMap: expandNodeChildMap,
 ) => {
@@ -184,7 +225,6 @@ const initTreeChecked = (
       }
     }
   });
-  handleChildNodeCheckParent(treeList, expendNodeChildListMap);
 };
 const handleChildNodeCheckParent = (
   treeList: DataNodeListItem[],
@@ -241,7 +281,7 @@ const computedExpandNodeChildListMap = (treeList: DataNodeListItem[]) => {
       });
     }
   });
-  return map;
+  return map as expandNodeChildMap;
 };
 function treeListFindByKey(treeList: DataNodeListItem[], current: any) {
   return treeList.findIndex((node) => node.key === current);
@@ -272,6 +312,8 @@ const Tree: FC<TreeProps> = (props) => {
     defaultCheckedKeys = [],
     checkable = false,
     onCheck,
+    keyAlias,
+    titleAlias,
   } = props;
   let flatTreeList = useMemo(() => {
     let treeList = treeToArray({
@@ -279,6 +321,8 @@ const Tree: FC<TreeProps> = (props) => {
       defaultExpandedKeys,
       defaultCheckedKeys,
       checkable,
+      keyAlias,
+      titleAlias,
     });
     // 没有设置key, 用index代替
     treeList.forEach((item, index) => {
@@ -286,7 +330,6 @@ const Tree: FC<TreeProps> = (props) => {
         item.key = index;
       }
     });
-    console.log(treeList);
     return treeList;
   }, [treeData]);
   //保存所有可以展开节点的所有子节点列表map
@@ -400,21 +443,23 @@ const Tree: FC<TreeProps> = (props) => {
             className="tree-switcher"
           >
             <span className="anticon-icon">
-              <svg
-                viewBox="0 0 1024 1024"
-                focusable="false"
-                data-icon="caret-down"
-                width="1em"
-                height="1em"
-                fill="currentColor"
-                aria-hidden="true"
-                style={{
-                  transform: `rotate(${item.expand ? 0 : '-90deg'})`,
-                  transition: 'transform ease 300ms',
-                }}
-              >
-                <path d="M840.4 300H183.6c-19.7 0-30.7 20.8-18.5 35l328.4 380.8c9.4 10.9 27.5 10.9 37 0L858.9 335c12.2-14.2 1.2-35-18.5-35z"></path>
-              </svg>
+              {!item.icon && (
+                <svg
+                  viewBox="0 0 1024 1024"
+                  focusable="false"
+                  data-icon="caret-down"
+                  width="1em"
+                  height="1em"
+                  fill="currentColor"
+                  aria-hidden="true"
+                  style={{
+                    transform: `rotate(${item.expand ? 0 : '-90deg'})`,
+                    transition: 'transform ease 300ms',
+                  }}
+                >
+                  <path d="M840.4 300H183.6c-19.7 0-30.7 20.8-18.5 35l328.4 380.8c9.4 10.9 27.5 10.9 37 0L858.9 335c12.2-14.2 1.2-35-18.5-35z"></path>
+                </svg>
+              )}
             </span>
           </span>
         )}
