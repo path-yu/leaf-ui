@@ -13,7 +13,7 @@ import React, {
 } from 'react';
 import cssStyle from './Carousel.module.scss';
 import classNames from 'classnames';
-import { useElementHover } from '../../hook/useElementHover';
+import { useElementHover } from '../../hook';
 import { useDragAble } from './hook/useDragable';
 import { CarouselExpose } from './Api/CarouselMethods.api';
 export interface CarouselProps {

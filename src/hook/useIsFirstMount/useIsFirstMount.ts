@@ -6,7 +6,6 @@ export function useIsFirstMount(depList: any[]) {
     if (depList.length === 0 || isMount) return;
     setIsMount(true);
   }, [depList]);
-
   return {
     isMount,
   };

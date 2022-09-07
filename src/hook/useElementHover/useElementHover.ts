@@ -1,4 +1,4 @@
-import { Ref, RefObject, useEffect, useRef, useState } from 'react';
+import { RefObject, useEffect, useRef, useState } from 'react';
 
 export function useElementHover(target: RefObject<HTMLElement>) {
   const [isHover, setIsHover] = useState(false);

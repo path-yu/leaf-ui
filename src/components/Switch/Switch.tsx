@@ -1,7 +1,7 @@
 import React, { FC, ReactNode, MouseEvent, useState } from 'react';
 import cssStyle from './Switch.module.scss';
 import classNames from 'classnames';
-import { useSkipFistEffect } from '../../hook/useSkipFistEffect';
+import { useSkipFistEffect } from '../../hook';
 interface SwitchProps {
   /**
    * @description 当前是否选中

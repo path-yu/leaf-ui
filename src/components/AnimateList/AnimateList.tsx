@@ -13,7 +13,7 @@ import React, {
   useState,
 } from 'react';
 import { animated, useTransition, UseTransitionProps } from '@react-spring/web';
-import { useIsFirstMount } from '../../hook/useIsFirstMount';
+import { useIsFirstMount } from '../../hook';
 
 interface AnimateListProps {
   /** 列表数据 */

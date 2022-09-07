@@ -71,6 +71,11 @@ export default defineConfig({
         children: ['/components/Upload/index.md'],
       },
     ],
+    '/hook': [
+      {
+        children: ['/hook/useDragMove/index.md'],
+      },
+    ],
   },
   // more config: https://d.umijs.org/config,
   cssModulesTypescriptLoader: {

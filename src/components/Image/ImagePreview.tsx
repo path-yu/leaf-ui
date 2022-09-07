@@ -11,7 +11,7 @@ import { createPortal } from 'react-dom';
 import './style/image-preview.scss';
 import CSSMotion from 'rc-motion';
 import classNames from 'classnames';
-import { useDragMove } from '../../hook/useDragMove';
+import { useDragMove } from '../../hook';
 import {
   prevIcon,
   nextIcon,
