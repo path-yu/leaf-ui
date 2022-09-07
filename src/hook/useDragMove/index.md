@@ -31,4 +31,3 @@ export default () => {
 |------|---------------|-----|---------|
 | ref  | 需要绑定的目标元素     | `RefObject<HTMLElement>`    | `--`    |
 | reset | 拖拽结束是否重置到原始位置 |  `boolean`   | `false` |
-

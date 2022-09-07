@@ -75,6 +75,12 @@ export default defineConfig({
       {
         children: ['/hook/useDragMove/index.md'],
       },
+      {
+        children: ['/hook/useClickOutSize/index.md'],
+      },
+      {
+        children: ['/hook/useAsyncState/index.md'],
+      },
     ],
   },
   // more config: https://d.umijs.org/config,

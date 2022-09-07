@@ -4,7 +4,7 @@ import { sleep } from '../../utils/core/sleep';
 export function useAsyncState<Data>(
   promise: Promise<Data> | ((...args: any[]) => Promise<Data>),
   initialState: Data,
-  Option: UseAsyncStateOptions,
+  Option: UseAsyncStateOptions = {},
 ) {
   const {
     immediate = true,
@@ -28,7 +28,7 @@ export function useAsyncState<Data>(
     if (delay > 0) {
       await sleep(delay);
     }
-    const _promise = typeof promise === 'function' ? await promise(...args) : promise;
+    const _promise = typeof promise === 'function' ? promise(...args) : promise;
     try {
       const data = await _promise;
       setState(data);

@@ -8,7 +8,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import useClickOutSize from '../../hook/useClickOutSize/useClickOutSize';
+import { useClickOutSize } from '../../hook';
 import useDebounce from '../../hook/useDebounce/useDebounce';
 import Icon from '../Icon/Icon';
 import Input, { InputProps } from '../Input/Input';
