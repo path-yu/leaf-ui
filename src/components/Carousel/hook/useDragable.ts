@@ -6,6 +6,7 @@ import {
   TouchEvent as ReactTouchEvent,
 } from 'react';
 import { isMobile } from '../../../utils/core/isMobile';
+import { getEventClientPosition } from '../../../utils/core/getEventClientPosition';
 
 let _isMobile = isMobile();
 export function useDragAble(data: {
@@ -99,20 +100,6 @@ export function useDragAble(data: {
     trigger.current = false;
     moveDiff.current = { x: 0, y: 0 };
     mouseOrTouchPosition.current = { x: 0, y: 0 };
-  };
-  const getEventClientPosition = (event: any) => {
-    let x, y;
-    if (!_isMobile) {
-      x = (event as MouseEvent).clientX;
-      y = (event as MouseEvent).clientY;
-    } else {
-      x = (event as TouchEvent).touches[0].clientX;
-      y = (event as TouchEvent).touches[0].clientY;
-    }
-    return {
-      x,
-      y,
-    };
   };
   const reboundEle = () => {
     target.current!.style.cssText =
