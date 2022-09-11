@@ -1,6 +1,7 @@
-import { MutableRefObject, RefObject, useEffect, useRef } from 'react';
+import { DependencyList, MutableRefObject, RefObject, useEffect, useRef } from 'react';
 import { isMobile } from '../../utils/core/isMobile';
 import { getEventClientPosition } from '../../utils/core/getEventClientPosition';
+import { sleep } from '../../utils/core/sleep';
 
 let _isMobile = isMobile();
 export function useDragMove(options: DragMoveOptions) {
@@ -25,6 +26,9 @@ export function useDragMove(options: DragMoveOptions) {
       x: 0,
       y: 0,
     },
+    deps = [],
+    asyncDelay = 0,
+    autoBindEvent = true,
   } = options;
   const isHorizontal =
     moveDirection === 'horizontal' || moveDirection === 'left' || moveDirection === 'right';
@@ -131,33 +135,40 @@ export function useDragMove(options: DragMoveOptions) {
     }
   };
   useEffect(() => {
-    if (!target?.current) return;
-    console.log(target.current!.style.transform);
-    if (_isMobile) {
-      target.current?.addEventListener('touchstart', handleMouseDownOrTouchStart);
-      target.current?.addEventListener('touchmove', handleMouseMoveOrTouchMove);
-      target.current?.addEventListener('touchend', handleMouseUpOrTouchEnd);
-    } else {
-      window.addEventListener('mousemove', handleMouseMoveOrTouchMove);
-      document.body.addEventListener('mouseup', handleMouseUpOrTouchEnd);
-      target.current?.addEventListener('mousedown', handleMouseDownOrTouchStart);
-    }
+    return bindEventEffect();
+  }, deps);
+  const bindEventEffect = () => {
+    sleep(asyncDelay).then(() => {
+      if (!target?.current) return;
+      if (_isMobile) {
+        autoBindEvent &&
+          target.current?.addEventListener('touchstart', handleMouseDownOrTouchStart);
+        autoBindEvent && target.current?.addEventListener('touchmove', handleMouseMoveOrTouchMove);
+        autoBindEvent && target.current?.addEventListener('touchend', handleMouseUpOrTouchEnd);
+      } else {
+        window.addEventListener('mousemove', handleMouseMoveOrTouchMove);
+        window.addEventListener('mouseup', handleMouseUpOrTouchEnd);
+        target.current?.addEventListener('mousedown', handleMouseDownOrTouchStart);
+      }
+    });
     return () => {
-      if (!target.current) return;
       if (_isMobile) {
         target.current?.removeEventListener('touchstart', handleMouseDownOrTouchStart);
         target.current?.removeEventListener('touchmove', handleMouseMoveOrTouchMove);
         target.current?.removeEventListener('touchend', handleMouseUpOrTouchEnd);
       } else {
         window.removeEventListener('mousemove', handleMouseMoveOrTouchMove);
-        document.body.removeEventListener('mouseup', handleMouseUpOrTouchEnd);
+        window.removeEventListener('mouseup', handleMouseUpOrTouchEnd);
         target.current?.removeEventListener('mousedown', handleMouseDownOrTouchStart);
       }
     };
-  }, [target]);
+  };
   return {
     moveIng,
     moveDiff,
+    handleMouseDownOrTouchStart,
+    handleMouseMoveOrTouchMove,
+    handleMouseUpOrTouchEnd,
   };
 }
 export interface DragMoveOptions {
@@ -194,10 +205,30 @@ export interface DragMoveOptions {
     x: number;
     y: number;
   };
+  /**
+   * @description useEffect依赖数组
+   * @default []
+   */
+  deps?: DependencyList;
+  /**
+   * @description 当目标ref是一个需要异步加载的组件时，需要的等待时间
+   */
+  asyncDelay?: number;
+  /**
+   * @description 是否自动绑定DOM事件
+   * @default true;
+   */
+  autoBindEvent?: boolean;
 }
 export interface DragMoveResult {
   /** 记录当前是否正在拖着中的ref */
   moveIng: MutableRefObject<boolean>;
   /** 记录当前移动的距离 */
   moveDiff: MutableRefObject<{ x: number; y: number }>;
+  /** 鼠标按下或者手指按下事件，默认会自动绑定，也可以手动绑定，pc只需要绑定onMouseDown为此回调即可 */
+  handleMouseDownOrTouchStart: (e: MouseEvent | TouchEvent) => void;
+  /** 鼠标移动或者手指移动事件，pc端默认绑定在window上，不需要手动绑定，移动端可以手动绑定onTouchMove事件 */
+  handleMouseMoveOrTouchMove: (e: MouseEvent | TouchEvent) => void;
+  /** 鼠标抬起或者手指抬起事件，pc端默认绑定在window上，移动端可以手动绑定到onTouchEnd事件 */
+  handleMouseUpOrTouchEnd: (e: MouseEvent | TouchEvent) => void;
 }

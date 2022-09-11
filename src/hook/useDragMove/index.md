@@ -10,7 +10,7 @@ export default () => {
   const ref = useRef<HTMLDivElement>(null);
   useDragMove({
     target: ref,
-    moveDirection: 'right',
+    moveDirection: 'horizontal',
     onMove(diff) {
       console.log(diff.x);
     },
@@ -27,76 +27,13 @@ export default () => {
         userSelect: 'none',
       }}
     >
-      try drag
+      try drag {}
     </div>
   );
 };
 ```
 
-### slider
-
-借助此 hook，可以实现一个简单的进度条拖拽
-
-```tsx
-import React, { useState, CSSProperties, useRef } from 'react';
-import { useDragMove } from 'leaf-ui';
-export default () => {
-  let [progress, setProgress] = useState(0);
-  const target = useRef<HTMLDivElement>(null);
-  let sliderWidth = 400;
-  let containerStyle: CSSProperties = {
-    width: sliderWidth + 'px',
-    position: 'relative',
-    height: '15px',
-    background: '#ccc',
-    borderRadius: '10px',
-  };
-  let slideStyle: CSSProperties = {
-    width: progress + '%',
-    height: '100%',
-    background: '#4569d4',
-    position: 'absulte',
-    display: 'flex',
-    justifyContent: 'flex-end',
-    borderRadius: '10px 0 0 10px',
-  };
-  useDragMove({
-    target: target,
-    moveDirection: 'right',
-    reset: false,
-    maxMoveDiff: sliderWidth - 23,
-    originTranslate: {
-      x: -2,
-      y: -5,
-    },
-    onMove(diff) {
-      let value = diff.x /  sliderWidth
-      setProgress(value * 100);
-    },
-  });
-  return (
-    <div style={containerStyle}>
-      <div style={slideStyle}></div>
-      <div
-        ref={target}
-        style={{
-          position: 'absolute',
-          top:0,
-          left:0,
-          width: '25px',
-          height: '25px',
-          borderRadius: '50%',
-          background: '#f5f5f5',
-          border: '2px solid #4569d4',
-          transform: 'translate(0,-20%)',
-        }}
-      ></div>
-    </div>
-  );
-};
-```
-
-### Options
+### options
 
 ```ts | pure
 export interface DragMoveOptions {
@@ -133,6 +70,21 @@ export interface DragMoveOptions {
     x: number;
     y: number;
   };
+  /**
+   * @description useEffect依赖数组
+   * @default []
+   */
+  deps?: DependencyList;
+  /**
+   * @description 当目标ref是一个需要异步加载的组件时，需要的等待时间
+   * @default 0
+   */
+  asyncDelay?: number;
+  /**
+   * @description 是否自动绑定DOM事件
+   * @default true;
+   */
+  autoBindEvent?:boolean
 }
 ```
 
@@ -144,5 +96,12 @@ export interface DragMoveResult {
   moveIng: MutableRefObject<boolean>;
   /** 记录当前移动的距离 */
   moveDiff: MutableRefObject<{ x: number; y: number }>;
+  /** 鼠标按下或者手指按下事件，默认会自动绑定，也可以手动绑定，pc只需要绑定onMouseDown为此回调即可 */
+  handleMouseDownOrTouchStart: (e: MouseEvent | TouchEvent) => void;
+  /** 鼠标移动或者手指移动事件，pc端默认绑定在window上，不需要手动绑定，移动端可以手动绑定onTouchMove事件 */
+  handleMouseMoveOrTouchMove: (e: MouseEvent | TouchEvent) => void;
+  /** 鼠标抬起或者手指抬起事件，pc端默认绑定在window上，移动端可以手动绑定到onTouchEnd事件 */
+  handleMouseUpOrTouchEnd: (e: MouseEvent | TouchEvent) => void;
 }
+
 ```

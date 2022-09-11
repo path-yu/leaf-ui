@@ -42,10 +42,16 @@ const ImagePreview: ForwardRefRenderFunction<ImagePreviewExpose, ImagePreviewPro
   const [previewShow, setPreviewShow] = useState(false);
   const previewWrapperRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
-  const { handleMouseDown } = useDragMove(imageRef, true);
+
   const [scale, setScale] = useState(1);
   const [rotate, setRotate] = useState(0);
   const [isMount, setIsMount] = useState(false);
+  useDragMove({
+    target: imageRef,
+    reset: true,
+    deps: [previewShow],
+    asyncDelay: 300,
+  });
   let scaleMap: { [key: string]: { increment: number | null; reduce: number | null } } = {
     1: {
       increment: 1.5,
@@ -165,7 +171,6 @@ const ImagePreview: ForwardRefRenderFunction<ImagePreviewExpose, ImagePreviewPro
             >
               <div style={{ transform: `scale(${scale}) rotate(${rotate}deg)`, margin: 'auto' }}>
                 <img
-                  onMouseDown={handleMouseDown}
                   src={previewSrcList[current]}
                   alt=""
                   ref={imageRef}
