@@ -78,7 +78,27 @@ export default () => {
   );
 };
 ```
-
+### 更新消息内容
+可以通过唯一的`key`来更新内容。
+```tsx
+import React from 'react';
+import { message, Button } from 'leaf-ui';
+const key = 'updatable';
+export default () => {
+  return (
+    <Button
+      onClick={() => {
+        message.loading({ content: 'Loading...', key });
+        setTimeout(() => {
+          message.success({ content: 'Loaded!', key, duration: 2 });
+        }, 1000);
+      }}
+    >
+      open info message
+    </Button>
+  );
+};
+```
 ### 加载中
 
 开启全局 loading，可自行异步关闭
@@ -188,12 +208,13 @@ export default () => {
 
 `config` 对象属性如下：
 
-| 参数  | 说明  | 类型        | 默认值 |
-|-----|-----|-----------|-----|
-|  className  |  自定义 CSS class   | `string`    | -   |
-|  content  | 提示内容    | `ReactNode` |     |
-|  duration  |  	自动关闭的延时，单位秒。设为 0 时不自动关闭   | `number`          | 3   |
-|   icon  |  	自定义图标   |  `ReactNode`         | -   |
-|  style   |   自定义内联样式  |     `	CSSProperties`      | -   |
-|  onClick  |  点击 message 时触发的回调函数   |  	`function`         | -   |
-|  onClose  |  关闭时触发的回调函数                      |    `function`                | -   |
+| 参数        | 说明                       | 类型               | 默认值     |
+|-----------|--------------------------|------------------|---------|
+| className | 自定义 CSS class            | `string`         | -       |
+| content   | 提示内容                     | `ReactNode`      |         |
+| duration  | 	自动关闭的延时，单位秒。设为 0 时不自动关闭 | `number`         | 3       |
+| icon      | 	自定义图标                   | `ReactNode`      | -       |
+| style     | 自定义内联样式                  | `	CSSProperties` | -       |
+| onClick   | 点击 message 时触发的回调函数      | 	`function`      | -       |
+| onClose   | 关闭时触发的回调函数               | `function`       | -       |
+| key       | 当前提示唯一标识                 | `string &#124; number` |    `-` |

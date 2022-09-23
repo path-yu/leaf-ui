@@ -1,6 +1,7 @@
 import React, {
   CSSProperties,
   forwardRef,
+  Key,
   MutableRefObject,
   ReactNode,
   useImperativeHandle,
@@ -25,9 +26,10 @@ interface CommonArgs {
   style?: CSSProperties;
   onClick?: clickFn;
   icon?: ReactNode;
+  key?: Key;
 }
 interface MessageItemData extends CommonArgs {
-  key: string;
+  key: Key;
 }
 type voidFn = () => void;
 type clickFn = (e: React.MouseEvent<HTMLDivElement>) => void;
@@ -82,6 +84,9 @@ const getMessageConfig = (
     } else {
       ctx.duration = ctx.duration * 1000;
     }
+    if (!ctx.type) {
+      ctx.type = type;
+    }
     return ctx;
   } else {
     return {
@@ -115,6 +120,7 @@ const MessageProvider = forwardRef<MessageProviderExpose, MessageProvideProps>((
           style = {},
           onClick = (event) => {},
           icon,
+          key,
         } = argProps;
         let item: MessageItemData = {
           type,
@@ -126,6 +132,7 @@ const MessageProvider = forwardRef<MessageProviderExpose, MessageProvideProps>((
           onClick,
           icon,
         };
+
         let callback: Function;
         const result = () => {
           onClose && onClose();
@@ -143,7 +150,22 @@ const MessageProvider = forwardRef<MessageProviderExpose, MessageProvideProps>((
         if (duration !== 0) {
           setTimeout(result, duration);
         }
-        setMessageList((prev) => [...prev, item]);
+        // 处理自定义key参数
+        if (key) {
+          let findOriginIndex = messageList.findIndex((message) => message.key === key);
+          item.key = key;
+          if (findOriginIndex === -1) {
+            setMessageList((prev) => [...prev, item]);
+          } else {
+            setMessageList((prev) => {
+              let newList = [...prev];
+              newList[findOriginIndex] = item;
+              return newList;
+            });
+          }
+        } else {
+          setMessageList((prev) => [...prev, item]);
+        }
         return result as MessageType;
       },
     }),
