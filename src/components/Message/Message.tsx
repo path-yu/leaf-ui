@@ -28,9 +28,6 @@ interface CommonArgs {
   icon?: ReactNode;
   key?: Key;
 }
-interface MessageItemData extends CommonArgs {
-  key: Key;
-}
 type voidFn = () => void;
 type clickFn = (e: React.MouseEvent<HTMLDivElement>) => void;
 interface MessageProviderExpose {
@@ -70,6 +67,10 @@ const message = {
       getMessageConfig(content, duration, 'error', onClose),
     );
   },
+  open(config: ArgsProps) {
+    setDefaultDuration(config);
+    return MessageProviderRef!.current!.addMessage(config);
+  },
 };
 const getMessageConfig = (
   content: JointContent,
@@ -79,11 +80,7 @@ const getMessageConfig = (
 ) => {
   if (typeof content === 'object') {
     let ctx = content as ArgsProps;
-    if (!ctx.duration) {
-      ctx.duration = 3000;
-    } else {
-      ctx.duration = ctx.duration * 1000;
-    }
+    setDefaultDuration(ctx);
     if (!ctx.type) {
       ctx.type = type;
     }
@@ -97,6 +94,13 @@ const getMessageConfig = (
     } as ArgsProps;
   }
 };
+const setDefaultDuration = (config: ArgsProps) => {
+  if (!config.duration) {
+    config.duration = 3000;
+  } else {
+    config.duration = config.duration * 1000;
+  }
+};
 let MessageProviderRef: MutableRefObject<MessageProviderExpose | null> | null = null;
 const MessageApp = () => {
   MessageProviderRef = useRef<MessageProviderExpose>(null);
@@ -105,7 +109,7 @@ const MessageApp = () => {
 
 interface MessageProvideProps {}
 const MessageProvider = forwardRef<MessageProviderExpose, MessageProvideProps>((props, ref) => {
-  let [messageList, setMessageList] = useState<MessageItemData[]>([]);
+  let [messageList, setMessageList] = useState<CommonArgs[]>([]);
 
   useImperativeHandle(
     ref,
@@ -122,7 +126,7 @@ const MessageProvider = forwardRef<MessageProviderExpose, MessageProvideProps>((
           icon,
           key,
         } = argProps;
-        let item: MessageItemData = {
+        let item: CommonArgs = {
           type,
           content,
           duration,
@@ -132,7 +136,6 @@ const MessageProvider = forwardRef<MessageProviderExpose, MessageProvideProps>((
           onClick,
           icon,
         };
-
         let callback: Function;
         const result = () => {
           onClose && onClose();
@@ -186,7 +189,7 @@ const MessageProvider = forwardRef<MessageProviderExpose, MessageProvideProps>((
         effect="slide-down"
         appear={true}
         wrapItemStyle={{ display: 'flex', justifyContent: 'center' }}
-        buildItem={(item: MessageItemData, index) => {
+        buildItem={(item: CommonArgs, index) => {
           return (
             <div
               className={classNames('message-notice', item.className)}

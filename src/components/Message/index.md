@@ -22,7 +22,6 @@ export default () => {
   );
 };
 ```
-
 ### 不同提示类型
 
 ```tsx
@@ -154,12 +153,13 @@ export default () => {
   return (
     <Button
       onClick={() => {
-        message.success({
+        message.open({
           content: 'This is a prompt message with custom className and style',
           className: 'custom-class',
           style: {
             marginTop: '20vh',
           },
+          type:"error"
         });
       }}
     >
@@ -203,7 +203,7 @@ export default () => {
 * `message.error(config)`
 * `message.info(config)`
 * `message.warning(config)`
-* `message.warn(config)` // alias of warning
+* `message.warn(config)`
 * `message.loading(config)`
 
 `config` 对象属性如下：
