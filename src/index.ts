@@ -32,3 +32,4 @@ export {
   type CheckBoxGroupOption,
 } from './components/Checkbox/CheckboxGroup';
 export * from './hook/index';
+export { default as Slider } from './components/Slider/Slider';

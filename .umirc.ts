@@ -47,6 +47,9 @@ export default defineConfig({
         children: ['/components/Checkbox/index.md'],
       },
       {
+        children: ['/components/Slider/index.md'],
+      },
+      {
         children: ['/components/Icon/index.md'],
       },
       {

@@ -1,5 +1,4 @@
 import { isMobile } from './isMobile';
-
 export const getEventClientPosition = (event: any) => {
   let x, y;
   if (!isMobile()) {
