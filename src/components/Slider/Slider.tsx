@@ -15,7 +15,7 @@ export interface SliderProps {
    * @description 设置初始取值。当 range 为 false 时，使用 number，否则用 [number, number]
    * @default 0 | [0,0]
    */
-  defaultValue?: sliderValueType;
+  defaultValue?: number | [number, number];
   /**
    * @description 禁用slider
    * @default true
@@ -29,7 +29,7 @@ export interface SliderProps {
   /**
    * @description 设置当前取值。当 range 为 false 时，使用 number，否则用 [number, number]
    */
-  value?: sliderValueType;
+  value?: number | [number, number];
   /**
    * @description 最大值
    *@default 100
@@ -48,7 +48,16 @@ export interface SliderProps {
   /**
    * @description Slider值发生改变时的回调，并传入当前值作为参数
    */
-  onChange?: (value: sliderValueType) => void;
+  onChange?: (value: number | [number, number]) => void;
+  /**
+   * @description 与 `onmouseup` 触发时机一致，把当前值作为参数传入
+   */
+  onAfterChange?: (value: number | [number, number]) => void;
+  /**
+   * @description 反向坐标轴
+   * @default false
+   */
+  reverse?: boolean;
 }
 const _isMobile = isMobile();
 type sliderValueType = number | [number, number];
@@ -56,8 +65,19 @@ const defaultSize = { width: 0, height: 0 };
 type NativeAndReactTouchOrMouseEvent = ReactTouchEvent | ReactMouseEvent | TouchEvent | MouseEvent;
 type PickDOMRectWidthAndHeight = Pick<DOMRect, 'width' | 'height'>;
 const Slider: FC<SliderProps> = (props) => {
-  const { vertical, max = 100, min = 0, onChange, defaultValue, range } = props;
-  const percentage = useRef(defaultValue);
+  const {
+    vertical,
+    max = 100,
+    min = 0,
+    onChange,
+    defaultValue = 0,
+    value,
+    range = false,
+    disabled = false,
+    reverse = false,
+    onAfterChange,
+  } = props;
+  const percentage = useRef(value ? value : defaultValue);
   const movePosition = useRef({ x: 0, y: 0 });
   const moveDiff = useRef({ x: 0, y: 0 });
   const isClick = useRef(false);
@@ -70,6 +90,7 @@ const Slider: FC<SliderProps> = (props) => {
   >([defaultSize, defaultSize]);
   // 手指或者鼠标在圆点下按下
   const handleTouchStartOrMouseDown = (event: NativeAndReactTouchOrMouseEvent) => {
+    if (disabled) return;
     isClick.current = true;
     const { x, y } = getEventClientPosition(event);
     const currentTarget = event.currentTarget as HTMLDivElement;
@@ -88,24 +109,33 @@ const Slider: FC<SliderProps> = (props) => {
     const { x, y } = getEventClientPosition(event);
     moveDiff.current.x += x - movePosition.current.x;
     moveDiff.current.y += y - movePosition.current.y;
+    let { x: moveDiffX, y: moveDiffY } = moveDiff.current;
+    let absoluteMove = vertical
+      ? reverse
+        ? moveDiffY
+        : -moveDiffY
+      : reverse
+      ? -moveDiffX
+      : moveDiffX;
+
     if (typeof percentage.current === 'number') {
       let result = calcPercentage(
         vertical
-          ? sliderTrackRect.current!.height + -moveDiff.current.y
-          : sliderTrackRect.current!.width + moveDiff.current.x,
+          ? sliderTrackRect.current!.height + absoluteMove
+          : sliderTrackRect.current!.width + absoluteMove,
       );
       setPercentage(result);
     } else {
       const [onePercentage, twoPercentage] = percentage.current!;
       if (clickHandleIndex.current === 1) {
         let offset = vertical
-          ? rangeSliderHandlePercentageSize.current[0].height + -moveDiff.current.y
-          : rangeSliderHandlePercentageSize.current[0].width + moveDiff.current.x;
+          ? rangeSliderHandlePercentageSize.current[0].height + absoluteMove
+          : rangeSliderHandlePercentageSize.current[0].width + absoluteMove;
         setPercentage([calcPercentage(offset), twoPercentage]);
       } else {
         let offset = vertical
-          ? rangeSliderHandlePercentageSize.current[1].height + -moveDiff.current.y
-          : rangeSliderHandlePercentageSize.current[1].width + moveDiff.current.x;
+          ? rangeSliderHandlePercentageSize.current[1].height + absoluteMove
+          : rangeSliderHandlePercentageSize.current[1].width + absoluteMove;
         setPercentage([onePercentage, calcPercentage(offset)]);
       }
     }
@@ -115,25 +145,30 @@ const Slider: FC<SliderProps> = (props) => {
   const handleTouchEndOrMouseUp = () => {
     if (!isClick.current) return;
     isClick.current = false;
+    onAfterChange?.(percentage.current!);
+  };
+  const getClickOffset = (event: ReactMouseEvent) => {
+    let sliderDOMRect = sliderRef.current!.getBoundingClientRect();
+    let offsetX = event.clientX - sliderDOMRect.x;
+    let offsetY = (event.clientY = sliderDOMRect.y);
+    return {
+      offsetX,
+      offsetY,
+    };
   };
   // 点击slider
   const handleSliderClick = (event: ReactMouseEvent) => {
+    if (disabled) return;
     let target = event.target as HTMLDivElement;
     if (isClick.current || target.classList.contains('slider-handle')) return;
-    let { offsetY, offsetX } = event.nativeEvent;
+    let { offsetY, offsetX } = getClickOffset(event);
+    offsetX = reverse ? sliderRect.current.width - offsetX : offsetX;
+    offsetY = reverse ? offsetY : sliderRect.current.height - offsetY;
     if (typeof percentage.current === 'number') {
-      setPercentage(calcPercentage(vertical ? sliderRect.current.height - offsetY : offsetX));
+      setPercentage(calcPercentage(vertical ? offsetY : offsetX));
     } else {
-      let clickTargetIsTrack = target.classList.contains('slider-track');
       const [onePercentage, twoPercentage] = percentage.current!;
-      let currentClickOffset = vertical
-        ? clickTargetIsTrack
-          ? getPercentSize('height', twoPercentage) - offsetY
-          : sliderRect.current.height - offsetY
-        : clickTargetIsTrack
-        ? getPercentSize('width', onePercentage) + offsetX
-        : offsetX;
-      let currentClickPercentage = calcPercentage(currentClickOffset);
+      let currentClickPercentage = calcPercentage(vertical ? offsetY : offsetX);
       if (currentClickPercentage < onePercentage) {
         setPercentage([currentClickPercentage, twoPercentage]);
       } else if (currentClickPercentage > twoPercentage) {
@@ -159,7 +194,7 @@ const Slider: FC<SliderProps> = (props) => {
     if (result < min) {
       result = min;
     }
-    return result;
+    return Math.abs(result);
   };
   const getPercentSize = (type: 'width' | 'height', percentage: number) => {
     if (type === 'width') {
@@ -197,48 +232,67 @@ const Slider: FC<SliderProps> = (props) => {
           { width: getPercentSize('width', twoPercentage), height: 0 },
         ];
       }
-      console.log(rangeSliderHandlePercentageSize);
     }
+  };
+  const setSliderTrackStyle = (ele: HTMLDivElement, percentageStr: string) => {
+    ele.style.cssText = `${vertical ? 'height' : 'width'}:${percentageStr};${
+      vertical ? (reverse ? 'top:0% ' : 'bottom:0%') : reverse ? 'right:0% ' : 'left:0%'
+    }`;
+  };
+  const setSliderRangeTrackStyle = (
+    sliderTrackEle: HTMLElement,
+    onePercentage: number,
+    twoPercentage: number,
+  ) => {
+    let diffPercentage = Math.abs(twoPercentage - onePercentage);
+    sliderTrackEle.style.cssText = `${vertical ? 'height' : 'width'}:${percentageToStr(
+      diffPercentage,
+    )};${vertical ? (reverse ? 'top' : 'bottom') : reverse ? 'right' : 'left'}:${percentageToStr(
+      Math.min(onePercentage, twoPercentage),
+    )}`;
+  };
+  const setSliderHandleStyle = (ele: HTMLDivElement, percentageStr: string) => {
+    ele.style.cssText = `${
+      vertical ? (reverse ? 'top ' : 'bottom') : reverse ? 'right' : 'left'
+    }:${percentageStr};translate:${
+      vertical ? (reverse ? '0 -50%' : '0 50%') : reverse ? '50%' : '-50%'
+    }`;
   };
   const changeSliderStyle = () => {
     let target = sliderRef.current! as HTMLDivElement;
     const sliderTrackEle = target.childNodes[1] as HTMLDivElement;
     const sliderHandleOneEle = target.childNodes[2] as HTMLDivElement;
     const sliderHandleTwoEle = target.childNodes[3] as HTMLDivElement;
-    let percentageStr = `${percentage.current}%`;
     if (typeof percentage.current === 'number') {
-      if (vertical) {
-        sliderTrackEle.style.height = percentageStr;
-        sliderHandleOneEle.style.bottom = percentageStr;
-      } else {
-        sliderTrackEle.style.width = percentageStr;
-        sliderHandleOneEle.style.left = percentageStr;
-      }
+      let percentageStr = percentageToStr(percentage.current);
+      setSliderTrackStyle(sliderTrackEle, percentageStr);
+      setSliderHandleStyle(sliderHandleOneEle, percentageStr);
     } else {
       const [onePercentage, twoPercentage] = percentage.current!;
       let diffPercentage = Math.abs(twoPercentage - onePercentage);
       if (vertical) {
-        sliderHandleOneEle.style.bottom = percentageToStr(onePercentage);
-        sliderHandleTwoEle.style.bottom = percentageToStr(twoPercentage);
-        sliderTrackEle.style.cssText = `height:${percentageToStr(
-          diffPercentage,
-        )};bottom:${percentageToStr(Math.min(onePercentage, twoPercentage))}`;
+        setSliderHandleStyle(sliderHandleOneEle, percentageToStr(onePercentage));
+        setSliderHandleStyle(sliderHandleTwoEle, percentageToStr(twoPercentage));
+        setSliderRangeTrackStyle(sliderTrackEle, onePercentage, twoPercentage);
       } else {
-        sliderHandleOneEle.style.left = percentageToStr(onePercentage);
-        sliderHandleTwoEle.style.left = percentageToStr(twoPercentage);
+        setSliderHandleStyle(sliderHandleOneEle, percentageToStr(onePercentage));
+        setSliderHandleStyle(sliderHandleTwoEle, percentageToStr(twoPercentage));
         sliderTrackEle.style.cssText = `width:${percentageToStr(
           diffPercentage,
         )};left:${percentageToStr(Math.min(onePercentage, twoPercentage))}`;
+        setSliderRangeTrackStyle(sliderTrackEle, onePercentage, twoPercentage);
       }
     }
   };
   const percentageToStr = (value: number) => {
     return `${value}%`;
   };
-  const setPercentage = (value: sliderValueType) => {
-    percentage.current = value;
-    changeSliderStyle();
-    onChange?.(percentage.current);
+  const setPercentage = (sliderValue: sliderValueType) => {
+    if (!value) {
+      percentage.current = sliderValue;
+      changeSliderStyle();
+    }
+    onChange?.(sliderValue);
   };
   const eventMaps = useMemo(() => {
     if (_isMobile) {
@@ -253,28 +307,41 @@ const Slider: FC<SliderProps> = (props) => {
       };
     }
   }, [percentage]);
+  const setSliderRect = () => {
+    sliderRect.current = {
+      width: sliderRef.current!.scrollWidth,
+      height: sliderRef.current!.scrollHeight,
+    };
+  };
   useEffect(() => {
     if (!_isMobile) {
       window.addEventListener('mousemove', handleTouchOrMouseMove);
       window.addEventListener('mouseup', handleTouchEndOrMouseUp);
     }
-    sliderRect.current = {
-      width: sliderRef.current!.scrollWidth,
-      height: sliderRef.current!.scrollHeight,
-    };
+    setSliderRect();
+    window.addEventListener('resize', setSliderRect);
     changeSliderStyle();
     return () => {
       if (!_isMobile) {
         window.removeEventListener('mousemove', handleTouchOrMouseMove);
         window.removeEventListener('mouseup', handleTouchEndOrMouseUp);
+        window.removeEventListener('resize', setSliderRect);
       }
     };
-  }, []);
+  }, [reverse]);
+  useEffect(() => {
+    if (value) {
+      percentage.current = value;
+      changeSliderStyle();
+    }
+  }, [value]);
+  const tabIndexObj = disabled ? {} : { tabIndex: 0 };
   return (
     <div
       className={classNames('slider', {
         'slider-horizontal': !vertical,
         'slider-vertical': vertical,
+        'slider-disabled': disabled,
       })}
       ref={sliderRef}
       onClick={handleSliderClick}
@@ -284,14 +351,14 @@ const Slider: FC<SliderProps> = (props) => {
       <div
         data-index={1}
         className="slider-handle slider-handle1"
-        tabIndex={0}
         {...eventMaps}
+        {...tabIndexObj}
       ></div>
       {range && (
         <div
           data-index={2}
           className="slider-handle slider-handle2"
-          tabIndex={0}
+          {...tabIndexObj}
           {...eventMaps}
         ></div>
       )}

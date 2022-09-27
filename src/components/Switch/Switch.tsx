@@ -80,6 +80,7 @@ const Switch: FC<SwitchProps> = (props) => {
       onChange?.(!checkedValue);
       onClick?.(!checkedValue, event);
     } else {
+      onChange?.(!checked);
       onClick?.(checked, event);
     }
   };
