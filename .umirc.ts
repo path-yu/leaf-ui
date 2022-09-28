@@ -50,6 +50,9 @@ export default defineConfig({
         children: ['/components/Slider/index.md'],
       },
       {
+        children: ['/components/Tooltip/index.md'],
+      },
+      {
         children: ['/components/Icon/index.md'],
       },
       {

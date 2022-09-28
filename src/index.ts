@@ -33,3 +33,4 @@ export {
 } from './components/Checkbox/CheckboxGroup';
 export * from './hook/index';
 export { default as Slider } from './components/Slider/Slider';
+export { default as Tooltip } from './components/Tooltip/Tooltip';

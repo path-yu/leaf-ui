@@ -5,11 +5,15 @@ import React, {
   MouseEvent as ReactMouseEvent,
   useRef,
   useEffect,
+  forwardRef,
+  ForwardRefRenderFunction,
+  useImperativeHandle,
 } from 'react';
 import './slider.scss';
 import classNames from 'classnames';
 import { isMobile } from '../../utils/core/isMobile';
 import { getEventClientPosition } from '../../utils/core/getEventClientPosition';
+import Tooltip, { TooltipExpose } from '../Tooltip/Tooltip';
 export interface SliderProps {
   /**
    * @description 设置初始取值。当 range 为 false 时，使用 number，否则用 [number, number]
@@ -58,13 +62,26 @@ export interface SliderProps {
    * @default false
    */
   reverse?: boolean;
+  /**
+   * @description 是否显示文字提示
+   * @default true
+   */
+  showTips?: boolean;
+  /**
+   * @description Slider 会把当前值传给 formatter，并在 Tooltip 中显示 formatter 的返回值，
+   */
+  formatter?: (value: string) => string;
 }
 const _isMobile = isMobile();
 type sliderValueType = number | [number, number];
 const defaultSize = { width: 0, height: 0 };
 type NativeAndReactTouchOrMouseEvent = ReactTouchEvent | ReactMouseEvent | TouchEvent | MouseEvent;
 type PickDOMRectWidthAndHeight = Pick<DOMRect, 'width' | 'height'>;
-const Slider: FC<SliderProps> = (props) => {
+export interface SliderExpose {
+  blur: () => void;
+  focus: () => void;
+}
+const Slider: ForwardRefRenderFunction<SliderExpose, SliderProps> = (props, ref) => {
   const {
     vertical,
     max = 100,
@@ -76,6 +93,8 @@ const Slider: FC<SliderProps> = (props) => {
     disabled = false,
     reverse = false,
     onAfterChange,
+    formatter,
+    showTips = true,
   } = props;
   const percentage = useRef(value ? value : defaultValue);
   const movePosition = useRef({ x: 0, y: 0 });
@@ -83,11 +102,16 @@ const Slider: FC<SliderProps> = (props) => {
   const isClick = useRef(false);
   const sliderRect = useRef<PickDOMRectWidthAndHeight>(defaultSize);
   const sliderRef = useRef<HTMLDivElement>(null);
+  const sliderHandleOneEleRef = useRef<HTMLDivElement>(null);
+  const sliderHandleTwoEleRef = useRef<HTMLDivElement>(null);
   const clickHandleIndex = useRef<number | null>(null); // 记录当前从那个小圆点开始点击
   const sliderTrackRect = useRef<PickDOMRectWidthAndHeight>(defaultSize);
+  const oneTooltipRef = useRef<TooltipExpose>(null);
+  const twoTooltipRef = useRef<TooltipExpose>(null);
   const rangeSliderHandlePercentageSize = useRef<
     [PickDOMRectWidthAndHeight, PickDOMRectWidthAndHeight]
   >([defaultSize, defaultSize]);
+
   // 手指或者鼠标在圆点下按下
   const handleTouchStartOrMouseDown = (event: NativeAndReactTouchOrMouseEvent) => {
     if (disabled) return;
@@ -146,6 +170,18 @@ const Slider: FC<SliderProps> = (props) => {
     if (!isClick.current) return;
     isClick.current = false;
     onAfterChange?.(percentage.current!);
+    if (clickHandleIndex.current === 1 && oneTooltipRef.current) {
+      setTimeout(() => {
+        oneTooltipRef.current!.hideTooltip();
+        oneTooltipRef.current!.setMouseLeaveLock(false);
+      }, 300);
+    }
+    if (clickHandleIndex.current === 2 && twoTooltipRef.current) {
+      setTimeout(() => {
+        twoTooltipRef.current!.hideTooltip();
+        twoTooltipRef.current!.setMouseLeaveLock(false);
+      }, 300);
+    }
   };
   const getClickOffset = (event: ReactMouseEvent) => {
     let sliderDOMRect = sliderRef.current!.getBoundingClientRect();
@@ -165,24 +201,32 @@ const Slider: FC<SliderProps> = (props) => {
     offsetX = reverse ? sliderRect.current.width - offsetX : offsetX;
     offsetY = reverse ? offsetY : sliderRect.current.height - offsetY;
     if (typeof percentage.current === 'number') {
-      setPercentage(calcPercentage(vertical ? offsetY : offsetX));
+      setPercentage(calcPercentage(vertical ? offsetY : offsetX), 1);
     } else {
       const [onePercentage, twoPercentage] = percentage.current!;
       let currentClickPercentage = calcPercentage(vertical ? offsetY : offsetX);
       if (currentClickPercentage < onePercentage) {
-        setPercentage([currentClickPercentage, twoPercentage]);
+        setPercentage([currentClickPercentage, twoPercentage], 1);
       } else if (currentClickPercentage > twoPercentage) {
-        setPercentage([onePercentage, currentClickPercentage]);
+        setPercentage([onePercentage, currentClickPercentage], 2);
       } else {
         let oneDiffPercentage = currentClickPercentage - onePercentage;
         let twoDiffPercentage = Math.abs(currentClickPercentage - twoPercentage);
         if (twoDiffPercentage > oneDiffPercentage) {
-          setPercentage([currentClickPercentage, twoPercentage]);
+          setPercentage([currentClickPercentage, twoPercentage], 1);
         } else {
-          setPercentage([onePercentage, currentClickPercentage]);
+          setPercentage([onePercentage, currentClickPercentage], 2);
         }
       }
     }
+  };
+  const getOnePercentageStr = () => {
+    return typeof percentage.current === 'number'
+      ? percentage.current.toString()
+      : percentage.current[0].toString();
+  };
+  const getTwoPercentageStr = () => {
+    return (percentage.current as number[])[1].toString();
   };
   const calcPercentage = (value: number) => {
     let result = Math.round(
@@ -261,15 +305,14 @@ const Slider: FC<SliderProps> = (props) => {
   const changeSliderStyle = () => {
     let target = sliderRef.current! as HTMLDivElement;
     const sliderTrackEle = target.childNodes[1] as HTMLDivElement;
-    const sliderHandleOneEle = target.childNodes[2] as HTMLDivElement;
-    const sliderHandleTwoEle = target.childNodes[3] as HTMLDivElement;
+    const sliderHandleOneEle = sliderHandleOneEleRef.current as HTMLDivElement;
+    const sliderHandleTwoEle = sliderHandleTwoEleRef.current as HTMLDivElement;
     if (typeof percentage.current === 'number') {
       let percentageStr = percentageToStr(percentage.current);
       setSliderTrackStyle(sliderTrackEle, percentageStr);
       setSliderHandleStyle(sliderHandleOneEle, percentageStr);
     } else {
       const [onePercentage, twoPercentage] = percentage.current!;
-      let diffPercentage = Math.abs(twoPercentage - onePercentage);
       if (vertical) {
         setSliderHandleStyle(sliderHandleOneEle, percentageToStr(onePercentage));
         setSliderHandleStyle(sliderHandleTwoEle, percentageToStr(twoPercentage));
@@ -277,21 +320,39 @@ const Slider: FC<SliderProps> = (props) => {
       } else {
         setSliderHandleStyle(sliderHandleOneEle, percentageToStr(onePercentage));
         setSliderHandleStyle(sliderHandleTwoEle, percentageToStr(twoPercentage));
-        sliderTrackEle.style.cssText = `width:${percentageToStr(
-          diffPercentage,
-        )};left:${percentageToStr(Math.min(onePercentage, twoPercentage))}`;
         setSliderRangeTrackStyle(sliderTrackEle, onePercentage, twoPercentage);
       }
     }
   };
+
   const percentageToStr = (value: number) => {
     return `${value}%`;
   };
-  const setPercentage = (sliderValue: sliderValueType) => {
+  const getOnePercentageTitle = () =>
+    formatter ? formatter(getOnePercentageStr()) : getOnePercentageStr();
+  const getTwoPercentageTitle = () =>
+    formatter ? formatter(getTwoPercentageStr()) : getTwoPercentageStr();
+  const setPercentage = (sliderValue: sliderValueType, clickIndex?: number) => {
     if (!value) {
       percentage.current = sliderValue;
       changeSliderStyle();
     }
+    if (!clickIndex) {
+      clickIndex = clickHandleIndex.current!;
+    }
+    if (showTips) {
+      if (clickIndex === 1 && oneTooltipRef.current) {
+        oneTooltipRef.current.setTitle(getOnePercentageTitle());
+        oneTooltipRef.current.setPosition(sliderHandleOneEleRef.current!);
+        isClick.current && oneTooltipRef.current.setMouseLeaveLock(true);
+      }
+      if (clickIndex === 2 && twoTooltipRef.current) {
+        twoTooltipRef.current.setTitle(getTwoPercentageTitle());
+        twoTooltipRef.current.setPosition(sliderHandleTwoEleRef.current!);
+        isClick.current && twoTooltipRef.current.setMouseLeaveLock(true);
+      }
+    }
+
     onChange?.(sliderValue);
   };
   const eventMaps = useMemo(() => {
@@ -335,7 +396,61 @@ const Slider: FC<SliderProps> = (props) => {
       changeSliderStyle();
     }
   }, [value]);
+  useImperativeHandle(ref, () => ({
+    focus() {
+      sliderHandleOneEleRef.current!.focus();
+      if (sliderHandleTwoEleRef.current) {
+        sliderHandleTwoEleRef.current.focus();
+      }
+    },
+    blur() {
+      sliderHandleOneEleRef.current!.blur();
+      if (sliderHandleTwoEleRef.current) {
+        sliderHandleTwoEleRef.current.blur();
+      }
+    },
+  }));
   const tabIndexObj = disabled ? {} : { tabIndex: 0 };
+  let sliderOneHandle = (
+    <div
+      data-index={1}
+      className="slider-handle slider-handle1"
+      {...eventMaps}
+      {...tabIndexObj}
+      ref={sliderHandleOneEleRef}
+    ></div>
+  );
+  let sliderTwoHandle = (
+    <div
+      data-index={2}
+      className="slider-handle slider-handle2"
+      {...tabIndexObj}
+      {...eventMaps}
+      ref={sliderHandleTwoEleRef}
+    ></div>
+  );
+  if (showTips) {
+    sliderOneHandle = (
+      <Tooltip
+        ref={oneTooltipRef}
+        title={getOnePercentageTitle()}
+        position={vertical ? 'right' : 'top'}
+      >
+        {sliderOneHandle}
+      </Tooltip>
+    );
+    if (typeof percentage.current !== 'number') {
+      sliderTwoHandle = (
+        <Tooltip
+          ref={twoTooltipRef}
+          title={getTwoPercentageTitle()}
+          position={vertical ? 'right' : 'top'}
+        >
+          {sliderTwoHandle}
+        </Tooltip>
+      );
+    }
+  }
   return (
     <div
       className={classNames('slider', {
@@ -348,22 +463,10 @@ const Slider: FC<SliderProps> = (props) => {
     >
       <div className="slider-rail"></div>
       <div className="slider-track"></div>
-      <div
-        data-index={1}
-        className="slider-handle slider-handle1"
-        {...eventMaps}
-        {...tabIndexObj}
-      ></div>
-      {range && (
-        <div
-          data-index={2}
-          className="slider-handle slider-handle2"
-          {...tabIndexObj}
-          {...eventMaps}
-        ></div>
-      )}
+      {sliderOneHandle}
+      {range && sliderTwoHandle}
     </div>
   );
 };
 
-export default Slider;
+export default forwardRef(Slider);

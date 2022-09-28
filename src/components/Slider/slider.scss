@@ -12,6 +12,9 @@
   &:hover .slider-track {
     background-color: #69c0ff;
   }
+  &:hover .slider-handle {
+    border-color: #69c0ff;
+  }
   .slider-rail {
     position: absolute;
     width: 100%;

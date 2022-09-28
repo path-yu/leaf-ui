@@ -9,7 +9,7 @@ export default () => {
   return (
     <>
       <div>
-        <Slider defaultValue={20} />
+        <Slider defaultValue={20} showTips={false} />
         <Slider
           range
           defaultValue={[20, 50]}
@@ -31,9 +31,7 @@ import { Slider, Space } from 'leaf-ui';
 export default () => {
   return (
     <>
-      <div>
-        <Slider defaultValue={20} disabled />
-      </div>
+      <Slider defaultValue={20} disabled />
     </>
   );
 };
@@ -96,15 +94,22 @@ export default () => {
   return (
     <>
       <Slider defaultValue={30} reverse={reverse} />
-      <Slider range defaultValue={[20, 50]} reverse={reverse} onChange={(v)=>{
-          console.log(v)
-      }} />
+      <Slider
+        range
+        defaultValue={[20, 50]}
+        reverse={reverse}
+        onChange={(v) => {
+          console.log(v);
+        }}
+      />
       Reversed: <Switch size="small" checked={reverse} onChange={setReverse} />
     </>
   );
 };
 ```
+
 ### 受控
+
 ```tsx
 import { Slider } from 'leaf-ui';
 import React, { useState } from 'react';
@@ -114,9 +119,34 @@ export default () => {
 
   return (
     <>
-      <Slider value={value} onChange={setValue}  />
+      <Slider value={value} onChange={setValue} />
     </>
   );
 };
 ```
+
+### 自定义提示
+使用 `formatter` 可以格式化 Tooltip 的内容，
+
+```tsx
+import React, {useRef} from 'react';
+import {Slider, Space} from 'leaf-ui';
+const formatter = (value: number) => `${value}%`;
+
+export default () => {
+  return (
+    <>
+      <Slider defaultValue={20} formatter={formatter} />
+    </>
+  );
+};
+```
+
 <API src="./Slider.tsx">
+
+### Method
+
+| 名称    | 描述   | 类型         |
+|-------|------|------------|
+| blur  | 移除焦点 | `() => void` |
+| focus | 获取焦点 |   `() => void`         |
