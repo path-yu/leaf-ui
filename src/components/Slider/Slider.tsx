@@ -194,9 +194,8 @@ const Slider: ForwardRefRenderFunction<SliderExpose, SliderProps> = (props, ref)
   };
   // 点击slider
   const handleSliderClick = (event: ReactMouseEvent) => {
-    if (disabled) return;
     let target = event.target as HTMLDivElement;
-    if (isClick.current || target.classList.contains('slider-handle')) return;
+    if (isClick.current || target.classList.contains('slider-handle') || disabled) return;
     let { offsetY, offsetX } = getClickOffset(event);
     offsetX = reverse ? sliderRect.current.width - offsetX : offsetX;
     offsetY = reverse ? offsetY : sliderRect.current.height - offsetY;
