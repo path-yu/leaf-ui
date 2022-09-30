@@ -53,6 +53,9 @@ export default defineConfig({
         children: ['/components/Tooltip/index.md'],
       },
       {
+        children: ['/components/ScrollBar/index.md'],
+      },
+      {
         children: ['/components/Icon/index.md'],
       },
       {

@@ -18,7 +18,7 @@ export function useElementHover(target: RefObject<HTMLElement>) {
       target.current?.removeEventListener('mouseenter', handleMouseEnter);
       target.current?.removeEventListener('mouseleave', handleMouseLeave);
     };
-  }, []);
+  });
 
   return {
     isHover,

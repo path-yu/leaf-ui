@@ -26,7 +26,7 @@ export function useDragMove(options: DragMoveOptions) {
       x: 0,
       y: 0,
     },
-    deps = [],
+    deps = undefined,
     asyncDelay = 0,
     autoBindEvent = true,
   } = options;
@@ -34,12 +34,16 @@ export function useDragMove(options: DragMoveOptions) {
     moveDirection === 'horizontal' || moveDirection === 'left' || moveDirection === 'right';
   const isVertical =
     moveDirection === 'vertical' || moveDirection === 'top' || moveDirection === 'bottom';
+  const getMaxMoveDiff = () => (typeof maxMoveDiff === 'function' ? maxMoveDiff() : maxMoveDiff);
+  let maxMoveDiffResult = getMaxMoveDiff();
+
   const handleMouseDownOrTouchStart = (e: MouseEvent | TouchEvent) => {
     isClick.current = true;
     let { x, y } = getEventClientPosition(e);
     touchPosition.current = { x, y };
     target.current!.style.transition = 'none';
     onStart?.(e);
+    maxMoveDiffResult = getMaxMoveDiff();
   };
   const handleMouseMoveOrTouchMove = (e: MouseEvent | TouchEvent) => {
     e.stopPropagation();
@@ -47,10 +51,11 @@ export function useDragMove(options: DragMoveOptions) {
     if (!isClick.current) return;
     let { x, y } = getEventClientPosition(e);
     let { x: moveX, y: moveY } = moveDiff.current;
+
     if (
-      maxMoveDiff &&
+      maxMoveDiffResult &&
       moveDirection === 'around' &&
-      (Math.abs(moveX) >= maxMoveDiff || Math.abs(moveY) >= maxMoveDiff)
+      (Math.abs(moveX) >= maxMoveDiffResult || Math.abs(moveY) >= maxMoveDiffResult)
     )
       return;
     moveDiff.current.x += x - touchPosition.current.x;
@@ -69,11 +74,11 @@ export function useDragMove(options: DragMoveOptions) {
     }
     let absMoveX = Math.abs(moveDiff.current.x);
     let absMoveY = Math.abs(moveDiff.current.y);
-    if (maxMoveDiff && absMoveX > maxMoveDiff) {
-      moveDiff.current.x = moveDiff.current.x > 0 ? maxMoveDiff : -maxMoveDiff;
+    if (maxMoveDiffResult && absMoveX > maxMoveDiffResult) {
+      moveDiff.current.x = moveDiff.current.x > 0 ? maxMoveDiffResult : -maxMoveDiffResult;
     }
-    if (maxMoveDiff && absMoveY > maxMoveDiff) {
-      moveDiff.current.y = moveDiff.current.y > 0 ? maxMoveDiff : -maxMoveDiff;
+    if (maxMoveDiffResult && absMoveY > maxMoveDiffResult) {
+      moveDiff.current.y = moveDiff.current.y > 0 ? maxMoveDiffResult : -maxMoveDiffResult;
     }
     moveEle();
     onMove?.({ x: moveDiff.current.x, y: moveDiff.current.y }, e);
@@ -127,11 +132,11 @@ export function useDragMove(options: DragMoveOptions) {
     let moveY = originTranslate.y + diffY;
     if (!ele) return;
     if (moveDirection === 'around') {
-      ele.style.transform = `translate(${moveX}px,${moveY}px)`;
+      ele.style.translate = `${moveX}px ${moveY}px`;
     } else if (isHorizontal) {
-      ele.style.transform = `translate(${moveX}px,${originTranslate.y}px)`;
+      ele.style.translate = `${moveX}px ${originTranslate.y}px`;
     } else if (isVertical) {
-      ele.style.transform = `translate(${originTranslate.y}px,${moveY}px)`;
+      ele.style.translate = `${originTranslate.y}px ${moveY}px`;
     }
   };
   useEffect(() => {
@@ -169,6 +174,7 @@ export function useDragMove(options: DragMoveOptions) {
     handleMouseDownOrTouchStart,
     handleMouseMoveOrTouchMove,
     handleMouseUpOrTouchEnd,
+    isClick,
   };
 }
 export interface DragMoveOptions {
@@ -195,7 +201,7 @@ export interface DragMoveOptions {
   /** 移动中达到阈值触发回调 */
   activeThreshold?: () => void;
   /** 最大移动距离 */
-  maxMoveDiff?: number;
+  maxMoveDiff?: number | (() => number);
   /** 达到阈值开启transition，默认拖拽开始会关闭transition，结束时开启transition */
   activeTransition?: boolean;
   /** 设置目标元素的transition */
@@ -231,4 +237,6 @@ export interface DragMoveResult {
   handleMouseMoveOrTouchMove: (e: MouseEvent | TouchEvent) => void;
   /** 鼠标抬起或者手指抬起事件，pc端默认绑定在window上，移动端可以手动绑定到onTouchEnd事件 */
   handleMouseUpOrTouchEnd: (e: MouseEvent | TouchEvent) => void;
+  /** 是否在目标元素点击 */
+  isClick?: MutableRefObject<boolean>;
 }

@@ -10,7 +10,8 @@ export default () => {
   const ref = useRef<HTMLDivElement>(null);
   useDragMove({
     target: ref,
-    moveDirection: 'horizontal',
+    moveDirection: 'right',
+    reset:false,
     onMove(diff) {
       console.log(diff.x);
     },
@@ -60,7 +61,7 @@ export interface DragMoveOptions {
   /** 移动中达到阈值触发回调 */
   activeThreshold?: () => void;
   /** 最大移动距离 */
-  maxMoveDiff?: number;
+  maxMoveDiff?: number | (() => number);
   /** 达到阈值开启transition，默认拖拽开始会关闭transition，结束时开启transition */
   activeTransition?: boolean;
   /** 设置目标元素的transition */
@@ -102,6 +103,8 @@ export interface DragMoveResult {
   handleMouseMoveOrTouchMove: (e: MouseEvent | TouchEvent) => void;
   /** 鼠标抬起或者手指抬起事件，pc端默认绑定在window上，移动端可以手动绑定到onTouchEnd事件 */
   handleMouseUpOrTouchEnd: (e: MouseEvent | TouchEvent) => void;
+  /** 是否在目标元素点击 */
+  isClick?: MutableRefObject<boolean>;
 }
 
 ```
