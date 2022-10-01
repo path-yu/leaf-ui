@@ -217,10 +217,12 @@ const MessageProvider = forwardRef<MessageProviderExpose, MessageProvideProps>((
   );
 });
 (() => {
-  let container = document.createElement('div');
-  document.body.appendChild(container);
-  setTimeout(() => {
-    createRoot(container).render(<MessageApp />);
-  });
+  window.onload = () => {
+    let container = document.createElement('div');
+    document.body.appendChild(container);
+    setTimeout(() => {
+      createRoot(container).render(<MessageApp />);
+    });
+  };
 })();
 export default message;
