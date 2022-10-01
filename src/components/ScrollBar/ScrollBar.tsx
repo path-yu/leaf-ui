@@ -163,9 +163,15 @@ const ScrollBar: ForwardRefRenderFunction<ScrollBarExpose, ScrollBarProps & Prop
       }, 300);
     });
   };
-  const initComputedSizeMap = () => {
+  const sheepTick = () => {
+    return new Promise((resolve) => setTimeout(resolve, 100));
+  };
+  const initComputedSizeMap = async () => {
+    //等待一个tick，垂直方向scrollbarRailEle可能还没render完成,获取不到真实DOMSize
+    await sheepTick();
     let container = containerRef.current as HTMLDivElement;
     let scrollbarRailEle = scrollbarRailRef.current!;
+
     let containerClientSize = horizontal ? container.clientWidth : container.clientHeight;
     let scrollSize = horizontal ? container.scrollWidth : container.scrollHeight;
     let scrollbarRailSize = horizontal
@@ -193,7 +199,7 @@ const ScrollBar: ForwardRefRenderFunction<ScrollBarExpose, ScrollBarProps & Prop
   const setScrollRailBarStyle = () => {
     let { scrollBarSize, moveDiff } = computedSizeMap.current;
     let scrollbarRailBar = scrollBarRailBarRef.current;
-    if (!scrollbarRailBar && scrollBarSize === 0) return;
+    if (!scrollbarRailBar || scrollBarSize === 0) return;
     scrollbarRailBar!.style.cssText = `${
       horizontal ? 'width' : 'height'
     }:${scrollBarSize}px;translate:${
