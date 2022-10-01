@@ -12,10 +12,11 @@ import React, {
 import './scrollbar.scss';
 import classNames from 'classnames';
 import { useDragMove } from '../../hook';
+import { throttle } from 'lodash';
 
 export interface ScrollBarProps {
   /**
-   * @description 	显示滚动条的时机，none 表示一直显示
+   * @description 	显示滚动条的时机，none 表示一直显示，scroll表示在滚动时显示
    * @default hover
    */
   trigger?: 'hover' | 'none' | 'scroll';
@@ -25,35 +26,56 @@ export interface ScrollBarProps {
    */
   horizontal?: boolean;
   /**
-   * @description 滚动的回调
+   * @description 滚动的回调 e表示事件对象，scrollType表示触发滚动的类型，native为原始滚动，如鼠标滚轮，手指滑动操作，moveBar指拖拽滚动条触发的滚动
    */
-  onScroll?: (e: Event) => void;
+  onScroll?: (e: UIEvent<HTMLDivElement>, scrollType: 'native' | 'moveBar') => void;
   /**
    * @description 设置scrollbar容器style
    */
   style?: CSSProperties;
+  /**
+   * @description 设置滚动条消失时间，单位ms，trigger为hover或者scroll有效
+   * @default 1000ms
+   */
+  delayTime?: number;
 }
 export interface ScrollBarExpose {
   //滚动到特定区域
-  scrollTo?: (options: { left?: number; top?: number; behavior?: ScrollBehavior }) => Promise<any>;
+  scrollTo?: (
+    options: { left?: number; top?: number; behavior?: ScrollBehavior },
+    listener?: boolean,
+  ) => null | Promise<unknown>;
 }
 
 const ScrollBar: ForwardRefRenderFunction<ScrollBarExpose, ScrollBarProps & PropsWithChildren> = (
   props,
   ref,
 ) => {
-  let { children, horizontal = false, trigger = 'hover', style } = props;
+  let {
+    children,
+    horizontal = false,
+    trigger = 'hover',
+    style,
+    delayTime = 1000,
+    onScroll,
+  } = props;
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollbarRailRef = useRef<HTMLDivElement>(null);
   const scrollBarRailBarRef = useRef<HTMLDivElement>(null);
   const scrollType = useRef<'native' | 'moveBar'>('native');
+  let timeId: any;
   const computedSizeMap = useRef({
+    //滚动条大小 (高度或宽度)
     scrollBarSize: 0,
+    // 滚动条滑道大小
     scrollbarRailSize: 0,
+    // scrollTop与滚动条最大滚动距离的比例
     averageScrollSize: 0,
-    availableScrollSize: 0,
+    // 滚动条最大移动距离
     scrollBarMaxMoveSize: 0,
+    // 记录滚动条移动了多少距离
     moveDiff: 0,
+    // 内容区最大滚动距离
     contentMaxScrollSize: 0,
   });
   const show = useRef(trigger === 'none');
@@ -62,19 +84,38 @@ const ScrollBar: ForwardRefRenderFunction<ScrollBarExpose, ScrollBarProps & Prop
       let { scrollTop } = e.currentTarget;
       let { averageScrollSize } = computedSizeMap.current;
       computedSizeMap.current.moveDiff = scrollTop / averageScrollSize;
+      if (horizontal) {
+        moveDiff.current.x = computedSizeMap.current.moveDiff;
+      } else {
+        moveDiff.current.y = computedSizeMap.current.moveDiff;
+      }
+      if (trigger === 'scroll') {
+        show.current = true;
+        clearTimeout(timeId);
+        timeId = setTimeout(() => {
+          if (!isClick.current) {
+            show.current = false;
+            setScrollRailBarStyle();
+          }
+        }, delayTime);
+      }
       setScrollRailBarStyle();
     }
+    onScroll?.(e, scrollType.current);
   };
-  useImperativeHandle(ref, () => ({
-    scrollTo(options) {
-      return new Promise((resolve) => {});
-    },
-  }));
-
+  useImperativeHandle(ref, () => {
+    return {
+      scrollTo,
+    };
+  });
   useEffect(() => {
     initComputedSizeMap();
+    window.addEventListener('resize', throttleHandleResize);
+    return () => {
+      window.removeEventListener('resize', throttleHandleResize);
+    };
   });
-  const { isClick } = useDragMove({
+  const { isClick, moveDiff } = useDragMove({
     target: scrollBarRailBarRef,
     moveDirection: horizontal ? 'right' : 'bottom',
     reset: false,
@@ -87,24 +128,41 @@ const ScrollBar: ForwardRefRenderFunction<ScrollBarExpose, ScrollBarProps & Prop
       computedSizeMap.current.moveDiff = diffResult;
       let { scrollBarMaxMoveSize, contentMaxScrollSize } = computedSizeMap.current;
       let scrollSize = Math.round((diffResult / scrollBarMaxMoveSize) * contentMaxScrollSize);
-      let scrollToOption: ScrollToOptions = {};
-      if (horizontal) {
-        scrollToOption.left = scrollSize;
-      } else {
-        scrollToOption.top = scrollSize;
-      }
-      containerRef.current!.scrollTo(scrollToOption);
+      let scrollToOption: ScrollToOptions = {
+        [horizontal ? 'left' : 'top']: scrollSize,
+      };
+      scrollTo(scrollToOption);
     },
     onEnd() {
-      if (trigger === 'hover') {
+      if (trigger !== 'none') {
         setTimeout(() => {
           show.current = false;
           setScrollRailBarStyle();
-        }, 200);
+        }, delayTime);
       }
       scrollType.current = 'native';
     },
   });
+  const scrollTo = (options: ScrollToOptions, listener = false) => {
+    if ((!options.top === undefined && !horizontal) || (!options.left === undefined && horizontal))
+      return null;
+    containerRef.current!.scrollTo(options);
+    if (!listener) return null;
+    const { top, left } = options;
+    let moveScrollDiff = horizontal ? left : top;
+    moveScrollDiff = Math.min(computedSizeMap.current.contentMaxScrollSize, moveScrollDiff!);
+    let timer: any;
+    const { current: containerEle } = containerRef;
+    return new Promise((resolve) => {
+      timer = setInterval(() => {
+        let checkScrollSize = horizontal ? containerEle!.scrollLeft : containerEle!.scrollTop;
+        if (checkScrollSize === moveScrollDiff) {
+          resolve(true);
+          clearInterval(timer);
+        }
+      }, 300);
+    });
+  };
   const initComputedSizeMap = () => {
     let container = containerRef.current as HTMLDivElement;
     let scrollbarRailEle = scrollbarRailRef.current!;
@@ -115,12 +173,12 @@ const ScrollBar: ForwardRefRenderFunction<ScrollBarExpose, ScrollBarProps & Prop
       : scrollbarRailEle.clientHeight;
     let scrollBarSize = scrollbarRailSize * (scrollbarRailSize / scrollSize);
     let scrollBarMaxMoveSize = scrollbarRailSize - scrollBarSize;
-    let availableScrollSize = scrollSize - scrollbarRailSize;
+    let availableScrollSize = scrollSize - containerClientSize;
+
     if (availableScrollSize !== 0) {
       computedSizeMap.current = {
         scrollbarRailSize,
         scrollBarSize,
-        availableScrollSize,
         averageScrollSize: availableScrollSize / scrollBarMaxMoveSize,
         scrollBarMaxMoveSize: scrollbarRailSize - scrollBarSize,
         moveDiff: 0,
@@ -142,6 +200,7 @@ const ScrollBar: ForwardRefRenderFunction<ScrollBarExpose, ScrollBarProps & Prop
       horizontal ? moveDiff + 'px' : '0 ' + moveDiff + 'px'
     };visibility:${show.current ? 'visible' : 'hidden'};opacity:${show.current ? 1 : 0} `;
   };
+  const throttleHandleResize = throttle(initComputedSizeMap, 300);
 
   const scrollbarRailStyle = useMemo<CSSProperties>(() => {
     return horizontal
@@ -153,7 +212,8 @@ const ScrollBar: ForwardRefRenderFunction<ScrollBarExpose, ScrollBarProps & Prop
       : {
           right: '4px',
           top: '2px',
-          bottom: ' 2px',
+          bottom: '2px',
+          width: 'var(--scrollbar-width)',
         };
   }, []);
   let eventMaps =
@@ -164,9 +224,9 @@ const ScrollBar: ForwardRefRenderFunction<ScrollBarExpose, ScrollBarProps & Prop
             setScrollRailBarStyle();
           },
           onMouseLeave: () => {
-            if (isClick.current) return;
             show.current = false;
-            setScrollRailBarStyle();
+            if (isClick.current) return;
+            setTimeout(setScrollRailBarStyle, delayTime);
           },
         }
       : {};
@@ -177,8 +237,9 @@ const ScrollBar: ForwardRefRenderFunction<ScrollBarExpose, ScrollBarProps & Prop
         'scrollbar-horizontal': horizontal,
       })}
       {...eventMaps}
+      style={style}
     >
-      <div className="scrollbar-container" onScroll={handleScroll} style={style} ref={containerRef}>
+      <div className="scrollbar-container" onScroll={handleScroll} ref={containerRef}>
         <div className="scrollbar-content">{children}</div>
       </div>
       <div className="scrollbar-rail" ref={scrollbarRailRef} style={scrollbarRailStyle}>

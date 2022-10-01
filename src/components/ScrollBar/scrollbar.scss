@@ -24,8 +24,6 @@
   }
   .scrollbar-rail {
     position: absolute;
-
-    width: var(--scrollbar-width);
     user-select: none;
     pointer-events: none;
     .scrollbar-rail_bar {
@@ -34,8 +32,8 @@
       pointer-events: all;
       background-color: rgba(0, 0, 0, 0.25);
       transition: background-color,opacity 200ms var(--scrollbar-bezier);
-      width: var(--scrollbar-width);
       border-radius: 5px;
+      width: 100%;
       &:hover {
         background: var(--scrollbar-hover-color);
       }
@@ -49,7 +47,6 @@
     }
   }
   .scrollbar-rail {
-    width: 100%;
     height: var(--scrollbar-height);
     .scrollbar-rail_bar {
       height: 100%;

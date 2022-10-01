@@ -2,68 +2,121 @@
 
 ```tsx
 import React from 'react';
-import {ScrollBar} from 'leaf-ui';
+import { ScrollBar } from 'leaf-ui';
 export default () => {
-    return  <ScrollBar style={{maxHeight:"120px"}}>
-      我们在田野上面找猪<br/>
-      想象中已找到了三只<br/>
-      小鸟在白云上面追逐<br/>
-      它们在树底下跳舞<br/>
-      啦啦啦啦啦啦啦啦咧<br/>
-      啦啦啦啦咧<br/>
-      我们在想象中度过了许多年<br/>
-      想象中我们是如此的疯狂<br/>
-      我们在城市里面找猪<br/>
-      想象中已找到了几百万只<br/>
-      小鸟在公园里面唱歌<br/>
-      它们独自在想象里跳舞  <br/>
-      啦啦啦啦啦啦啦啦咧  <br/>
-      啦啦啦啦咧  <br/>
-      我们在想象中度过了许多年  <br/>
-      许多年之后我们又开始想象 <br/>
+  return (
+    <ScrollBar style={{ maxHeight: '120px' }}>
+      众芳摇落独暄妍，占尽风情向小园。
+      <br />
+      疏影横斜水清浅，暗香浮动月黄昏。
+      <br />
+      霜禽欲下先偷眼，粉蝶如知合断魂。
+      <br />
+      幸有微吟可相狎，不须檀板共金樽。
+      <br />
+      剪绡零碎点酥乾，向背稀稠画亦难。
+      <br />
+      日薄从甘春至晚，霜深应怯夜来寒。
+      <br />
+      澄鲜只共邻僧惜，冷落犹嫌俗客看。
+      <br />
+      忆着江南旧行路，酒旗斜拂堕吟鞍。
+      <br />
     </ScrollBar>
-}
+  );
+};
 ```
+
 ### 水平滚动
+
 ```tsx
 import React from 'react';
-import {ScrollBar} from 'leaf-ui';
+import { ScrollBar } from 'leaf-ui';
 export default () => {
-  return  <ScrollBar  horizontal >
-  <div style={{whiteSpace:'nowrap',padding:'10px'}}>
-    我们在田野上面找猪 想象中已找到了三只 小鸟在白云上面追逐 它们在树底下跳舞
-    啦啦啦啦啦啦啦啦咧 啦啦啦啦咧 我们在想象中度过了许多年
-    想象中我们是如此的疯狂 我们在城市里面找猪 想象中已找到了几百万只
-    小鸟在公园里面唱歌 它们独自在想象里跳舞 啦啦啦啦啦啦啦啦咧 啦啦啦啦咧
-    我们在想象中度过了许多年 许多年之后我们又开始想象 啦啦啦啦啦啦啦啦咧
-  </div>
-  </ScrollBar>
-}
-```
-### 触发方式
-`trigger="none"` 会让滚动条一直显示，`trigger="hover"` 会让滚动条在鼠标悬浮的时候显示。
-```tsx
-import React from 'react';
-import {ScrollBar} from 'leaf-ui';
-export default () => {
-    return  <ScrollBar style={{maxHeight:"120px"}} trigger="none">
-      我们在田野上面找猪<br/>
-      想象中已找到了三只<br/>
-      小鸟在白云上面追逐<br/>
-      它们在树底下跳舞<br/>
-      啦啦啦啦啦啦啦啦咧<br/>
-      啦啦啦啦咧<br/>
-      我们在想象中度过了许多年<br/>
-      想象中我们是如此的疯狂<br/>
-      我们在城市里面找猪<br/>
-      想象中已找到了几百万只<br/>
-      小鸟在公园里面唱歌<br/>
-      它们独自在想象里跳舞  <br/>
-      啦啦啦啦啦啦啦啦咧  <br/>
-      啦啦啦啦咧  <br/>
-      我们在想象中度过了许多年  <br/>
-      许多年之后我们又开始想象 <br/>
+  return (
+    <ScrollBar horizontal>
+      <div style={{ whiteSpace: 'nowrap', padding: '10px' }}>
+        要坚持稳中求进工作总基调，完整、准确、全面贯彻新发展理念，加快构建新发展格局，着力推动高质量发展，全面落实疫情要防住、经济要稳住、发展要安全的要求，巩固经济回升向好趋势，着力稳就业稳物价，保持经济运行在合理区间，力争实现最好结果。
+      </div>
     </ScrollBar>
-}
+  );
+};
 ```
+
+### 触发方式
+
+`trigger="none"` 会让滚动条一直显示，`trigger="hover"` 会让滚动条在鼠标悬浮的时候显示。
+
+```tsx
+import React, { useRef } from 'react';
+import { ScrollBar, Button } from 'leaf-ui';
+
+export default () => {
+  const scrollBarRef = useRef();
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+      <ScrollBar
+        ref={scrollBarRef}
+        style={{ maxHeight: '120px', maxWidth: '300px' }}
+        trigger="none"
+      >
+        众芳摇落独暄妍，占尽风情向小园。
+        <br />
+        疏影横斜水清浅，暗香浮动月黄昏。
+        <br />
+        霜禽欲下先偷眼，粉蝶如知合断魂。
+        <br />
+        幸有微吟可相狎，不须檀板共金樽。
+        <br />
+        剪绡零碎点酥乾，向背稀稠画亦难。
+        <br />
+        日薄从甘春至晚，霜深应怯夜来寒。
+        <br />
+        澄鲜只共邻僧惜，冷落犹嫌俗客看。
+        <br />
+        忆着江南旧行路，酒旗斜拂堕吟鞍。
+        <br />
+      </ScrollBar>
+      <ScrollBar
+        style={{ maxHeight: '120px', maxWidth: '300px', marginLeft: '30px' }}
+        trigger="scroll"
+      >
+        众芳摇落独暄妍，占尽风情向小园。
+        <br />
+        疏影横斜水清浅，暗香浮动月黄昏。
+        <br />
+        霜禽欲下先偷眼，粉蝶如知合断魂。
+        <br />
+        幸有微吟可相狎，不须檀板共金樽。
+        <br />
+        剪绡零碎点酥乾，向背稀稠画亦难。
+        <br />
+        日薄从甘春至晚，霜深应怯夜来寒。
+        <br />
+        澄鲜只共邻僧惜，冷落犹嫌俗客看。
+        <br />
+        忆着江南旧行路，酒旗斜拂堕吟鞍。
+        <br />
+      </ScrollBar>
+      <Button
+        style={{ height: '40px' }}
+        onClick={() => {
+          scrollBarRef.current.scrollTo({ top: 100, behavior: 'smooth' }, true).then(() => {
+            console.log('success');
+          });
+        }}
+      >
+        change Scroll
+      </Button>
+    </div>
+  );
+};
+```
+
 <API src="ScrollBar.tsx">
+
+### Method
+
+| 名称       | 描述          | 类型                                                                                                                            |
+|----------|-------------|-------------------------------------------------------------------------------------------------------------------------------|
+| scrollTo | 移动容器滚动到指定位置 | `(options: { left?: number; top?: number; behavior?: ScrollBehavior }, listener?: boolean,) => null  &#124; Promise<unknown>` |

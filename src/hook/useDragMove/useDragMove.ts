@@ -2,14 +2,19 @@ import { DependencyList, MutableRefObject, RefObject, useEffect, useRef } from '
 import { isMobile } from '../../utils/core/isMobile';
 import { getEventClientPosition } from '../../utils/core/getEventClientPosition';
 import { sleep } from '../../utils/core/sleep';
+import { cloneDeep } from 'lodash';
 
 let _isMobile = isMobile();
 export function useDragMove(options: DragMoveOptions) {
   let timerId: any;
-  let isClick = useRef(false);
-  let moveIng = useRef(false);
-  let touchPosition = useRef({ x: 0, y: 0 });
-  let moveDiff = useRef({ x: 0, y: 0 });
+  const isClick = useRef(false);
+  const moveIng = useRef(false);
+  // 记录移动时的坐标
+  const touchPosition = useRef({ x: 0, y: 0 });
+  // 鼠标或手指移动的距离
+  const moveDiff = useRef({ x: 0, y: 0 });
+  // 记录最终移动元素的距离
+  const moveDiffResult = useRef({ x: 0, y: 0 });
   const {
     target,
     reset = true,
@@ -45,43 +50,49 @@ export function useDragMove(options: DragMoveOptions) {
     onStart?.(e);
     maxMoveDiffResult = getMaxMoveDiff();
   };
+  const validateMoveBorder = () => {
+    let checkBorder = false;
+    if (
+      (moveDirection === 'left' && moveDiff.current.x > 0) ||
+      (moveDirection === 'right' && moveDiff.current.x < 0)
+    ) {
+      moveDiffResult.current.x = 0;
+      checkBorder = true;
+    }
+    if (
+      (moveDirection === 'top' && moveDiff.current.y > 0) ||
+      (moveDirection === 'bottom' && moveDiff.current.y < 0)
+    ) {
+      moveDiffResult.current.y = 0;
+      checkBorder = true;
+    }
+    let absMoveX = Math.abs(moveDiff.current.x);
+    let absMoveY = Math.abs(moveDiff.current.y);
+    if (maxMoveDiffResult && absMoveX > maxMoveDiffResult) {
+      moveDiffResult.current.x = moveDiff.current.x > 0 ? maxMoveDiffResult : -maxMoveDiffResult;
+      checkBorder = true;
+    }
+    if (maxMoveDiffResult && absMoveY > maxMoveDiffResult) {
+      moveDiffResult.current.y = moveDiff.current.y > 0 ? maxMoveDiffResult : -maxMoveDiffResult;
+      checkBorder = true;
+    }
+    if (!checkBorder) {
+      moveDiffResult.current.x = moveDiff.current.x;
+      moveDiffResult.current.y = moveDiff.current.y;
+    }
+  };
   const handleMouseMoveOrTouchMove = (e: MouseEvent | TouchEvent) => {
     e.stopPropagation();
     e.preventDefault();
     if (!isClick.current) return;
     let { x, y } = getEventClientPosition(e);
     let { x: moveX, y: moveY } = moveDiff.current;
-
-    if (
-      maxMoveDiffResult &&
-      moveDirection === 'around' &&
-      (Math.abs(moveX) >= maxMoveDiffResult || Math.abs(moveY) >= maxMoveDiffResult)
-    )
-      return;
+    // 是否达到拖拽边界
     moveDiff.current.x += x - touchPosition.current.x;
     moveDiff.current.y += y - touchPosition.current.y;
-    if (
-      (moveDirection === 'left' && moveDiff.current.x > 0) ||
-      (moveDirection === 'right' && moveDiff.current.x < 0)
-    ) {
-      moveDiff.current.x = 0;
-    }
-    if (
-      (moveDirection === 'top' && moveDiff.current.y > 0) ||
-      (moveDirection === 'bottom' && moveDiff.current.y < 0)
-    ) {
-      moveDiff.current.y = 0;
-    }
-    let absMoveX = Math.abs(moveDiff.current.x);
-    let absMoveY = Math.abs(moveDiff.current.y);
-    if (maxMoveDiffResult && absMoveX > maxMoveDiffResult) {
-      moveDiff.current.x = moveDiff.current.x > 0 ? maxMoveDiffResult : -maxMoveDiffResult;
-    }
-    if (maxMoveDiffResult && absMoveY > maxMoveDiffResult) {
-      moveDiff.current.y = moveDiff.current.y > 0 ? maxMoveDiffResult : -maxMoveDiffResult;
-    }
+    validateMoveBorder();
     moveEle();
-    onMove?.({ x: moveDiff.current.x, y: moveDiff.current.y }, e);
+    onMove?.({ x: moveDiffResult.current.x, y: moveDiffResult.current.y }, e);
     checkThreshold();
     touchPosition.current = { x, y }; //更新上一次鼠标移动后的x和y坐标
     moveIng.current = true;
@@ -127,7 +138,7 @@ export function useDragMove(options: DragMoveOptions) {
   };
   const moveEle = () => {
     let ele = target.current as HTMLElement;
-    let { x: diffX, y: diffY } = moveDiff.current;
+    let { x: diffX, y: diffY } = moveDiffResult.current;
     let moveX = originTranslate.x + diffX;
     let moveY = originTranslate.y + diffY;
     if (!ele) return;
