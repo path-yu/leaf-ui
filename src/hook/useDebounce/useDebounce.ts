@@ -22,5 +22,4 @@ const useDebounce: DebounceFunc = (fn, wait = 300) => {
     fnRef,
   };
 };
-
 export default useDebounce;

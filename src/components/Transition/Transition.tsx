@@ -2,7 +2,6 @@ import React, { FC, ReactNode } from 'react';
 import { CSSTransition } from 'react-transition-group';
 import { CSSTransitionProps } from 'react-transition-group/CSSTransition';
 type AnimationName = 'zoom-in-top' | 'zoom-in-left' | 'zoom-in-bottom' | 'zoom-in-right';
-
 export type TransitionProps = CSSTransitionProps & {
   animation?: AnimationName;
   wrapper?: boolean;

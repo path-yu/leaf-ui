@@ -36,3 +36,4 @@ export { default as Slider } from './components/Slider/Slider';
 export { default as Tooltip } from './components/Tooltip/Tooltip';
 export { default as ScrollBar } from './components/ScrollBar/ScrollBar';
 export * from './components/ScrollBar/ScrollBar';
+export * from './components/BaseTransition/BaseTransition';

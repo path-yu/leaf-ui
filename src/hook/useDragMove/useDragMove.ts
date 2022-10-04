@@ -2,7 +2,6 @@ import { DependencyList, MutableRefObject, RefObject, useEffect, useRef } from '
 import { isMobile } from '../../utils/core/isMobile';
 import { getEventClientPosition } from '../../utils/core/getEventClientPosition';
 import { sleep } from '../../utils/core/sleep';
-import { cloneDeep } from 'lodash';
 
 let _isMobile = isMobile();
 export function useDragMove(options: DragMoveOptions) {
