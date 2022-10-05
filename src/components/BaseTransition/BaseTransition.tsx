@@ -4,11 +4,12 @@ import { isObject } from 'lodash';
 import { BaseTransitionProps } from './ReactTransitionPropsType';
 import { CommonTransitionProps, easingType, timeoutType } from './Api/CommonTransitionProps';
 
-type transitionStatusStyle = {
+export type transitionStatusStyle = {
   [key in TransitionStatus]?: CSSProperties;
 };
 type newBaseTransitionProps = CommonTransitionProps & BaseTransitionProps<HTMLElement>;
 const defaultDuration = 300;
+const defaultEasing = 'cubic-bezier(0.4, 0, 0.2, 1)';
 const setTransitionStyle = (
   style: transitionStatusStyle,
   timeout: timeoutType,
@@ -30,17 +31,14 @@ const getDefaultStyle = (timeout: timeoutType, easing: easingType) => {
   };
 };
 const Fade: FC<PropsWithChildren & newBaseTransitionProps> = (props) => {
-  let { timeout, children, easing, appear = true } = props;
-  const wrapTargetRef = useRef<HTMLDivElement>(null);
-  if (!easing) {
-    easing = 'cubic-bezier(0.4, 0, 0.2, 1)';
-  }
+  let { timeout, children, easing = defaultEasing, appear = true } = props;
+
   const transitionStyle = useMemo(() => {
     let defaultTransitionStyle: transitionStatusStyle = {
-      entering: { opacity: 1 },
-      entered: { opacity: 1 },
-      exiting: { opacity: 0 },
-      exited: { opacity: 0 },
+      entering: { opacity: 1, visibility: 'visible' },
+      entered: { opacity: 1, visibility: 'visible' },
+      exiting: { opacity: 0, visibility: 'hidden' },
+      exited: { opacity: 0, visibility: 'hidden' },
     };
     setTransitionStyle(defaultTransitionStyle, timeout, easing);
     return defaultTransitionStyle;
@@ -55,55 +53,62 @@ const Fade: FC<PropsWithChildren & newBaseTransitionProps> = (props) => {
     [timeout, appear, easing],
   );
   return (
-    <BaseWrapTransition
-      refTarget={wrapTargetRef}
-      {...props}
-      defaultStyle={defaultStyle}
-      transitionStyle={transitionStyle}
-    >
+    <BaseWrapTransition {...props} defaultStyle={defaultStyle} transitionStyle={transitionStyle}>
       {children}
     </BaseWrapTransition>
   );
 };
 export interface CollapseProps extends BaseTransitionProps<HTMLElement> {
   /**
-   * @description 未扩展时的最小高度值。
+   * @description 未扩展时的最小值。
    * @default 0
    */
-  collapsedHeight?: number;
+  collapsedSize?: number;
   /**
    * @description 开启水平方向折叠
    * @default false
    */
-  orientation?: boolean;
+  horizontal?: boolean;
 }
 const CollapseTransition: FC<newBaseTransitionProps & PropsWithChildren & CollapseProps> = (
   props,
 ) => {
-  let { timeout, children, easing, appear = true, collapsedHeight = 0, orientation } = props;
+  let { timeout, children, easing, appear = true, collapsedSize = 0, horizontal } = props;
   if (!easing) {
     easing = 'cubic-bezier(0.4, 0, 0.2, 1)';
   }
-  const defaultSize = `${collapsedHeight}px`;
+  const defaultSizeStyle = `${collapsedSize}px`;
   const wrapTargetRef = useRef<HTMLDivElement>(null);
+  let timeId: any;
   const transitionStyle = useMemo(() => {
     let defaultTransitionStyle: transitionStatusStyle = {
       entering: {},
-      exiting: {},
+      entered: {},
     };
     setTransitionStyle(defaultTransitionStyle, timeout, easing);
     return defaultTransitionStyle;
   }, [timeout, easing]);
-  const defaultStyle = useMemo<CSSProperties>(
-    () => ({
-      height: defaultSize,
-      transitionProperty: 'height',
+  const defaultStyle = useMemo<CSSProperties>(() => {
+    let style: CSSProperties = {
       transitionDuration: isObject(timeout) ? `${timeout.appear}ms` : `${defaultDuration}ms`,
       transitionTimingFunction: isObject(easing) ? `${easing.enter}` : `${easing}`,
       overflow: 'hidden',
-    }),
-    [timeout, appear, easing],
-  );
+    };
+    if (horizontal) {
+      style.width = defaultSizeStyle;
+      style.transitionProperty = 'width';
+    } else {
+      style.height = defaultSizeStyle;
+      style.transitionProperty = 'height';
+    }
+    return style;
+  }, [timeout, appear, easing]);
+  const handleEnterSetStyle = () => {
+    let { scrollWidth, scrollHeight } = wrapTargetRef.current!;
+    wrapTargetRef.current!.style[horizontal ? 'width' : 'height'] = `${
+      horizontal ? scrollWidth : scrollHeight
+    }px`;
+  };
   return (
     <BaseWrapTransition
       refTarget={wrapTargetRef}
@@ -111,19 +116,19 @@ const CollapseTransition: FC<newBaseTransitionProps & PropsWithChildren & Collap
       defaultStyle={defaultStyle}
       transitionStyle={transitionStyle}
       onEnter={(isAppear) => {
-        if (orientation) {
-          wrapTargetRef.current!.style.width = wrapTargetRef.current!.scrollWidth + 'px';
-        } else {
-          wrapTargetRef.current!.style.height = wrapTargetRef.current!.scrollHeight + 'px';
-        }
+        handleEnterSetStyle();
         props.onEnter?.(isAppear);
       }}
+      onEntered={(isAppear) => {
+        wrapTargetRef.current!.style[horizontal ? 'width' : 'height'] = 'auto';
+        props.onEntered?.(isAppear);
+      }}
       onExit={() => {
-        if (orientation) {
-          wrapTargetRef.current!.style.width = defaultSize;
-        } else {
-          wrapTargetRef.current!.style.height = defaultSize;
-        }
+        handleEnterSetStyle();
+        clearTimeout(timeId);
+        timeId = setTimeout(() => {
+          wrapTargetRef.current!.style[horizontal ? 'width' : 'height'] = defaultSizeStyle;
+        });
         props.onExit?.();
       }}
     >
@@ -144,19 +149,14 @@ const BaseWrapTransition: FC<
     value = false,
     children,
     appear = true,
-    onEnter,
-    onEntering,
-    onEntered,
-    onExiting,
-    onExited,
-    onExit,
     unmountOnExit = false,
     mountOnEnter = false,
-    addEndListener,
-    nodeRef,
+    wrap = true,
+    style = {},
     defaultStyle,
     transitionStyle,
     refTarget,
+    ...restProps
   } = props;
   if (!timeout) {
     timeout = defaultDuration;
@@ -168,25 +168,19 @@ const BaseWrapTransition: FC<
   }
   return (
     <Transition
+      {...restProps}
       in={value}
       timeout={timeout}
       unmountOnExit={unmountOnExit}
       appear={appear}
       mountOnEnter={mountOnEnter}
-      addEndListener={addEndListener}
-      onEnter={onEnter}
-      onEntering={onEntering}
-      onEntered={onEntered}
-      onExit={onExit}
-      onExiting={onExiting}
-      onExited={onExited}
-      nodeRef={nodeRef}
     >
       {(state) => (
         <div
           style={{
             ...defaultStyle,
             ...transitionStyle[state],
+            ...style,
           }}
           ref={refTarget}
         >
@@ -196,4 +190,31 @@ const BaseWrapTransition: FC<
     </Transition>
   );
 };
-export { Fade, CollapseTransition };
+const Zoom: FC<PropsWithChildren & newBaseTransitionProps> = (props) => {
+  let { timeout, children, easing = 'cubic-bezier(0.4, 0, 0.2, 1)', appear = true } = props;
+  const transitionStyle = useMemo(() => {
+    let defaultTransitionStyle: transitionStatusStyle = {
+      entering: { transform: 'scale(1)' },
+      entered: { transform: 'scale(1)' },
+      exiting: { transform: 'scale(0)' },
+      exited: { transform: 'scale(0)' },
+    };
+    setTransitionStyle(defaultTransitionStyle, timeout, easing);
+    return defaultTransitionStyle;
+  }, [timeout, easing]);
+
+  const defaultStyle = useMemo<CSSProperties>(
+    () => ({
+      transform: 'scale(0)',
+      transitionProperty: 'transform',
+      ...getDefaultStyle(timeout, easing),
+    }),
+    [timeout, appear, easing],
+  );
+  return (
+    <BaseWrapTransition {...props} defaultStyle={defaultStyle} transitionStyle={transitionStyle}>
+      {children}
+    </BaseWrapTransition>
+  );
+};
+export { Fade, CollapseTransition, Zoom, BaseWrapTransition };

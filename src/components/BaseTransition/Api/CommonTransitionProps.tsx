@@ -1,4 +1,4 @@
-import { EndHandler } from 'react-transition-group/Transition';
+import { CSSProperties } from 'react';
 
 export interface CommonTransitionProps {
   /**
@@ -20,6 +20,10 @@ export interface CommonTransitionProps {
    * @default true
    */
   appear?: boolean;
+  /**
+   * @description 容器额外style
+   */
+  style?: CSSProperties;
 }
 export type timeoutType = number | { appear?: number; enter?: number; exit?: number } | undefined;
 export type easingType = { enter?: string; exit?: string } | string | undefined;
