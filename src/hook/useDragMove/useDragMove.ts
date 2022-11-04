@@ -133,14 +133,18 @@ export function useDragMove(options: DragMoveOptions) {
   const resetRef = () => {
     moveDiff.current = { x: 0, y: 0 };
     touchPosition.current = { x: 0, y: 0 };
-    moveEle();
+    moveEle(true);
   };
-  const moveEle = () => {
+  const moveEle = (reset = false) => {
     let ele = target.current as HTMLElement;
     let { x: diffX, y: diffY } = moveDiffResult.current;
     let moveX = originTranslate.x + diffX;
     let moveY = originTranslate.y + diffY;
     if (!ele) return;
+    if (reset) {
+      moveX = 0;
+      moveY = 0;
+    }
     if (moveDirection === 'around') {
       ele.style.translate = `${moveX}px ${moveY}px`;
     } else if (isHorizontal) {
