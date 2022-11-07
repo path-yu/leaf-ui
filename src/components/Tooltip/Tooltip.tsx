@@ -133,7 +133,7 @@ const Tooltip: ForwardRefRenderFunction<TooltipExpose, TooltipProps & PropsWithC
         {children}
       </span>
     ) : (
-      cloneElement(children, {
+      cloneElement(children as React.ReactElement<any>, {
         onMouseEnter: handleMouseEnter,
         onMouseLeave: handleMouseLeave,
       })
