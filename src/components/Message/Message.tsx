@@ -4,6 +4,7 @@ import React, {
   Key,
   MutableRefObject,
   ReactNode,
+  useEffect,
   useImperativeHandle,
   useRef,
   useState,
@@ -18,6 +19,7 @@ import classNames from 'classnames';
 export interface ArgsProps extends CommonArgs {
   onClose?: () => void;
 }
+let mounted = false;
 interface CommonArgs {
   type: actionType;
   content: string;
@@ -42,32 +44,50 @@ export interface ThenableArgument {
 }
 type JointContent = ReactNode | ArgsProps;
 const message = {
-  info(content: JointContent, duration = 3, onClose?: voidFn) {
+  async info(content: JointContent, duration = 3, onClose?: voidFn) {
+    if (!mounted) {
+      await handleMount();
+    }
     return MessageProviderRef!.current!.addMessage(
       getMessageConfig(content, duration, 'info', onClose),
     );
   },
-  warning(content: JointContent, duration = 3, onClose?: voidFn) {
+  async warning(content: JointContent, duration = 3, onClose?: voidFn) {
+    if (!mounted) {
+      await handleMount();
+    }
     return MessageProviderRef!.current!.addMessage(
       getMessageConfig(content, duration, 'warning', onClose),
     );
   },
-  success(content: JointContent, duration = 3, onClose?: voidFn) {
+  async success(content: JointContent, duration = 3, onClose?: voidFn) {
+    if (!mounted) {
+      await handleMount();
+    }
     return MessageProviderRef!.current!.addMessage(
       getMessageConfig(content, duration, 'success', onClose),
     );
   },
-  loading(content: JointContent, duration = 3, onClose?: voidFn) {
+  async loading(content: JointContent, duration = 3, onClose?: voidFn) {
+    if (!mounted) {
+      await handleMount();
+    }
     return MessageProviderRef!.current!.addMessage(
       getMessageConfig(content, duration, 'loading', onClose),
     );
   },
-  error(content: JointContent, duration = 3000, onClose?: voidFn) {
+  async error(content: JointContent, duration = 3000, onClose?: voidFn) {
+    if (!mounted) {
+      await handleMount();
+    }
     return MessageProviderRef!.current!.addMessage(
       getMessageConfig(content, duration, 'error', onClose),
     );
   },
-  open(config: ArgsProps) {
+  async open(config: ArgsProps) {
+    if (!mounted) {
+      await handleMount();
+    }
     setDefaultDuration(config);
     return MessageProviderRef!.current!.addMessage(config);
   },
@@ -103,6 +123,9 @@ const setDefaultDuration = (config: ArgsProps) => {
 };
 let MessageProviderRef: MutableRefObject<MessageProviderExpose | null> | null = null;
 const MessageApp = () => {
+  useEffect(() => {
+    mounted = true;
+  }, []);
   MessageProviderRef = useRef<MessageProviderExpose>(null);
   return <MessageProvider ref={MessageProviderRef} />;
 };
@@ -216,13 +239,22 @@ const MessageProvider = forwardRef<MessageProviderExpose, MessageProvideProps>((
     </div>
   );
 });
-(() => {
-  window.onload = () => {
+
+const handleMount = () => {
+  return new Promise((resolve, reject) => {
     let container = document.createElement('div');
     document.body.appendChild(container);
     setTimeout(() => {
-      createRoot(container).render(<MessageApp />);
+      createRoot(container, {}).render(<MessageApp />);
     });
-  };
-})();
+    let timerId = setInterval(() => {
+      if (MessageProviderRef!.current) {
+        clearInterval(timerId);
+        resolve(true);
+      }
+    }, 30);
+  });
+};
+window.addEventListener('DOMContentLoaded', handleMount);
+
 export default message;

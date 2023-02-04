@@ -48,9 +48,6 @@ const ImagePreview: ForwardRefRenderFunction<ImagePreviewExpose, ImagePreviewPro
   const [isMount, setIsMount] = useState(false);
   useDragMove({
     target: imageRef,
-    reset: true,
-    deps: [previewShow],
-    asyncDelay: 300,
   });
   let scaleMap: { [key: string]: { increment: number | null; reduce: number | null } } = {
     1: {

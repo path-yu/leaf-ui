@@ -279,6 +279,7 @@ const AnimateList: ForwardRefRenderFunction<AnimateListExpose, AnimateListProps>
     }
   };
   const handleDragEnter = (event: DragEvent, i: number) => {
+    event.preventDefault();
     if (!filterOriginDrop(i) && !enterSwapLock.current) {
       dragSwapEventType === 'enter' && triggerSwap(i);
       dragEnter?.(event);

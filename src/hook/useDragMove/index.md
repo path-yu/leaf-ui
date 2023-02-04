@@ -10,11 +10,7 @@ export default () => {
   const ref = useRef<HTMLDivElement>(null);
   useDragMove({
     target: ref,
-    moveDirection: 'right',
-    reset:false,
-    onMove(diff) {
-      console.log(diff.x);
-    },
+    reset: true,
   });
   return (
     <div
@@ -85,7 +81,7 @@ export interface DragMoveOptions {
    * @description 是否自动绑定DOM事件
    * @default true;
    */
-  autoBindEvent?:boolean
+  autoBindEvent?: boolean;
 }
 ```
 
@@ -106,5 +102,4 @@ export interface DragMoveResult {
   /** 是否在目标元素点击 */
   isClick?: MutableRefObject<boolean>;
 }
-
 ```
