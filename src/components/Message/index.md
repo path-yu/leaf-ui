@@ -6,7 +6,7 @@
 
 ```tsx
 import React from 'react';
-import { message, Button } from 'leaf-ui';
+import { message, Button } from 'leaf-react-ui';
 
 export default () => {
   return (
@@ -22,11 +22,12 @@ export default () => {
   );
 };
 ```
+
 ### 不同提示类型
 
 ```tsx
 import React from 'react';
-import { message, Button, Space } from 'leaf-ui';
+import { message, Button, Space } from 'leaf-react-ui';
 
 export default () => {
   return (
@@ -63,7 +64,7 @@ export default () => {
 
 ```tsx
 import React from 'react';
-import { message, Button, Space } from 'leaf-ui';
+import { message, Button, Space } from 'leaf-react-ui';
 
 export default () => {
   return (
@@ -77,11 +78,14 @@ export default () => {
   );
 };
 ```
+
 ### 更新消息内容
+
 可以通过唯一的`key`来更新内容。
+
 ```tsx
 import React from 'react';
-import { message, Button } from 'leaf-ui';
+import { message, Button } from 'leaf-react-ui';
 const key = 'updatable';
 export default () => {
   return (
@@ -98,13 +102,14 @@ export default () => {
   );
 };
 ```
+
 ### 加载中
 
 开启全局 loading，可自行异步关闭
 
 ```tsx
 import React from 'react';
-import { message, Button, Space } from 'leaf-ui';
+import { message, Button, Space } from 'leaf-react-ui';
 
 export default () => {
   return (
@@ -126,7 +131,7 @@ export default () => {
 
 ```tsx
 import React from 'react';
-import { message, Button, Space } from 'leaf-ui';
+import { message, Button, Space } from 'leaf-react-ui';
 
 export default () => {
   return (
@@ -143,11 +148,14 @@ export default () => {
   );
 };
 ```
+
 ### 自定义样式
-通过style和className来自定义样式
+
+通过 style 和 className 来自定义样式
+
 ```tsx
 import React from 'react';
-import { message, Button, Space } from 'leaf-ui';
+import { message, Button, Space } from 'leaf-react-ui';
 
 export default () => {
   return (
@@ -159,7 +167,7 @@ export default () => {
           style: {
             marginTop: '20vh',
           },
-          type:"error"
+          type: 'error',
         });
       }}
     >
@@ -168,53 +176,56 @@ export default () => {
   );
 };
 ```
+
 ### API
+
 组件提供了一些静态方法，使用方式和参数如下：
-* `message.success(content, [duration], onClose)`
 
-* `message.error(content, [duration], onClose)`
+- `message.success(content, [duration], onClose)`
 
-* `message.info(content, [duration], onClose)`
+- `message.error(content, [duration], onClose)`
 
-* `message.warning(content, [duration], onClose)`
+- `message.info(content, [duration], onClose)`
 
-* `message.warn(content, [duration], onClose)`
+- `message.warning(content, [duration], onClose)`
 
-* ` message.loading(content, [duration], onClose)`
+- `message.warn(content, [duration], onClose)`
 
-| 参数      | 说明   | 类型          | 默认值 |
-|---------|------|-------------|:---:|
-| content | 提升内容 | `ReactNode` |  -  |
-| duration    | 	自动关闭的延时，单位秒。设为 0 时不自动关闭     | `number`    |  3  |
-| onClose     |   	关闭时触发的回调函数   |      `function`       |  -  |
+- ` message.loading(content, [duration], onClose)`
+
+| 参数     | 说明                                        | 类型        | 默认值 |
+| -------- | ------------------------------------------- | ----------- | :----: |
+| content  | 提升内容                                    | `ReactNode` |   -    |
+| duration | 自动关闭的延时，单位秒。设为 0 时不自动关闭 | `number`    |   3    |
+| onClose  | 关闭时触发的回调函数                        | `function`  |   -    |
 
 组件同时提供 promise 接口。
 
-* `message[level](content, [duration]).then(afterClose)`
+- `message[level](content, [duration]).then(afterClose)`
 
-* `message[level](content, [duration], onClose).then(afterClose)`
+- `message[level](content, [duration], onClose).then(afterClose)`
 
 其中 `message[level]` 是组件已经提供的静态方法。then 接口返回值是 Promise。
 
 也可以对象的形式传递参数：
 
-* `message.open(config)`
-* `message.success(config)`
-* `message.error(config)`
-* `message.info(config)`
-* `message.warning(config)`
-* `message.warn(config)`
-* `message.loading(config)`
+- `message.open(config)`
+- `message.success(config)`
+- `message.error(config)`
+- `message.info(config)`
+- `message.warning(config)`
+- `message.warn(config)`
+- `message.loading(config)`
 
 `config` 对象属性如下：
 
-| 参数        | 说明                       | 类型               | 默认值     |
-|-----------|--------------------------|------------------|---------|
-| className | 自定义 CSS class            | `string`         | -       |
-| content   | 提示内容                     | `ReactNode`      |         |
-| duration  | 	自动关闭的延时，单位秒。设为 0 时不自动关闭 | `number`         | 3       |
-| icon      | 	自定义图标                   | `ReactNode`      | -       |
-| style     | 自定义内联样式                  | `	CSSProperties` | -       |
-| onClick   | 点击 message 时触发的回调函数      | 	`function`      | -       |
-| onClose   | 关闭时触发的回调函数               | `function`       | -       |
-| key       | 当前提示唯一标识                 | `string &#124; number` |    `-` |
+| 参数      | 说明                                        | 类型                   | 默认值 |
+| --------- | ------------------------------------------- | ---------------------- | ------ |
+| className | 自定义 CSS class                            | `string`               | -      |
+| content   | 提示内容                                    | `ReactNode`            |        |
+| duration  | 自动关闭的延时，单位秒。设为 0 时不自动关闭 | `number`               | 3      |
+| icon      | 自定义图标                                  | `ReactNode`            | -      |
+| style     | 自定义内联样式                              | ` CSSProperties`       | -      |
+| onClick   | 点击 message 时触发的回调函数               | `function`             | -      |
+| onClose   | 关闭时触发的回调函数                        | `function`             | -      |
+| key       | 当前提示唯一标识                            | `string &#124; number` | `-`    |

@@ -1,12 +1,14 @@
 ## InfiniteScroll 无限滚动
+
 滚动到底部时，加载更多数据。
 
 ### 基础演示
-通过给指定需要滚动加载的列表包裹 `InfiniteScroll`，并指定对应的加载方法即可，在load方法中
-调用传入副作用函数更新加载状态即可。
+
+通过给指定需要滚动加载的列表包裹 `InfiniteScroll`，并指定对应的加载方法即可，在 load 方法中调用传入副作用函数更新加载状态即可。
+
 ```tsx
 import React, { useEffect, useState } from 'react';
-import { InfiniteScroll } from 'leaf-ui';
+import { InfiniteScroll } from 'leaf-react-ui';
 
 export default () => {
   let [list, setList] = useState([]);
@@ -32,4 +34,5 @@ export default () => {
   );
 };
 ```
+
 <API src="InfiniteScroll.tsx">

@@ -3,7 +3,7 @@
 ### 基本演示
 
 ```tsx
-import { Carousel } from 'leaf-ui';
+import { Carousel } from 'leaf-react-ui';
 import React from 'react';
 
 export default () => {
@@ -39,7 +39,7 @@ export default () => {
 设置`autoplay`即可自动播放
 
 ```tsx
-import { Carousel } from 'leaf-ui';
+import { Carousel } from 'leaf-react-ui';
 import React from 'react';
 
 export default () => {
@@ -75,7 +75,7 @@ export default () => {
 通过`dotType`来设置指示点类型，通过`showDots={false}`来隐藏指示点，通过`dotPosition`设置指示点位置
 
 ```tsx
-import { Carousel } from 'leaf-ui';
+import { Carousel } from 'leaf-react-ui';
 import React from 'react';
 
 export default () => {
@@ -111,7 +111,7 @@ export default () => {
 将`direction`指定为`vertical`即可
 
 ```tsx
-import { Carousel } from 'leaf-ui';
+import { Carousel } from 'leaf-react-ui';
 import React from 'react';
 
 export default () => {
@@ -147,7 +147,7 @@ export default () => {
 切换效果为渐显。
 
 ```tsx
-import { Carousel } from 'leaf-ui';
+import { Carousel } from 'leaf-react-ui';
 import React from 'react';
 
 export default () => {
@@ -183,7 +183,7 @@ export default () => {
 设定`trigger`为`hover`鼠标经过指示点时触发切换。
 
 ```tsx
-import { Carousel } from 'leaf-ui';
+import { Carousel } from 'leaf-react-ui';
 import React from 'react';
 
 export default () => {
@@ -219,7 +219,7 @@ export default () => {
 设定`defaultIndex`对应页数即可
 
 ```tsx
-import { Carousel } from 'leaf-ui';
+import { Carousel } from 'leaf-react-ui';
 import React from 'react';
 
 export default () => {
@@ -255,7 +255,7 @@ export default () => {
 开启循环播放，会在前后各复制一个 slide ，让轮播图看上去切换上循环的，类似无缝轮播，默认开启，通过`loop={false}`来关闭。
 
 ```tsx
-import { Carousel } from 'leaf-ui';
+import { Carousel } from 'leaf-react-ui';
 import React from 'react';
 
 export default () => {
@@ -291,7 +291,7 @@ export default () => {
 通过 `draggable={true}`来开启拖拽切换轮播图，同时支持 pc 端移动端
 
 ```tsx
-import { Carousel, Button, CarouselExpose } from 'leaf-ui';
+import { Carousel, Button, CarouselExpose } from 'leaf-react-ui';
 import React, { useRef } from 'react';
 export default () => {
   const contentStyle: React.CSSProperties = {

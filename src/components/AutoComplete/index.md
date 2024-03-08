@@ -6,7 +6,7 @@
 
 ```tsx
 import React from 'react';
-import { AutoComplete } from 'leaf-ui';
+import { AutoComplete } from 'leaf-react-ui';
 const lakers = [
   'bradley',
   'pope',
@@ -39,7 +39,7 @@ export default () => (
 
 ```tsx
 import React from 'react';
-import { AutoComplete } from 'leaf-ui';
+import { AutoComplete } from 'leaf-react-ui';
 const lakersWithNumber = [
   { value: 'bradley', number: 11 },
   { value: 'pope', number: 1 },
@@ -80,7 +80,7 @@ export default () => (
 
 ```tsx
 import React from 'react';
-import { AutoComplete } from 'leaf-ui';
+import { AutoComplete } from 'leaf-react-ui';
 const handleFetch = (query: string) => {
   return fetch(`https://api.github.com/search/users?q=${query}`)
     .then((res) => res.json())

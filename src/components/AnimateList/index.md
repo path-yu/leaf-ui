@@ -6,7 +6,7 @@
 
 ```tsx
 import React, { useRef, useState } from 'react';
-import { AnimateList, Button, Space, Icon } from 'leaf-ui';
+import { AnimateList, Button, Space, Icon } from 'leaf-react-ui';
 
 export default () => {
   let [list, setList] = useState(['react', 'vue', 'angular']);
@@ -57,7 +57,7 @@ export default () => {
 
 ```tsx
 import React, { useState } from 'react';
-import { AnimateList, Button, Space } from 'leaf-ui';
+import { AnimateList, Button, Space } from 'leaf-react-ui';
 
 export default () => {
   let [list, setList] = useState(['react', 'vue', 'angular']);
@@ -108,7 +108,7 @@ export default () => {
 
 ```tsx
 import React, { useState, useRef } from 'react';
-import { AnimateList, Button, Space } from 'leaf-ui';
+import { AnimateList, Button, Space } from 'leaf-react-ui';
 
 export default () => {
   let [list, setList] = useState(['react', 'vue', 'angular']);
@@ -183,7 +183,7 @@ export default () => {
 
 ```tsx
 import React, { useRef, useState } from 'react';
-import { AnimateList, Button, Space, Icon } from 'leaf-ui';
+import { AnimateList, Button, Space, Icon } from 'leaf-react-ui';
 
 export default () => {
   let [list, setList] = useState(['react', 'vue', 'angular']);
@@ -212,7 +212,10 @@ export default () => {
               onClick={(event) => {
                 let target = event.target as HTMLElement;
                 // 过滤拖拽元素点击
-                if (target.classList.contains('triggerDrag') || target.classList.contains('fa-list')) {
+                if (
+                  target.classList.contains('triggerDrag') ||
+                  target.classList.contains('fa-list')
+                ) {
                   return;
                 }
                 setList((prev) => prev.filter((v) => v !== item));

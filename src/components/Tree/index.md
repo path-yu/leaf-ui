@@ -1,10 +1,12 @@
 ### Tree-树形控件
- 用于展示树状结构数据，并具有展开收起选择等交互功能。
+
+用于展示树状结构数据，并具有展开收起选择等交互功能。
+
 ### 基础演示
 
 ```tsx
 import React from 'react';
-import { Tree, DataNode } from 'leaf-ui';
+import { Tree, DataNode } from 'leaf-react-ui';
 export default () => {
   const treeData: DataNode[] = [
     {
@@ -77,7 +79,7 @@ export default () => {
 
 ```tsx
 import React from 'react';
-import { Tree } from 'leaf-ui';
+import { Tree } from 'leaf-react-ui';
 export default () => {
   const onCheck: TreeProps['onCheck'] = (checkedKeys, info) => {
     console.log('onCheck', checkedKeys);
@@ -159,7 +161,7 @@ export default () => {
 
 ```tsx
 import React from 'react';
-import { Tree, DataNode } from 'leaf-ui';
+import { Tree, DataNode } from 'leaf-react-ui';
 export default () => {
   const onCheck: TreeProps['onCheck'] = (checkedKeys, info) => {
     console.log('onCheck', checkedKeys);
@@ -238,7 +240,7 @@ export default () => {
 
 ```tsx
 import React from 'react';
-import { Tree, DataNode } from 'leaf-ui';
+import { Tree, DataNode } from 'leaf-react-ui';
 export default () => {
   const onCheck: TreeProps['onCheck'] = (checkedKeys, info) => {
     console.log('onCheck', checkedKeys);
@@ -316,7 +318,7 @@ export default () => {
 
 ```tsx
 import React, { useRef, useState } from 'react';
-import { Tree, DataNode, TreeExpose, Button } from 'leaf-ui';
+import { Tree, DataNode, TreeExpose, Button } from 'leaf-react-ui';
 
 export default () => {
   const onCheck: TreeProps['onCheck'] = (checkedKeys, info) => {
@@ -429,7 +431,7 @@ export default () => {
 
 ```tsx
 import React from 'react';
-import { Tree, DataNode } from 'leaf-ui';
+import { Tree, DataNode } from 'leaf-react-ui';
 export default () => {
   const treeData: DataNode[] = [
     {
@@ -504,10 +506,12 @@ export default () => {
 ```
 
 ### 初始化过滤树节点
+
 使用 `filterTreeListCallback`对初始化树数据做过滤
+
 ```tsx
 import React from 'react';
-import { Tree, DataNode } from 'leaf-ui';
+import { Tree, DataNode } from 'leaf-react-ui';
 export default () => {
   const treeData: DataNode[] = [
     {
@@ -581,5 +585,6 @@ export default () => {
 | selectable | 设置节点是否可被选中 | `boolean` | `true` |
 | title | 节点标题 | `ReactNode` | `--` |
 
-### Methods 
+### Methods
+
 <API hideTitle src="./TreeExpose.api.tsx">

@@ -6,7 +6,7 @@
 
 ```tsx
 import React from 'react';
-import { Button } from 'leaf-ui';
+import { Button } from 'leaf-react-ui';
 
 export default () => <Button>Test</Button>;
 ```
@@ -15,7 +15,7 @@ export default () => <Button>Test</Button>;
 
 ```tsx
 import React from 'react';
-import { Button,Space } from 'leaf-ui';
+import { Button, Space } from 'leaf-react-ui';
 
 export default () => (
   <Space align="center">
@@ -29,7 +29,7 @@ export default () => (
 
 ```tsx
 import React from 'react';
-import { Button, Space } from 'leaf-ui';
+import { Button, Space } from 'leaf-react-ui';
 
 export default () => (
   <Space>
@@ -47,7 +47,7 @@ export default () => (
 
 ```tsx
 import React from 'react';
-import { Button,Space } from 'leaf-ui';
+import { Button, Space } from 'leaf-react-ui';
 
 export default () => (
   <Space>

@@ -1,4 +1,4 @@
-# leaf-ui
+# leaf-react-ui
 
 ## Getting Started
 

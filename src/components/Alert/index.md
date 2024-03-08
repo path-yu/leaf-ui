@@ -6,7 +6,7 @@
 
 ```tsx
 import React from 'react';
-import { Alert } from 'leaf-ui';
+import { Alert } from 'leaf-react-ui';
 export default () => {
   return <Alert title="this is alert!"></Alert>;
 };
@@ -16,7 +16,7 @@ export default () => {
 
 ```tsx
 import React from 'react';
-import { Alert } from 'leaf-ui';
+import { Alert } from 'leaf-react-ui';
 const stylesAlert = () => {
   return (
     <>
@@ -33,7 +33,7 @@ export default stylesAlert;
 
 ```tsx
 import React from 'react';
-import { Alert } from 'leaf-ui';
+import { Alert } from 'leaf-react-ui';
 const descriptionAlert = () => (
   <Alert
     title="提示标题欧亲"

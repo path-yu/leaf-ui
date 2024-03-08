@@ -6,7 +6,7 @@
 
 ```tsx
 import React from 'react';
-import { Menu } from 'leaf-ui';
+import { Menu } from 'leaf-react-ui';
 const defaultMenu = () => (
   <Menu defaultIndex="0" onSelect={(i) => console.log(i)}>
     <Menu.Item>cool link</Menu.Item>
@@ -25,7 +25,7 @@ export default defaultMenu;
 
 ```tsx
 import React from 'react';
-import { Menu } from 'leaf-ui';
+import { Menu } from 'leaf-react-ui';
 const clickMenu = () => (
   <Menu defaultIndex="0" onSelect={(i) => console.log(i)} mode="vertical">
     <Menu.Item>cool link</Menu.Item>
@@ -43,7 +43,7 @@ export default clickMenu;
 
 ```tsx
 import React from 'react';
-import { Menu } from 'leaf-ui';
+import { Menu } from 'leaf-react-ui';
 const openedMenu = () => (
   <Menu
     defaultIndex="0"

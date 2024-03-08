@@ -351,7 +351,6 @@ const Carousel: ForwardRefRenderFunction<CarouselExpose, CarouselProps & PropsWi
       });
     });
   };
-
   return (
     <div
       className={cssStyle.carousel}

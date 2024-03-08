@@ -2,7 +2,7 @@
 
 ```tsx
 import React from 'react';
-import { ScrollBar } from 'leaf-ui';
+import { ScrollBar } from 'leaf-react-ui';
 export default () => {
   return (
     <ScrollBar style={{ maxHeight: '120px' }}>
@@ -31,7 +31,7 @@ export default () => {
 
 ```tsx
 import React from 'react';
-import { ScrollBar } from 'leaf-ui';
+import { ScrollBar } from 'leaf-react-ui';
 export default () => {
   return (
     <ScrollBar horizontal>
@@ -49,7 +49,7 @@ export default () => {
 
 ```tsx
 import React, { useRef } from 'react';
-import { ScrollBar, Button } from 'leaf-ui';
+import { ScrollBar, Button } from 'leaf-react-ui';
 
 export default () => {
   const scrollBarRef = useRef();
@@ -117,6 +117,6 @@ export default () => {
 
 ### Method
 
-| 名称       | 描述          | 类型                                                                                                                            |
-|----------|-------------|-------------------------------------------------------------------------------------------------------------------------------|
-| scrollTo | 移动容器滚动到指定位置 | `(options: { left?: number; top?: number; behavior?: ScrollBehavior }, listener?: boolean,) => null  &#124; Promise<unknown>` |
+| 名称 | 描述 | 类型 |
+| --- | --- | --- |
+| scrollTo | 移动容器滚动到指定位置 | `(options: { left?: number; top?: number; behavior?: ScrollBehavior }, listener?: boolean,) => null &#124; Promise<unknown>` |

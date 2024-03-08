@@ -1,8 +1,9 @@
 ## Space-间距
 
 ### 演示
+
 ```tsx
-import { Space,Button } from 'leaf-ui';
+import { Space, Button } from 'leaf-react-ui';
 import React from 'react';
 
 const defaultDemo = () => (
@@ -19,8 +20,9 @@ export default defaultDemo;
 ```
 
 ### 垂直对齐
+
 ```tsx
-import { Space,Button } from 'leaf-ui';
+import { Space, Button } from 'leaf-react-ui';
 import React from 'react';
 
 const defaultDemo = () => (
@@ -33,13 +35,15 @@ const defaultDemo = () => (
 );
 export default defaultDemo;
 ```
+
 ### 自定义间距
+
 ```tsx
-import { Space,Button } from 'leaf-ui';
+import { Space, Button } from 'leaf-react-ui';
 import React from 'react';
 
 const defaultDemo = () => (
-  <Space size={[30,40]} >
+  <Space size={[30, 40]}>
     <Button>hello world</Button>
     <Button>hello world </Button>
     <Button>hello world </Button>
@@ -48,13 +52,15 @@ const defaultDemo = () => (
 );
 export default defaultDemo;
 ```
+
 ### 尾部对齐
+
 ```tsx
-import { Space,Button } from 'leaf-ui';
+import { Space, Button } from 'leaf-react-ui';
 import React from 'react';
 
 const defaultDemo = () => (
-  <Space justify="end" >
+  <Space justify="end">
     <Button>hello world</Button>
     <Button>hello world </Button>
     <Button>hello world </Button>
@@ -65,12 +71,13 @@ export default defaultDemo;
 ```
 
 ### 从中间
+
 ```tsx
-import { Space,Button } from 'leaf-ui';
+import { Space, Button } from 'leaf-react-ui';
 import React from 'react';
 
 const defaultDemo = () => (
-  <Space justify="center" >
+  <Space justify="center">
     <Button>hello world</Button>
     <Button>hello world </Button>
     <Button>hello world </Button>
@@ -83,11 +90,11 @@ export default defaultDemo;
 ### 空间环绕
 
 ```tsx
-import { Space,Button } from 'leaf-ui';
+import { Space, Button } from 'leaf-react-ui';
 import React from 'react';
 
 const defaultDemo = () => (
-  <Space justify="space-around" >
+  <Space justify="space-around">
     <Button>hello world</Button>
     <Button>hello world </Button>
     <Button>hello world </Button>
@@ -96,4 +103,5 @@ const defaultDemo = () => (
 );
 export default defaultDemo;
 ```
+
 <API src="./Space.tsx">

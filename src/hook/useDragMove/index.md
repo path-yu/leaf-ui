@@ -4,7 +4,7 @@
 
 ```tsx
 import React, { useRef } from 'react';
-import { useDragMove } from 'leaf-ui';
+import { useDragMove } from 'leaf-react-ui';
 
 export default () => {
   const ref = useRef<HTMLDivElement>(null);

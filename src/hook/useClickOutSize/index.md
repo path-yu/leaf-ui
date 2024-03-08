@@ -3,7 +3,7 @@
 在目标元素外点击触发钩子，函数接受一个 DOM 元素，和相应的处理函数。
 
 ```tsx
-import { useClickOutSize, message } from 'leaf-ui';
+import { useClickOutSize, message } from 'leaf-react-ui';
 import React, { useRef } from 'react';
 
 export default () => {

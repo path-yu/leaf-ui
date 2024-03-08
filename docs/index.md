@@ -1,7 +1,7 @@
 ---
 hero:
-  title: leaf-ui
-  desc: leaf-ui site example
+  title: leaf-react-ui
+  desc: leaf-react-ui site example
   actions:
     - text: Getting Started
       link: /components
@@ -18,4 +18,4 @@ features:
 footer: Open-source MIT Licensed | Copyright © 2020<br />Powered by [dumi](https://d.umijs.org)
 ---
 
-## Hello leaf-ui!
+## Hello leaf-react-ui!

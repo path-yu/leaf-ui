@@ -4,7 +4,7 @@
 
 ```tsx
 import React, { useState } from 'react';
-import { Switch, Space } from 'leaf-ui';
+import { Switch, Space } from 'leaf-react-ui';
 
 export default () => {
   const onChange = (checked: boolean) => {
@@ -18,7 +18,7 @@ export default () => {
 
 ```tsx
 import React, { useState } from 'react';
-import { Switch, Space } from 'leaf-ui';
+import { Switch, Space } from 'leaf-react-ui';
 
 export default () => {
   return (
@@ -35,7 +35,7 @@ export default () => {
 
 ```tsx
 import React, { useState } from 'react';
-import { Switch, Space, Button } from 'leaf-ui';
+import { Switch, Space, Button } from 'leaf-react-ui';
 
 export default () => {
   const [disabled, setDisabled] = useState(true);
@@ -56,7 +56,7 @@ export default () => {
 
 ```tsx
 import React, { useState } from 'react';
-import { Switch, Space } from 'leaf-ui';
+import { Switch, Space } from 'leaf-react-ui';
 
 export default () => {
   return (
@@ -73,7 +73,7 @@ export default () => {
 
 ```tsx
 import React, { useState } from 'react';
-import { Switch, Space } from 'leaf-ui';
+import { Switch, Space } from 'leaf-react-ui';
 
 export default () => {
   const [checked, setChecked] = useState(false);

@@ -3,7 +3,7 @@
 ### 基本演示
 
 ```tsx
-import { Checkbox } from 'leaf-ui';
+import { Checkbox } from 'leaf-react-ui';
 import React, { ChangeEvent } from 'react';
 
 export default () => {
@@ -17,7 +17,7 @@ export default () => {
 ### 受控
 
 ```tsx
-import { Checkbox, Button } from 'leaf-ui';
+import { Checkbox, Button } from 'leaf-react-ui';
 import React, { ChangeEvent, useState } from 'react';
 
 export default () => {
@@ -39,7 +39,7 @@ export default () => {
 ### 不可用
 
 ```tsx
-import { Checkbox } from 'leaf-ui';
+import { Checkbox } from 'leaf-react-ui';
 import React from 'react';
 
 export default () => (
@@ -53,7 +53,7 @@ export default () => (
 ### checkbox 组
 
 ```tsx
-import { CheckboxGroup } from 'leaf-ui';
+import { CheckboxGroup } from 'leaf-react-ui';
 import React, { useState } from 'react';
 
 const onChange = (e, checkedValues: CheckboxValueType[]) => {
@@ -102,7 +102,7 @@ export default App;
 ### 全选组
 
 ```tsx
-import { CheckboxGroup, Checkbox } from 'leaf-ui';
+import { CheckboxGroup, Checkbox } from 'leaf-react-ui';
 import React, { useState } from 'react';
 
 const plainOptions = ['Apple', 'Pear', 'Orange'];

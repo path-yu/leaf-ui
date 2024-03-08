@@ -6,7 +6,7 @@
 
 ```tsx
 import React from 'react';
-import { Input } from 'leaf-ui';
+import { Input } from 'leaf-react-ui';
 const handleChange = (e) => {
   console.log(e.target.value);
 };
@@ -18,7 +18,7 @@ export default defaultInput;
 
 ```tsx
 import React from 'react';
-import { Input } from 'leaf-ui';
+import { Input } from 'leaf-react-ui';
 const disabledInput = () => <Input placeholder="disabled input" disabled />;
 export default disabledInput;
 ```
@@ -27,7 +27,7 @@ export default disabledInput;
 
 ```tsx
 import React from 'react';
-import { Input } from 'leaf-ui';
+import { Input } from 'leaf-react-ui';
 const iconInput = () => <Input placeholder="iconInput input" icon="search" />;
 export default iconInput;
 ```
@@ -36,7 +36,7 @@ export default iconInput;
 
 ```tsx
 import React from 'react';
-import { Input } from 'leaf-ui';
+import { Input } from 'leaf-react-ui';
 const sizeInput = () => (
   <>
     <Input defaultValue="large size" size="lg" />
@@ -50,7 +50,7 @@ export default sizeInput;
 
 ```tsx
 import React from 'react';
-import { Input } from 'leaf-ui';
+import { Input } from 'leaf-react-ui';
 const handleChange = (e) => {
   console.log(e.target.value);
 };

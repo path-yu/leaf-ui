@@ -4,7 +4,7 @@
 
 ```tsx
 import React from 'react';
-import { useAsyncState, Button, Space } from 'leaf-ui';
+import { useAsyncState, Button, Space } from 'leaf-react-ui';
 import axios from 'axios';
 export default () => {
   const { isLoading, state, isReady, execute } = useAsyncState(

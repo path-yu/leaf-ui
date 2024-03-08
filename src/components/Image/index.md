@@ -6,7 +6,7 @@
 
 ```tsx
 import React from 'react';
-import { Image } from 'leaf-ui';
+import { Image } from 'leaf-react-ui';
 export default () => {
   return (
     <Image
@@ -35,7 +35,7 @@ export default () => {
 
 ```tsx
 import React from 'react';
-import { Image, ImageGroup } from 'leaf-ui';
+import { Image, ImageGroup } from 'leaf-react-ui';
 
 export default () => {
   return (
@@ -56,7 +56,7 @@ export default () => {
 
 ```tsx
 import React from 'react';
-import { Image } from 'leaf-ui';
+import { Image } from 'leaf-react-ui';
 export default () => {
   return (
     <Image
@@ -74,7 +74,7 @@ export default () => {
 
 ```tsx
 import React from 'react';
-import { Image } from 'leaf-ui';
+import { Image } from 'leaf-react-ui';
 export default () => {
   return (
     <Image width={100} src="https://avatars.githubusercontent.com/u/59117479?v=4" previewDisabled />
@@ -88,7 +88,7 @@ export default () => {
 
 ```tsx
 import React from 'react';
-import { Image } from 'leaf-ui';
+import { Image } from 'leaf-react-ui';
 export default () => {
   return (
     <Image
@@ -106,7 +106,7 @@ export default () => {
 
 ```tsx
 import React from 'react';
-import { Image } from 'leaf-ui';
+import { Image } from 'leaf-react-ui';
 export default () => {
   return (
     <div style={{ height: '200px', overflow: 'scroll' }}>
@@ -128,7 +128,7 @@ export default () => {
 
 ```tsx
 import React from 'react';
-import { Image } from 'leaf-ui';
+import { Image } from 'leaf-react-ui';
 export default () => {
   return (
     <>
@@ -151,7 +151,7 @@ export default () => {
 
 ```tsx
 import React from 'react';
-import { Image } from 'leaf-ui';
+import { Image } from 'leaf-react-ui';
 export default () => {
   return (
     <Image
@@ -175,8 +175,11 @@ export default () => {
   );
 };
 ```
+
 ### Image Api
+
 <API hideTitle src="./Api/Image.api.tsx">
 
 ### ImageGroup Api
+
 <API hideTitle src="./ImageGroup.tsx">

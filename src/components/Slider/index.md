@@ -4,7 +4,7 @@
 
 ```tsx
 import React from 'react';
-import { Slider, Space } from 'leaf-ui';
+import { Slider, Space } from 'leaf-react-ui';
 export default () => {
   return (
     <>
@@ -27,7 +27,7 @@ export default () => {
 
 ```tsx
 import React from 'react';
-import { Slider, Space } from 'leaf-ui';
+import { Slider, Space } from 'leaf-react-ui';
 export default () => {
   return (
     <>
@@ -43,7 +43,7 @@ export default () => {
 
 ```tsx
 import React from 'react';
-import { Slider, Space } from 'leaf-ui';
+import { Slider, Space } from 'leaf-react-ui';
 export default () => {
   const onChange = (value: number | [number, number]) => {
     console.log('onChange: ', value);
@@ -69,7 +69,7 @@ export default () => {
 
 ```tsx
 import React from 'react';
-import { Slider, Space } from 'leaf-ui';
+import { Slider, Space } from 'leaf-react-ui';
 export default () => {
   return (
     <>
@@ -85,7 +85,7 @@ export default () => {
 ### 反向
 
 ```tsx
-import { Slider, Switch } from 'leaf-ui';
+import { Slider, Switch } from 'leaf-react-ui';
 import React, { useState } from 'react';
 
 export default () => {
@@ -111,7 +111,7 @@ export default () => {
 ### 受控
 
 ```tsx
-import { Slider } from 'leaf-ui';
+import { Slider } from 'leaf-react-ui';
 import React, { useState } from 'react';
 
 export default () => {
@@ -126,11 +126,12 @@ export default () => {
 ```
 
 ### 自定义提示
+
 使用 `formatter` 可以格式化 Tooltip 的内容，
 
 ```tsx
-import React, {useRef} from 'react';
-import {Slider, Space} from 'leaf-ui';
+import React, { useRef } from 'react';
+import { Slider, Space } from 'leaf-react-ui';
 const formatter = (value: number) => `${value}%`;
 
 export default () => {
@@ -146,7 +147,7 @@ export default () => {
 
 ### Method
 
-| 名称    | 描述   | 类型         |
-|-------|------|------------|
+| 名称  | 描述     | 类型         |
+| ----- | -------- | ------------ |
 | blur  | 移除焦点 | `() => void` |
-| focus | 获取焦点 |   `() => void`         |
+| focus | 获取焦点 | `() => void` |

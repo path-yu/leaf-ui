@@ -5,7 +5,7 @@
 ### 简单使用
 
 ```tsx
-import { Progress } from 'leaf-ui';
+import { Progress } from 'leaf-react-ui';
 import React from 'react';
 const defaultProgress = () => {
   return (
@@ -20,7 +20,7 @@ export default defaultProgress;
 ### 不同主题样式
 
 ```tsx
-import { Progress } from 'leaf-ui';
+import { Progress } from 'leaf-react-ui';
 import React from 'react';
 const themeProgress = () => {
   return (
@@ -43,7 +43,7 @@ export default themeProgress;
 ### 不显示进度值
 
 ```tsx
-import { Progress } from 'leaf-ui';
+import { Progress } from 'leaf-react-ui';
 import React from 'react';
 const hideTextProgress = () => {
   return (
