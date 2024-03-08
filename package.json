@@ -1,7 +1,7 @@
 {
-  "private": true,
-  "name": "leaf-ui",
-  "version": "1.0.0",
+  "private": false,
+  "name": "leaf-react-ui",
+  "version": "1.0.1",
   "scripts": {
     "start": "dumi dev",
     "docs:build": "dumi build",
@@ -13,6 +13,7 @@
     "test:coverage": "umi-test --coverage",
     "prepublishOnly": "npm run build"
   },
+  "homepage": "https://github.com/path-yu/leaf-ui",
   "files": [
     "dist"
   ],
@@ -54,6 +55,10 @@
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "yorkie": "^2.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/path-yu/leaf-ui"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.1.1",
